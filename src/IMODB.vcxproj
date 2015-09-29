@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{78379450-E3C5-402F-87A0-2C347EA8B2E2}</ProjectGuid>
     <RootNamespace>IMODB</RootNamespace>
+    <ProjectName>JIM-DB</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
