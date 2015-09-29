@@ -122,7 +122,6 @@
   <ItemGroup>
     <ClCompile Include="dataTyps\StringType.cpp" />
     <ClCompile Include="tasking\ClientPollTask.cpp" />
-    <ClCompile Include="index\BTree.cpp" />
     <ClCompile Include="configuration.cpp" />
     <ClCompile Include="log\LogTimer.cpp" />
     <ClCompile Include="log\Logger.cpp" />
@@ -141,9 +140,7 @@
     <ClInclude Include="dataTyps\StringType.h" />
     <ClInclude Include="dataTyps\StringType.hpp" />
     <ClInclude Include="tasking\ClientPollTask.h" />
-    <ClInclude Include="index\BTree.h" />
     <ClInclude Include="configuration.h" />
-    <ClInclude Include="index\BTree.hpp" />
     <ClInclude Include="log\LogTimer.h" />
     <ClInclude Include="log\Logger.h" />
     <ClInclude Include="log\LogMessage.h" />
