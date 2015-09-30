@@ -24,11 +24,17 @@
 #include "LogMessage.h"
 #include "LogTimer.h"
 #include "SpinLock.h"
-#define LOG_ERROR Logger::Log(LoggerTypes::ERROR_L,__FILE__,__LINE__)
-#define LOG_INFO Logger::Log(LoggerTypes::INFO,__FILE__,__LINE__)
-#define LOG_WARN Logger::Log(LoggerTypes::WARNING,__FILE__,__LINE__)
-#define LOG_DEBUG Logger::Log(LoggerTypes::DEBUG,__FILE__,__LINE__)
-#define LOG_EXCAPT Logger::Log(LoggerTypes::EXCAPTION,__FILE__,__LINE__)
+
+//custom macro for filename shorten but only for windows
+#define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
+//LINUX
+//#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+
+#define LOG_ERROR Logger::Log(LoggerTypes::ERROR_L,__FILENAME__,__LINE__)
+#define LOG_INFO Logger::Log(LoggerTypes::INFO,__FILENAME__,__LINE__)
+#define LOG_WARN Logger::Log(LoggerTypes::WARNING,__FILENAME__,__LINE__)
+#define LOG_DEBUG Logger::Log(LoggerTypes::DEBUG,__FILENAME__,__LINE__)
+#define LOG_EXCAPT Logger::Log(LoggerTypes::EXCAPTION,__FILENAME__,__LINE__)
 
 /**
 to prevent from copy elision
@@ -88,9 +94,7 @@ public:
 
 private:
 	//default log everything
-	Logger() :m_logLevel(LoggerTypes::INFO)
-	{
-	};
+	Logger() :m_logLevel(LoggerTypes::INFO) { };
 
 	~Logger();
 	//no copy no move no swap

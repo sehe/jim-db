@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 		LOG_WARN << "Unable to install console handler!";
 	}
 
-	Page p(4096,4*4096);
+	Page p(4096, 4 * 4096);
 
 	/*
 	//checking type
@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
 
 	auto& tasks = TaskQueue::getInstance();
 
-	TCPServer tcpServer(tasks);
-	tcpServer.start();
+	std::shared_ptr<IServer> tcpServer = std::make_shared<TCPServer>(tasks);
+	tcpServer->start();
 
 	//start the workers
 	auto threads = cfg.getInt(THREADS);
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 	//do nothing else here!
 	while (true)
 	{
-		tcpServer.accept(true); //call accept blocking
+		tcpServer->accept(true); //call accept blocking
 	}
 }
 

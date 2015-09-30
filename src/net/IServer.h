@@ -1,4 +1,4 @@
-/**
+﻿/**
 ############################################################################
 # GPL License                                                              #
 #                                                                          #
@@ -20,23 +20,25 @@
 **/
 
 #pragma once
-#include "../net/ClientHandle.h"
-#include "Task.h"
 
-/**
-\brief Polling Task for clients
-
-Checks for data. If there are some it creates a parsetask out of it. 
-if there are none it pushs a a new polltask with the same client to the list.
-
-\author Benjamin Meyer
-\date 15.09.2015 14:27
-*/
-class ClientPollTask : public Task
+class IServer
 {
 public:
-	explicit ClientPollTask(std::shared_ptr<IClient> client);
-	~ClientPollTask();
+	virtual ~IServer() { }
 
-	void execute() override;
+	/**
+	* accepts a new client if a new connection is available.
+	* if not it does nothing.
+	* If the client list is empty it does a blocking connection
+	* \param[in] bool blocking if the accept should block
+	*/
+	virtual int accept(const bool& blocking) = 0;
+
+	/**
+*\brief start the server
+*
+*\author Benjamin Meyer
+*\date 30.09.2015 19:41
+*/
+	virtual bool start() = 0;
 };

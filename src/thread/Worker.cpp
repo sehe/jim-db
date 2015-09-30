@@ -21,9 +21,8 @@
 
 #include "Worker.h"
 
-Worker::Worker(TaskQueue& t) : m_tasks(t), m_thread(&Worker::doTask, this), m_running(true)
-{
-}
+Worker::Worker(TaskQueue& t) : m_tasks(t), m_thread(&Worker::doTask, this), m_running(true) {}
+
 Worker::~Worker()
 {
 	m_running = false;

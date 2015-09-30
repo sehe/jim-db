@@ -37,16 +37,16 @@ class TaskQueue
 {
 public:
 	static TaskQueue& getInstance();
-    /**\brief Add a new task
+	/**\brief Add a new task
     *
     * Pushs a new task to the task queues back
     *\param[in] std::unique_ptr<Task> t the task to add
     *@author Benjamin Meyer
     *@date Mittwoch, 22. Juli 2015
     */
-    void push_pack(std::shared_ptr<Task> t);
+	void push_pack(std::shared_ptr<Task> t);
 
-    /**\brief returns a task without copying it
+	/**\brief returns a task without copying it
     *
     * get the next task of the queues front
     *\return unique_ptr<Task> from the front
@@ -54,21 +54,21 @@ public:
     *@date Mittwoch, 22. Juli 2015
     */
 
-    std::shared_ptr<Task> pop_front();
-    /**\brief Returns the current size of the taskqueue
+	std::shared_ptr<Task> pop_front();
+	/**\brief Returns the current size of the taskqueue
     *
     * If its 0 do not execute a task of it!
     *@author Benjamin Meyer
     *@date Mittwoch, 22. Juli 2015
     */
-    int size() const;
+	int size() const;
 
 private:
 	TaskQueue();
 	~TaskQueue();
 
 	static TaskQueue m_instance;
-    std::deque<std::shared_ptr<Task>> m_tasks;
+	std::deque<std::shared_ptr<Task>> m_tasks;
 	std::condition_variable m_cond;
 	std::mutex m_mutex;
 };

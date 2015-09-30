@@ -26,7 +26,7 @@
 class InsertTask:public Task
 {
 public:
-	explicit InsertTask(const std::shared_ptr<ClientHandle>& client, std::shared_ptr<rapidjson::Document> doc);
+	explicit InsertTask(const std::shared_ptr<IClient>& client, std::shared_ptr<rapidjson::Document> doc);
 
 	~InsertTask();
 	void execute() override;

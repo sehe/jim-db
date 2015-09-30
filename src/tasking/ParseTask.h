@@ -33,7 +33,7 @@
 class ParseTask: public Task
 {
 public:
-	ParseTask(std::shared_ptr<ClientHandle> client, std::shared_ptr<std::string> s);
+	ParseTask(std::shared_ptr<IClient> client, std::shared_ptr<std::string> s);
 	~ParseTask();
 
 	void execute() override;

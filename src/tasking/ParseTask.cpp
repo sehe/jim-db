@@ -26,7 +26,7 @@
 #include "ClientPollTask.h"
 #include "InsertTask.h"
 
-ParseTask::ParseTask(std::shared_ptr<ClientHandle> client, std::shared_ptr<std::string> s) :Task(client)
+ParseTask::ParseTask(std::shared_ptr<IClient> client, std::shared_ptr<std::string> s) :Task(client)
 {
 	m_string = s;
 }
@@ -45,20 +45,18 @@ void ParseTask::execute()
 	//TODO validate
 
 	//check if value exists
-	if(doc->FindMember("type") == doc->MemberEnd())
+	if (doc->FindMember("type") == doc->MemberEnd())
 	{
 		//TODO send some information
 		return;
 	}
 
-	if(doc->FindMember("type")->value == "insert")
+	if (doc->FindMember("type")->value == "insert")
 	{
 		LOG_DEBUG << "inserting";
-		TaskQueue::getInstance().push_pack(std::make_shared<InsertTask>(m_client,doc));
+		TaskQueue::getInstance().push_pack(std::make_shared<InsertTask>(m_client, doc));
 	}
 }
 
 
-ParseTask::~ParseTask()
-{
-}
+ParseTask::~ParseTask() {}

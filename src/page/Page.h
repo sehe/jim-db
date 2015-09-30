@@ -29,7 +29,7 @@ public:
 	Page(long long header, long long body);
 	~Page();
 
-	void setNext(const long long &id);
+	void setNext(const long long& id);
 	long long getNext() const;
 
 private:
@@ -39,9 +39,9 @@ private:
 	//pointer to the free typ chain start
 	FreeType* m_free;
 	//position of the free typ object start info
-	long long *m_freepos;
+	long long* m_freepos;
 	//holds the information of free space
-	long long m_freeSpace; 
+	long long m_freeSpace;
 	//holds the ID of the next page
 	long long m_next;
 	long long m_id;

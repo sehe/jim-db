@@ -32,8 +32,7 @@ public:
 
 private:
 	TaskQueue& m_tasks;
-    std::thread m_thread;
+	std::thread m_thread;
 	bool m_running;
-    void doTask();
+	void doTask();
 };
-

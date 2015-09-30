@@ -34,8 +34,9 @@
 #include "ClientHandle.h"
 #include <vector>
 #include "../tasking/TaskQueue.h"
+#include "IServer.h"
 
-class TCPServer
+class TCPServer : public IServer
 {
 public:
 	explicit TCPServer(TaskQueue& q);
@@ -44,7 +45,7 @@ public:
     * Startup the listenting to a port
     * \return true if started successfull false if not. try restarting it
     */
-	bool start();
+	bool start() override;
 
 	/**
     * accepts a new client if a new connection is available.
@@ -52,7 +53,7 @@ public:
 	* If the client list is empty it does a blocking connection
 	* \param[in] bool blocking if the accept should block
     */
-	int accept(const bool& blocking);
+	int accept(const bool& blocking) override;
 private:
 
 	/**

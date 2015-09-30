@@ -23,6 +23,7 @@
 #include <WinSock2.h>
 #include <ostream>
 #include<memory>
+#include "IClient.h"
 
 /**
 \breif A Simple client handler
@@ -32,19 +33,19 @@ Make sure not to WSACleanup here! This would terminate the whole service.
 
 \author Benjamin Meyer
 */
-class ClientHandle
+class ClientHandle:public IClient
 {
 public:
-	explicit ClientHandle(const SOCKET& s,const sockaddr_storage& add);
+	explicit ClientHandle(const SOCKET& s, const sockaddr_storage& add);
 	~ClientHandle();
 
 	/**
     * It need to be nullterminating!
     */
 	bool operator<<(std::shared_ptr<std::string> s);
-	bool send(std::shared_ptr<std::string> s);
-	bool hasData();
-	bool isConnected() const;
+	bool send(std::shared_ptr<std::string> s) override;
+	bool hasData() override;
+	bool isConnected() const override;
 
 	/**
 	\brief Get data from client
@@ -53,9 +54,9 @@ public:
 	\author Benjamin Meyer
 	\date 09.09.2015 14:00
 	*/
-	bool getData(std::shared_ptr<std::string> ptr);
+	bool getData(std::shared_ptr<std::string> ptr) override;
 
-	int getSockID() const;
+	int getSocketID() const override;
 
 private:
 	SOCKET m_sock;

@@ -125,7 +125,7 @@ bool ClientHandle::getData(std::shared_ptr<std::string> ptr)
 	return true;
 }
 
-int ClientHandle::getSockID() const
+int ClientHandle::getSocketID() const
 {
 	return m_sock;
 }

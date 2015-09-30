@@ -32,16 +32,12 @@ Holds all information that is needed and always refares to a client!
 class Task
 {
 public:
-	explicit Task(std::shared_ptr<ClientHandle> client) :m_client(client)
-	{
-	};
+	explicit Task(std::shared_ptr<IClient> client) :m_client(client) { };
 
-	virtual ~Task()
-	{
-	}
+	virtual ~Task() { }
 
 	virtual void execute() = 0;
 
 protected:
-	std::shared_ptr<ClientHandle> m_client;
+	std::shared_ptr<IClient> m_client;
 };

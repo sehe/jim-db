@@ -22,13 +22,9 @@
 #include "InsertTask.h"
 #include "../log/Logger.h"
 
-InsertTask::InsertTask(const std::shared_ptr<ClientHandle>& client, std::shared_ptr<rapidjson::Document> doc): Task(client),m_doc(doc)
-{
-}
+InsertTask::InsertTask(const std::shared_ptr<IClient>& client, std::shared_ptr<rapidjson::Document> doc): Task(client),m_doc(doc) {}
 
-InsertTask::~InsertTask()
-{
-}
+InsertTask::~InsertTask() {}
 
 void InsertTask::execute()
 {
@@ -91,14 +87,8 @@ void InsertTask::processObject(rapidjson::Value& obj) const
 	}
 }
 
-void InsertTask::processArray(rapidjson::Value& obj) const
-{
-}
+void InsertTask::processArray(rapidjson::Value& obj) const {}
 
-void InsertTask::processString(rapidjson::Value& obj) const
-{
-}
+void InsertTask::processString(rapidjson::Value& obj) const {}
 
-void InsertTask::processNumber(rapidjson::Value& obj) const
-{
-}
+void InsertTask::processNumber(rapidjson::Value& obj) const {}

@@ -20,23 +20,18 @@
 **/
 
 #pragma once
-#include "../net/ClientHandle.h"
-#include "Task.h"
+#include <string>
+#include <memory>
 
-/**
-\brief Polling Task for clients
-
-Checks for data. If there are some it creates a parsetask out of it. 
-if there are none it pushs a a new polltask with the same client to the list.
-
-\author Benjamin Meyer
-\date 15.09.2015 14:27
-*/
-class ClientPollTask : public Task
+class IClient
 {
 public:
-	explicit ClientPollTask(std::shared_ptr<IClient> client);
-	~ClientPollTask();
+	virtual ~IClient() { }
 
-	void execute() override;
+	virtual bool send(std::shared_ptr<std::string> s) = 0;
+	virtual bool hasData() = 0;
+	virtual bool isConnected() const = 0;
+
+	virtual bool getData(std::shared_ptr<std::string> s) = 0;
+	virtual int getSocketID() const = 0;
 };

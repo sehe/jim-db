@@ -21,28 +21,28 @@
 
 #pragma once
 #include <atomic>
+
 class SpinLock
 {
 private:
-    std::atomic_flag lck;
+	std::atomic_flag lck;
 
 public:
-    //since atomic_flag has no assignement we need to clear it like this.
-    inline SpinLock()
-    {
-        lck.clear(std::memory_order_release);
-    };
-    ~SpinLock() {};
+	//since atomic_flag has no assignement we need to clear it like this.
+	inline SpinLock()
+	{
+		lck.clear(std::memory_order_release);
+	};
 
-    inline void lock()
-    {
-        while (lck.test_and_set(std::memory_order_acquire))
-        {
-        }
-    }
+	~SpinLock() {};
 
-    inline void unlock()
-    {
-        lck.clear(std::memory_order_release);
-    }
+	inline void lock()
+	{
+		while (lck.test_and_set(std::memory_order_acquire)) { }
+	}
+
+	inline void unlock()
+	{
+		lck.clear(std::memory_order_release);
+	}
 };

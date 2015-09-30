@@ -27,9 +27,7 @@ const int TCPServer::DEFAULT_BUFFER_SIZE = 512;
 #include "../log/Logger.h"
 
 
-TCPServer::TCPServer(TaskQueue& q) : m_listensocket(INVALID_SOCKET)
-{
-}
+TCPServer::TCPServer(TaskQueue& q) : m_listensocket(INVALID_SOCKET) {}
 
 TCPServer::~TCPServer()
 {
@@ -137,7 +135,7 @@ int TCPServer::accept(const bool& blocking)
 	if (ClientSocket == INVALID_SOCKET)
 	{
 		LOG_ERROR << "accept failed: " << WSAGetLastError();
-		closesocket(m_listensocket); 
+		closesocket(m_listensocket);
 		//do not clean!
 		return 1;
 	}
@@ -151,7 +149,7 @@ int TCPServer::accept(const bool& blocking)
 	inet_ntop(their_addr.ss_family,
 	          get_in_addr(reinterpret_cast<struct sockaddr *>(&their_addr)), s,
 	          sizeof s);
-	LOG_INFO << "TCPServer: got connection from " << s << " ID: " << newCl->getSockID();
+	LOG_INFO << "TCPServer: got connection from " << s << " ID: " << newCl->getSocketID();
 	return true;
 }
 

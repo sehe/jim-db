@@ -24,14 +24,10 @@
 #include "ParseTask.h"
 
 
-ClientPollTask::ClientPollTask(std::shared_ptr<ClientHandle> client):Task(client)
-{
-}
+ClientPollTask::ClientPollTask(std::shared_ptr<IClient> client):Task(client) {}
 
 
-ClientPollTask::~ClientPollTask()
-{
-}
+ClientPollTask::~ClientPollTask() {}
 
 
 void ClientPollTask::execute()

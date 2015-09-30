@@ -143,6 +143,8 @@
     <ClInclude Include="dataTyps\StringType.h" />
     <ClInclude Include="dataTyps\StringType.hpp" />
     <ClInclude Include="dataTyps\FreeType.h" />
+    <ClInclude Include="net\IClient.h" />
+    <ClInclude Include="net\IServer.h" />
     <ClInclude Include="page\Page.h" />
     <ClInclude Include="tasking\ClientPollTask.h" />
     <ClInclude Include="configuration.h" />

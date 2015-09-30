@@ -88,13 +88,9 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const Configuration& obj);
 
 private:
-	Configuration()
-	{
-	};
+	Configuration() { };
 
-	~Configuration()
-	{
-	};
+	~Configuration() { };
 
 	//no copy no move no swap
 	Configuration(const Configuration&) = delete;
@@ -107,9 +103,7 @@ private:
 		std::string configKeyString;
 		std::string defaultValue;
 
-		ConfigMapping(const std::string& key, const std::string& def):configKeyString(key),defaultValue(def)
-		{
-		};
+		ConfigMapping(const std::string& key, const std::string& def):configKeyString(key),defaultValue(def) { };
 	};
 
 	//member
