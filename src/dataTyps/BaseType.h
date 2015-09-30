@@ -45,8 +45,9 @@ public:
 
 	//inlines not realy needed since the template forces inline
 	inline void setNext(const ptrdiff_t& next);
+	inline ptrdiff_t getNext();
 	inline void setData(T &t);
-
+	inline void setData(const T& t);
 	inline T getData() const;
 	
 protected:
@@ -60,7 +61,7 @@ protected:
 		explicit DataUnion(const T& t);
 	} m_data;
 
-	ptrdiff_t m_next;
+	long long m_next;
 };
 
 #include "BaseType.hpp"

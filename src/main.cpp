@@ -41,6 +41,7 @@ of memory and allow to querry them.
 #pragma comment(lib,"user32.lib")
 #include <iostream>
 #include "assert.h"
+#include "page/Page.h"
 //forward declare
 BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
@@ -66,6 +67,8 @@ int main(int argc, char* argv[])
 	{
 		LOG_WARN << "Unable to install console handler!";
 	}
+
+	Page p(4096,4*4096);
 
 	/*
 	//checking type

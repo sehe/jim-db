@@ -63,7 +63,19 @@ void BaseType<T>::setNext(const ptrdiff_t& next)
 }
 
 template <typename T>
+ptrdiff_t BaseType<T>::getNext()
+{
+	return m_next;
+}
+
+template <typename T>
 void BaseType<T>::setData(T& t)
+{
+	m_data.data = t;
+}
+
+template <typename T>
+void BaseType<T>::setData(const T& t)
 {
 	m_data.data = t;
 }

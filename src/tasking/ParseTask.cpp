@@ -24,6 +24,7 @@
 #include "../log/Logger.h"
 #include "TaskQueue.h"
 #include "ClientPollTask.h"
+#include "InsertTask.h"
 
 ParseTask::ParseTask(std::shared_ptr<ClientHandle> client, std::shared_ptr<std::string> s) :Task(client)
 {
@@ -40,11 +41,21 @@ void ParseTask::execute()
 		LOG_ERROR << "Failed parsing: " << *m_string;
 		//TODO return some error to client
 	}
-	//todo generate new task with taskFactory
+
 	//TODO validate
 
-	//we are done so current just make a poll task again
-	TaskQueue::getInstance().push_pack(std::make_shared<ClientPollTask>(m_client));
+	//check if value exists
+	if(doc->FindMember("type") == doc->MemberEnd())
+	{
+		//TODO send some information
+		return;
+	}
+
+	if(doc->FindMember("type")->value == "insert")
+	{
+		LOG_DEBUG << "inserting";
+		TaskQueue::getInstance().push_pack(std::make_shared<InsertTask>(m_client,doc));
+	}
 }
 
 

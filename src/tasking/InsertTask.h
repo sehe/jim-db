@@ -20,29 +20,21 @@
 **/
 
 #pragma once
-#include "BaseType.h"
+#include "Task.h"
+#include "../rapidjson/document.h"
 
-/**
-\brief The String Type for throwing strings into memory
-
-This type extends the BaseType to add Strings to memory. 
-It actually uses the BaseType<int> to store the size of the string.
-\author Benjamin Meyer
-\date 29.09.2015 10:45
-*/
-class StringType:public BaseType<long long>
+class InsertTask:public Task
 {
 public:
-	explicit StringType();
-	explicit StringType(const std::string& s);
-	inline std::shared_ptr<std::string> getString() const;
+	explicit InsertTask(const std::shared_ptr<ClientHandle>& client, std::shared_ptr<rapidjson::Document> doc);
 
-protected:
-	//simply dont call it! else the dtor of the base
-	//set the size to 0 which would be wrong!
-	//let it as it is to show that there is free space to use
-	//just chain it at the end of the free space type
-	~StringType(){};
+	~InsertTask();
+	void execute() override;
+private:
+	std::shared_ptr<rapidjson::Document> m_doc;
+
+	void processObject(rapidjson::Value& obj) const;
+	void processArray(rapidjson::Value& obj) const;
+	void processString(rapidjson::Value& obj) const;
+	void processNumber(rapidjson::Value& obj) const;
 };
-
-#include "StringType.hpp"

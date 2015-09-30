@@ -30,7 +30,7 @@ const std::map<ConfigValues, Configuration::ConfigMapping> Configuration::m_mapp
 {
 	{LOG_LEVEL,{"logLevel", "5"}},
 	{LOG_FILE,{"logFile", "defaultLogFile.txt"}},
-	{THREADS,{"threads", "0"}},;
+	{THREADS,{"threads", "0"}},
 };
 
 

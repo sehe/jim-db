@@ -1,4 +1,4 @@
-﻿/**
+/**
 ############################################################################
 # GPL License                                                              #
 #                                                                          #
@@ -20,29 +20,32 @@
 **/
 
 #pragma once
-#include "BaseType.h"
+#include <memory>
+#include "../dataTyps/FreeType.h"
 
-/**
-\brief The String Type for throwing strings into memory
-
-This type extends the BaseType to add Strings to memory. 
-It actually uses the BaseType<int> to store the size of the string.
-\author Benjamin Meyer
-\date 29.09.2015 10:45
-*/
-class StringType:public BaseType<long long>
+class Page
 {
 public:
-	explicit StringType();
-	explicit StringType(const std::string& s);
-	inline std::shared_ptr<std::string> getString() const;
+	Page(long long header, long long body);
+	~Page();
 
-protected:
-	//simply dont call it! else the dtor of the base
-	//set the size to 0 which would be wrong!
-	//let it as it is to show that there is free space to use
-	//just chain it at the end of the free space type
-	~StringType(){};
+	void setNext(const long long &id);
+	long long getNext() const;
+
+private:
+	char* m_header;
+	char* m_body;
+
+	//pointer to the free typ chain start
+	FreeType* m_free;
+	//position of the free typ object start info
+	long long *m_freepos;
+	//holds the information of free space
+	long long m_freeSpace; 
+	//holds the ID of the next page
+	long long m_next;
+	long long m_id;
+
+	//id generation with static counter
+	static long long m_s_idCounter;
 };
-
-#include "StringType.hpp"

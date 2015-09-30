@@ -1,4 +1,4 @@
-﻿/**
+/**
 ############################################################################
 # GPL License                                                              #
 #                                                                          #
@@ -19,30 +19,38 @@
 ############################################################################
 **/
 
-#pragma once
-#include "BaseType.h"
+#include "Page.h"
+#include "../log/Logger.h"
+#include "../assert.h"
+long long Page::m_s_idCounter = 0;
 
-/**
-\brief The String Type for throwing strings into memory
-
-This type extends the BaseType to add Strings to memory. 
-It actually uses the BaseType<int> to store the size of the string.
-\author Benjamin Meyer
-\date 29.09.2015 10:45
-*/
-class StringType:public BaseType<long long>
+Page::Page(long long header, long long body):m_freeSpace(body),m_next(0),m_id(++m_s_idCounter)
 {
-public:
-	explicit StringType();
-	explicit StringType(const std::string& s);
-	inline std::shared_ptr<std::string> getString() const;
+	m_header = new char[header];
+	m_body = new char[body];
 
-protected:
-	//simply dont call it! else the dtor of the base
-	//set the size to 0 which would be wrong!
-	//let it as it is to show that there is free space to use
-	//just chain it at the end of the free space type
-	~StringType(){};
-};
+	//put free type info in header
+	//so at pos 0 is a long long with the pos of the free type
+	m_freepos = new(&m_header[0]) long long(0);
 
-#include "StringType.hpp"
+	//throw in the free type into the body 
+	m_free = new(&m_body[0]) FreeType(body - sizeof(FreeType));
+
+	ASSERT(m_free->getFree() == body);
+}
+
+Page::~Page()
+{
+	delete[] m_header;
+	delete[] m_body;
+}
+
+void Page::setNext(const long long& id)
+{
+	m_next = id;
+}
+
+long long Page::getNext() const
+{
+	return m_next;
+}

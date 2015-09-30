@@ -121,6 +121,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dataTyps\StringType.cpp" />
+    <ClCompile Include="dataTyps\FreeType.cpp" />
+    <ClCompile Include="page\Page.cpp" />
     <ClCompile Include="tasking\ClientPollTask.cpp" />
     <ClCompile Include="configuration.cpp" />
     <ClCompile Include="log\LogTimer.cpp" />
@@ -129,6 +131,7 @@
     <ClCompile Include="net\ClientHandle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="net\TCPServer.cpp" />
+    <ClCompile Include="tasking\InsertTask.cpp" />
     <ClCompile Include="tasking\ParseTask.cpp" />
     <ClCompile Include="tasking\TaskQueue.cpp" />
     <ClCompile Include="thread\Worker.cpp" />
@@ -139,6 +142,8 @@
     <ClInclude Include="dataTyps\BaseType.h" />
     <ClInclude Include="dataTyps\StringType.h" />
     <ClInclude Include="dataTyps\StringType.hpp" />
+    <ClInclude Include="dataTyps\FreeType.h" />
+    <ClInclude Include="page\Page.h" />
     <ClInclude Include="tasking\ClientPollTask.h" />
     <ClInclude Include="configuration.h" />
     <ClInclude Include="log\LogTimer.h" />
@@ -152,6 +157,7 @@
     <ClInclude Include="stx\btree_multimap.h" />
     <ClInclude Include="stx\btree_multiset.h" />
     <ClInclude Include="stx\btree_set.h" />
+    <ClInclude Include="tasking\InsertTask.h" />
     <ClInclude Include="tasking\ParseTask.h" />
     <ClInclude Include="rapidjson\allocators.h" />
     <ClInclude Include="rapidjson\document.h" />

@@ -25,9 +25,9 @@
 //line and file is added automaticaly 
 #ifdef _DEBUG
 #define ASSERT(cond)\
-if(!cond)\
+if(!(cond))\
 {\
-	LOG_INFO << "Assert failed!";\
+	LOG_ERROR << "Assert failed!";\
 	exit(EXIT_FAILURE);\
 }
 #else

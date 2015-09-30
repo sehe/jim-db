@@ -21,7 +21,12 @@
 
 #include "StringType.h"
 
-StringType::StringType(const std::string& s):BaseType<int>()
+StringType::StringType() :BaseType<long long>()
+{
+	m_data.size = 0;
+}
+
+StringType::StringType(const std::string& s):BaseType<long long>()
 {
 	m_data.size = s.size();
 	m_next = 0;
