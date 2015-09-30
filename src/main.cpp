@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 		LOG_WARN << "Unable to install console handler!";
 	}
 
-	
+	/*
 	//checking type
 	char buffer[100];
 	auto typ0 = new(&buffer) StringType("Testing a Type");
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 	LOG_INFO << typ2->getData(); 
 	LOG_INFO << typ0->getData(); //size of type0
 	//no need for deletion since buffer will be deleted and everything is inside the buffer.
-	
+	*/
 
 	auto& tasks = TaskQueue::getInstance();
 
