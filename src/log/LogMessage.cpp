@@ -57,9 +57,7 @@ LogMessage::LogMessage(const LogMessage& other):m_type(other.m_type)
 	m_stream << other.m_stream.str();
 }
 
-LogMessage::LogMessage(LogMessage&& other): m_stream(std::move(other.m_stream)), m_type(other.m_type)
-{
-}
+LogMessage::LogMessage(LogMessage&& other): m_stream(std::move(other.m_stream)), m_type(other.m_type) {}
 
 LogMessage& LogMessage::operator=(const LogMessage& other)
 {

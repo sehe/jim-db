@@ -29,27 +29,20 @@ InsertTask::~InsertTask() {}
 void InsertTask::execute()
 {
 	//we know that it is insert and it contains a value
-	auto& value = m_doc->operator[]("value");
+	auto& value = m_doc->operator[]("data");
+	if (!value.IsObject())
+	{
+		//throw error to client since its not a obj!
 
-	//TODO this shouldnt be! Value should be a object wich contains
-	//the object to be insert as root!
-	//parse the value as json since we send the value as string
-	auto doc = std::make_shared<rapidjson::Document>();
-	doc->Parse(m_doc->operator[]("value").GetString());
+		return;
+	}
 
-	for (auto it = doc->MemberBegin(); it != doc->MemberEnd(); ++it)
+	for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it)
 	{
 		LOG_DEBUG << it->name.GetString();
 		if (it->value.IsObject())
 		{
-			//the first thing we should find is the root of the object so this is the entry
-			LOG_DEBUG << "Value is valid Object";
 			processObject(it->value);
-		}
-		else
-		{
-			//todo invalid value filed
-			return;
 		}
 	}
 }

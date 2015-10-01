@@ -26,27 +26,37 @@
 #include "ClientPollTask.h"
 #include "InsertTask.h"
 
-ParseTask::ParseTask(std::shared_ptr<IClient> client, std::shared_ptr<std::string> s) :Task(client)
+ParseTask::ParseTask(std::shared_ptr<IClient> client, std::shared_ptr<Message> s) :Task(client)
 {
-	m_string = s;
+	m_message = s;
 }
 
 void ParseTask::execute()
 {
-	LOG_SCOPE_TIME << "Parsing and took: " << *m_string;
+	/**
 	auto doc = std::make_shared<rapidjson::Document>();
-	doc->Parse(m_string->c_str());
+	{
+		LOG_SCOPE_TIME << "Parsing and took: " << m_message->getMessage();
+		doc->ParseInsitu(m_message->getMessage());
+	}
+
 	if (doc->HasParseError())
 	{
-		LOG_ERROR << "Failed parsing: " << *m_string;
+		LOG_ERROR << "Failed parsing: " << *m_message->getMessage();
 		//TODO return some error to client
 	}
 
-	//TODO validate
-
-	//check if value exists
-	if (doc->FindMember("type") == doc->MemberEnd())
+	//check if data and type exists
+	if (doc->FindMember("type") == doc->MemberEnd() || doc->FindMember("data") == doc->MemberEnd())
 	{
+		LOG_DEBUG << "invalid JSON. Missing type or Value";
+		//TODO send some information
+		return;
+	}
+
+	if(!doc->operator[]("data").IsObject())
+	{
+		LOG_DEBUG << "invalid JSON. Data is no object";
 		//TODO send some information
 		return;
 	}
@@ -54,8 +64,9 @@ void ParseTask::execute()
 	if (doc->FindMember("type")->value == "insert")
 	{
 		LOG_DEBUG << "inserting";
-		TaskQueue::getInstance().push_pack(std::make_shared<InsertTask>(m_client, doc));
+		//TaskQueue::getInstance().push_pack(std::make_shared<InsertTask>(m_client, doc));
 	}
+	*/
 }
 
 

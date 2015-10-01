@@ -21,6 +21,9 @@
 
 #include "ClientHandle.h"
 #include "../log/Logger.h"
+#include "Message.h"
+#include "../rapidjson/stringbuffer.h"
+#include "../rapidjson/writer.h"
 
 
 ClientHandle::ClientHandle(const SOCKET& s, const sockaddr_storage& add) : m_sock(s), m_addr(add),m_connected(true)
@@ -92,37 +95,36 @@ bool ClientHandle::isConnected() const
 	return m_connected;
 }
 
-bool ClientHandle::getData(std::shared_ptr<std::string> ptr)
+std::shared_ptr<Message> ClientHandle::getData()
 {
 	int n;
-	ptr->clear();
 
 	char size[4];
 	n = recv(m_sock, size, sizeof(size), 0);
 
 	//check if retval passed
 	if (!checkRetValRecv(n))
-		return false;
+		return nullptr;
 
 	//calc how much data
 	auto msgLen = atoi(size);
-	LOG_INFO << "recv a message with size: " << msgLen;
+	LOG_DEBUG << "recv a message with size: " << msgLen;
 
 	//create buffer for the data
-	auto buffer = new char[msgLen];
+	auto buffer = new char[msgLen + 1]; //one more for nullterm
 
 	//read buffer
 	n = recv(m_sock, buffer, msgLen, 0);
 
+	buffer[msgLen] = '\0';//add null term
 
 	//check retval if it passes
 	if (!checkRetValRecv(n))
-		return false;
-	ptr->append(buffer, msgLen);
-	LOG_INFO << "Message: " << *ptr;
+		return nullptr;
 
-	delete[] buffer; 
-	return true;
+	LOG_DEBUG << "Buffer Message: " << buffer;
+	//return ne Message
+	return std::make_shared<Message>(buffer);
 }
 
 int ClientHandle::getSocketID() const
@@ -158,9 +160,18 @@ bool ClientHandle::checkRetValRecv(const int& n)
 
 bool ClientHandle::handShake()
 {
-	int r = rand(); //add a random value to the handshake
-	auto handshake = std::make_shared<std::string>("HI");
-	*handshake += r;
+	rapidjson::Document doc;
+	doc.SetObject();
+
+	doc.AddMember("type", "handshake", doc.GetAllocator());
+	doc.AddMember("data", "hi", doc.GetAllocator());
+
+	// Convert JSON document to string
+	rapidjson::StringBuffer strbuf;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
+	doc.Accept(writer);
+
+	auto handshake = std::make_shared<std::string>(strbuf.GetString());
 	//sending a handshake HI and wait 1s to return a hi as shake
 	send(handshake);
 	if (!hasData())
@@ -169,19 +180,17 @@ bool ClientHandle::handShake()
 		m_connected = false;
 		return false;
 	}
+
+	auto mes = getData();
+	//check if handshaje is valid
+
+	if (std::string("hi") == mes->operator()()["data"].GetString())
+		LOG_DEBUG << "Handshake successful";
 	else
 	{
-		auto string = std::make_shared<std::string>();
-		getData(string);
-
-		if (*handshake == *string)
-			LOG_INFO << "Handshake successful";
-		else
-		{
-			LOG_INFO << "handshake Failed";
-			m_connected = false;
-			return false;
-		}
+		LOG_WARN << "handshake Failed";
+		m_connected = false;
+		return false;
 	}
 	return true;
 }

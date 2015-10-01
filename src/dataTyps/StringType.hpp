@@ -20,6 +20,7 @@
 **/
 
 #include "StringType.h"
+
 std::shared_ptr<std::string> StringType::getString() const
 {
 	auto string = std::make_shared<std::string>();

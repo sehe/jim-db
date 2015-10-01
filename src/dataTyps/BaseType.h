@@ -38,25 +38,28 @@ class BaseType
 {
 public:
 	BaseType();
-	explicit BaseType(T &t);
-	explicit BaseType(const T &t);
+	explicit BaseType(T& t);
+	explicit BaseType(const T& t);
 
 	~BaseType();
 
 	//inlines not realy needed since the template forces inline
 	inline void setNext(const ptrdiff_t& next);
 	inline ptrdiff_t getNext();
-	inline void setData(T &t);
+	inline void setData(T& t);
 	inline void setData(const T& t);
 	inline T getData() const;
-	
+
 protected:
 	union DataUnion
 	{
 		T data;
 		std::ptrdiff_t size;
 
-		DataUnion() { memset(this, 0, sizeof(DataUnion)); } //init with 0
+		DataUnion()
+		{
+			memset(this, 0, sizeof(DataUnion));
+		} //init with 0
 		explicit DataUnion(T& t);
 		explicit DataUnion(const T& t);
 	} m_data;

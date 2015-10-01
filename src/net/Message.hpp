@@ -19,63 +19,9 @@
 ############################################################################
 **/
 
-#include "BaseType.h"
+#pragma once
+#include "Message.h"
 
-template <typename T>
-BaseType<T>::DataUnion::DataUnion(T& t)
-{
-	this->data = t;
-}
-
-template <typename T>
-BaseType<T>::DataUnion::DataUnion(const T& t)
-{
-	this->data = t;
-}
-
-template <typename T>
-BaseType<T>::BaseType() :m_data(), m_next(0) {}
-
-template <typename T>
-BaseType<T>::BaseType(T& t):m_data(t), m_next(0) {}
-
-template <typename T>
-BaseType<T>::BaseType(const T& t) : m_data(t), m_next(0) {}
-
-template <typename T>
-BaseType<T>::~BaseType()
-{
-	//used to clear this, set the size to 0 so
-	//we know it is a simple type without something behind
-	m_data.size = 0;
-}
-
-template <typename T>
-void BaseType<T>::setNext(const ptrdiff_t& next)
-{
-	m_next = next;
-}
-
-template <typename T>
-ptrdiff_t BaseType<T>::getNext()
-{
-	return m_next;
-}
-
-template <typename T>
-void BaseType<T>::setData(T& t)
-{
-	m_data.data = t;
-}
-
-template <typename T>
-void BaseType<T>::setData(const T& t)
-{
-	m_data.data = t;
-}
-
-template <typename T>
-T BaseType<T>::getData() const
-{
-	return m_data.data;
+inline rapidjson::Document& Message::operator()() {
+	return m_doc;
 }

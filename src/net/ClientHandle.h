@@ -54,7 +54,7 @@ public:
 	\author Benjamin Meyer
 	\date 09.09.2015 14:00
 	*/
-	bool getData(std::shared_ptr<std::string> ptr) override;
+	std::shared_ptr<Message> getData() override;
 
 	int getSocketID() const override;
 

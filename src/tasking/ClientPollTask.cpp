@@ -40,13 +40,9 @@ void ClientPollTask::execute()
 	//we are connected check for data
 	if (m_client->hasData())
 	{
-		auto data = std::make_shared<std::string>();
-		if (m_client->getData(data))
-		{
-			//get into the next task which is parsing
-			TaskQueue::getInstance().push_pack(std::make_shared<ParseTask>(m_client, data));
-			return;
-		}
+		//get into the next task which is parsing
+		TaskQueue::getInstance().push_pack(std::make_shared<ParseTask>(m_client, m_client->getData()));
+		return;
 	}
 	TaskQueue::getInstance().push_pack(std::make_shared<ClientPollTask>(m_client));
 }

@@ -122,6 +122,7 @@
   <ItemGroup>
     <ClCompile Include="dataTyps\StringType.cpp" />
     <ClCompile Include="dataTyps\FreeType.cpp" />
+    <ClCompile Include="net\Message.cpp" />
     <ClCompile Include="page\Page.cpp" />
     <ClCompile Include="tasking\ClientPollTask.cpp" />
     <ClCompile Include="configuration.cpp" />
@@ -143,8 +144,10 @@
     <ClInclude Include="dataTyps\StringType.h" />
     <ClInclude Include="dataTyps\StringType.hpp" />
     <ClInclude Include="dataTyps\FreeType.h" />
+    <ClInclude Include="net\Message.h" />
     <ClInclude Include="net\IClient.h" />
     <ClInclude Include="net\IServer.h" />
+    <ClInclude Include="net\Message.hpp" />
     <ClInclude Include="page\Page.h" />
     <ClInclude Include="tasking\ClientPollTask.h" />
     <ClInclude Include="configuration.h" />

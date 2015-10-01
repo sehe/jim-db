@@ -36,12 +36,9 @@ of memory and allow to querry them.
 #include "configuration.h"
 #include "tasking/TaskQueue.h"
 #include "thread/Worker.h"
-#include "dataTyps/StringType.h"
-#include "dataTyps/BaseType.h"
 #pragma comment(lib,"user32.lib")
 #include <iostream>
-#include "assert.h"
-#include "page/Page.h"
+
 //forward declare
 BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
@@ -68,9 +65,9 @@ int main(int argc, char* argv[])
 		LOG_WARN << "Unable to install console handler!";
 	}
 
-	Page p(4096, 4 * 4096);
+	//Page p(4096, 4 * 4096);
 
-	/*
+	/**
 	//checking type
 	char buffer[100];
 	auto typ0 = new(&buffer) StringType("Testing a Type");

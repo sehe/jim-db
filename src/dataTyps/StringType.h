@@ -42,7 +42,7 @@ protected:
 	//set the size to 0 which would be wrong!
 	//let it as it is to show that there is free space to use
 	//just chain it at the end of the free space type
-	~StringType(){};
+	~StringType() {};
 };
 
 #include "StringType.hpp"

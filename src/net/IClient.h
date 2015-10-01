@@ -22,6 +22,7 @@
 #pragma once
 #include <string>
 #include <memory>
+#include "Message.h"
 
 class IClient
 {
@@ -32,6 +33,6 @@ public:
 	virtual bool hasData() = 0;
 	virtual bool isConnected() const = 0;
 
-	virtual bool getData(std::shared_ptr<std::string> s) = 0;
+	virtual std::shared_ptr<Message>  getData() = 0;
 	virtual int getSocketID() const = 0;
 };
