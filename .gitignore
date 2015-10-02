@@ -1,0 +1,12 @@
+*.*
+
+!.gitignore
+!SConstruct
+!*.md
+!*.h
+!*.hpp
+!*.cpp
+!*.py
+
+library/build/**
+
