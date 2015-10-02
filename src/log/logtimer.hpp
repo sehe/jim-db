@@ -1,5 +1,4 @@
 #include "logmessage.h"
-#include "logtimer.h"
 
 template <typename T>
 LogTimer& LogTimer::operator<<(const T& m)

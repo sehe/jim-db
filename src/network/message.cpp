@@ -19,8 +19,12 @@
 ############################################################################
 **/
 #include "message.h"
-
-Message::~Message()
+namespace jimdb
 {
-	delete[] m_message;
+	namespace network {
+		Message::~Message()
+		{
+			delete[] m_message;
+		}
+	}
 }

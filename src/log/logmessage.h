@@ -24,60 +24,63 @@
 #include <sstream>
 #include <map>
 #include <utility>
+namespace jimdb {
+	namespace common {
 
-enum LoggerTypes
-{
-	DEBUG = 5,
-	INFO = 4,
-	TIMER = 3,
-	WARNING = 2,
-	EXCAPTION = 1,
-	ERROR_L = 0,
-};
+		enum LoggerTypes
+		{
+			DEBUG = 5,
+			INFO = 4,
+			TIMER = 3,
+			WARNING = 2,
+			EXCAPTION = 1,
+			ERROR_L = 0,
+		};
 
-/**
-\brief Regular LogMessage
+		/**
+		\brief Regular LogMessage
 
-A regular Logmessage which will be written to Logger when leaving the scope.
-Use \see Logger::Error() to get a Message. Do "create" this without the Logger class!
-\author Benjamin Meyer
-\date
-*/
-class LogMessage
-{
-public:
-	/**
-    \brief Ctor for the a LogMessage
+		A regular Logmessage which will be written to Logger when leaving the scope.
+		Use \see Logger::Error() to get a Message. Do "create" this without the Logger class!
+		\author Benjamin Meyer
+		\date
+		*/
+		class LogMessage
+		{
+		public:
+			/**
+			\brief Ctor for the a LogMessage
 
-    It takes several parameter to log the position in file and line in file.
+			It takes several parameter to log the position in file and line in file.
 
-    \param[in] type
-    \param[in] file
-    \param[in] i
-    \author Benjamin Meyer
-    \date 22.05.2015 16:05
-    */
-	explicit LogMessage(const LoggerTypes& type, const std::string& file = "",
-	                    const int& i = 0);
-	~LogMessage();
-	std::string currentDateTime() const;
-	/**
-    returns self reference
-    */
-	template <typename T>
-	inline LogMessage& operator<<(const T& m);
+			\param[in] type
+			\param[in] file
+			\param[in] i
+			\author Benjamin Meyer
+			\date 22.05.2015 16:05
+			*/
+			explicit LogMessage(const LoggerTypes& type, const std::string& file = "",
+				const int& i = 0);
+			~LogMessage();
+			std::string currentDateTime() const;
+			/**
+			returns self reference
+			*/
+			template <typename T>
+			inline LogMessage& operator<<(const T& m);
 
 
-	LogMessage(const LogMessage& other);
-	LogMessage(LogMessage&& other);
+			LogMessage(const LogMessage& other);
+			LogMessage(LogMessage&& other);
 
-	LogMessage& operator=(const LogMessage& other);
-	LogMessage& operator=(LogMessage&& other);
+			LogMessage& operator=(const LogMessage& other);
+			LogMessage& operator=(LogMessage&& other);
 
-private:
-	std::ostringstream m_stream;
-	static std::map<LoggerTypes, std::string> m_enum_string_mapping;
-	LoggerTypes m_type;
-};
-
+		private:
+			std::ostringstream m_stream;
+			static std::map<LoggerTypes, std::string> m_enum_string_mapping;
+			LoggerTypes m_type;
+		};
+	}
+}
 #include "logmessage.hpp"

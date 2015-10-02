@@ -18,9 +18,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 ############################################################################
 **/
-
-#include "stringtype.h"
-
+#pragma once
 std::shared_ptr<std::string> StringType::getString() const
 {
 	auto string = std::make_shared<std::string>();

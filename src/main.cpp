@@ -48,14 +48,14 @@ int main(int argc, char* argv[])
 	if (argc > 1)
 		configFile = argv[1];
 	//get the config instance
-	auto& cfg = Configuration::getInstance();
+	auto& cfg = jimdb::common::Configuration::getInstance();
 	if (!cfg.parse(configFile))
 	{
 		std::cout << "Missing a config file!" << std::endl;
 		return 0;
 	}
 	//set the loglevel of the config or the default log level
-	Logger::getInstance().setLogLevel(cfg.getInt(LOG_LEVEL));
+	jimdb::common::Logger::getInstance().setLogLevel(cfg.getInt(jimdb::common::LOG_LEVEL));
 	LOG_INFO << cfg; //print out the config
 
 	//setup the console handle:
@@ -81,13 +81,13 @@ int main(int argc, char* argv[])
 	//no need for deletion since buffer will be deleted and everything is inside the buffer.
 	*/
 
-	auto& tasks = TaskQueue::getInstance();
+	auto& tasks = jimdb::tasking::TaskQueue::getInstance();
 
-	std::shared_ptr<IServer> tcpServer = std::make_shared<TCPServer>(tasks);
+	std::shared_ptr<jimdb::network::IServer> tcpServer = std::make_shared<jimdb::network::TCPServer>(tasks);
 	tcpServer->start();
 
 	//start the workers
-	auto threads = cfg.getInt(THREADS);
+	auto threads = cfg.getInt(jimdb::common::THREADS);
 	//if the config value is 0 take hardware conc.
 	if (threads == 0)
 	{
@@ -95,10 +95,10 @@ int main(int argc, char* argv[])
 	}
 
 	LOG_INFO << "Starting: " << threads + 1 << " Workers";
-	std::list<std::unique_ptr<Worker>> m_workers;
+	std::list<std::unique_ptr<jimdb::tasking::Worker>> m_workers;
 	for (auto i = 0; i < std::thread::hardware_concurrency(); ++i)
 	{
-		m_workers.push_back(std::make_unique<Worker>(tasks));
+		m_workers.push_back(std::make_unique<jimdb::tasking::Worker>(tasks));
 	}
 
 	//use this as acceptor and handshaker 

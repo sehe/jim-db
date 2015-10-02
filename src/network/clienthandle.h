@@ -24,47 +24,51 @@
 #include <ostream>
 #include<memory>
 #include "iclient.h"
-
-/**
-\breif A Simple client handler
-
-It allows to receive and send data to the underlaying sock
-Make sure not to WSACleanup here! This would terminate the whole service.
-
-\author Benjamin Meyer
-*/
-class ClientHandle:public IClient
+namespace jimdb
 {
-public:
-	explicit ClientHandle(const SOCKET& s, const sockaddr_storage& add);
-	~ClientHandle();
+	namespace network {
+		/**
+		\breif A Simple client handler
 
-	/**
-    * It need to be nullterminating!
-    */
-	bool operator<<(std::shared_ptr<std::string> s);
-	bool send(std::shared_ptr<std::string> s) override;
-	bool hasData() override;
-	bool isConnected() const override;
-	void close() override;
+		It allows to receive and send data to the underlaying sock
+		Make sure not to WSACleanup here! This would terminate the whole service.
 
-	/**
-	\brief Get data from client
+		\author Benjamin Meyer
+		*/
+		class ClientHandle :public IClient
+		{
+		public:
+			explicit ClientHandle(const SOCKET& s, const sockaddr_storage& add);
+			~ClientHandle();
 
-	\return returns false if getData failed or the cleint disconnected
-	\author Benjamin Meyer
-	\date 09.09.2015 14:00
-	*/
-	std::shared_ptr<Message> getData() override;
+			/**
+			* It need to be nullterminating!
+			*/
+			bool operator<<(std::shared_ptr<std::string> s);
+			bool send(std::shared_ptr<std::string> s) override;
+			bool hasData() override;
+			bool isConnected() const override;
+			void close() override;
 
-	int getSocketID() const override;
+			/**
+			\brief Get data from client
 
-private:
-	SOCKET m_sock;
-	sockaddr_storage m_addr;
-	std::string m_user;
-	std::string m_address;
-	bool m_connected;
+			\return returns false if getData failed or the cleint disconnected
+			\author Benjamin Meyer
+			\date 09.09.2015 14:00
+			*/
+			std::shared_ptr<Message> getData() override;
 
-	bool checkRetValRecv(const int& i);
-};
+			int getSocketID() const override;
+
+		private:
+			SOCKET m_sock;
+			sockaddr_storage m_addr;
+			std::string m_user;
+			std::string m_address;
+			bool m_connected;
+
+			bool checkRetValRecv(const int& i);
+		};
+	}
+}

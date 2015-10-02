@@ -22,33 +22,38 @@
 #pragma once
 #include "rapidjson/document.h"
 
-/**
-\brief Message type which holds the Message of a client
-
-It also holds the parsed document since it refares to the message (char*)
-and also manipulates it right after creation. ( In Situ parsing)
-
-\author Benjamin Meyer
-\date 01.10.2015 19:23
-*/
-class Message
+namespace jimdb
 {
-public:
-	inline explicit Message(char* message);
-	~Message();
+	namespace network
+	{
+		/**
+		\brief Message type which holds the Message of a client
 
-	/**
-	\brief Method to get the document of the message
+		It also holds the parsed document since it refares to the message (char*)
+		and also manipulates it right after creation. ( In Situ parsing)
 
-	\return A Reference to the rapidjson::Document of the message
-	\author Benjamin Meyer
-	\date 01.10.2015 19:24
-	*/
-	inline rapidjson::Document& operator()();
+		\author Benjamin Meyer
+		\date 01.10.2015 19:23
+		*/
+		class Message
+		{
+		public:
+			inline explicit Message(char* message);
+			~Message();
 
-private:
-	char* m_message;
-	rapidjson::Document m_doc;
-};
+			/**
+			\brief Method to get the document of the message
 
+			\return A Reference to the rapidjson::Document of the message
+			\author Benjamin Meyer
+			\date 01.10.2015 19:24
+			*/
+			inline rapidjson::Document& operator()();
+
+		private:
+			char* m_message;
+			rapidjson::Document m_doc;
+		};
+	}
+}
 #include "Message.hpp"

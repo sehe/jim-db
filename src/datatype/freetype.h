@@ -21,10 +21,13 @@
 
 #pragma once
 #include "stringtype.h"
-
-class FreeType : public StringType
-{
-public:
-	explicit FreeType(const int& size);
-	int getFree() const;
-};
+namespace jimdb {
+	namespace memorymanagement {
+		class FreeType : public StringType
+		{
+		public:
+			explicit FreeType(const int& size);
+			int getFree() const;
+		};
+	}
+}

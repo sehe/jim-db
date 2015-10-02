@@ -22,35 +22,39 @@
 #include "page.h"
 #include "../log/logger.h"
 #include "../assert.h"
-long long Page::m_s_idCounter = 0;
+namespace jimdb {
+	namespace memorymanagement {
+		long long Page::m_s_idCounter = 0;
 
-Page::Page(long long header, long long body):m_freeSpace(body),m_next(0),m_id(++m_s_idCounter)
-{
-	m_header = new char[header];
-	m_body = new char[body];
+		Page::Page(long long header, long long body) :m_freeSpace(body), m_next(0), m_id(++m_s_idCounter)
+		{
+			m_header = new char[header];
+			m_body = new char[body];
 
-	//put free type info in header
-	//so at pos 0 is a long long with the pos of the free type
-	m_freepos = new(&m_header[0]) long long(0);
+			//put free type info in header
+			//so at pos 0 is a long long with the pos of the free type
+			m_freepos = new(&m_header[0]) long long(0);
 
-	//throw in the free type into the body 
-	m_free = new(&m_body[0]) FreeType(body - sizeof(FreeType));
+			//throw in the free type into the body 
+			m_free = new(&m_body[0]) jimdb::memorymanagement::FreeType(body - sizeof(jimdb::memorymanagement::FreeType));
 
-	ASSERT(m_free->getFree() == body);
-}
+			ASSERT(m_free->getFree() == body);
+		}
 
-Page::~Page()
-{
-	delete[] m_header;
-	delete[] m_body;
-}
+		Page::~Page()
+		{
+			delete[] m_header;
+			delete[] m_body;
+		}
 
-void Page::setNext(const long long& id)
-{
-	m_next = id;
-}
+		void Page::setNext(const long long& id)
+		{
+			m_next = id;
+		}
 
-long long Page::getNext() const
-{
-	return m_next;
+		long long Page::getNext() const
+		{
+			return m_next;
+		}
+	}
 }

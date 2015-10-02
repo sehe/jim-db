@@ -23,7 +23,11 @@
 #include <string>
 #include <memory>
 
-/**
+namespace jimdb
+{
+	namespace memorymanagement
+	{
+		/**
 \brief The BaseType Typ Class
 It is templated. Use it with care! 
 the minimum size of the data filed is 64bit (size field used for String type). Do not make it bigger
@@ -33,38 +37,40 @@ as needed for JSON.
 \author Benjamin Meyer
 \date 25.09.2015 09:22
 */
-template <typename T>
-class BaseType
-{
-public:
-	BaseType();
-	explicit BaseType(T& t);
-	explicit BaseType(const T& t);
-
-	~BaseType();
-
-	//inlines not realy needed since the template forces inline
-	inline void setNext(const ptrdiff_t& next);
-	inline ptrdiff_t getNext();
-	inline void setData(T& t);
-	inline void setData(const T& t);
-	inline T getData() const;
-
-protected:
-	union DataUnion
-	{
-		T data;
-		std::ptrdiff_t size;
-
-		DataUnion()
+		template <typename T>
+		class BaseType
 		{
-			memset(this, 0, sizeof(DataUnion));
-		} //init with 0
-		explicit DataUnion(T& t);
-		explicit DataUnion(const T& t);
-	} m_data;
+		public:
+			BaseType();
+			explicit BaseType(T& t);
+			explicit BaseType(const T& t);
 
-	long long m_next;
-};
+			~BaseType();
+
+			//inlines not realy needed since the template forces inline
+			inline void setNext(const ptrdiff_t& next);
+			inline ::std::ptrdiff_t getNext();
+			inline void setData(T& t);
+			inline void setData(const T& t);
+			inline T getData() const;
+
+		protected:
+			union DataUnion
+			{
+				T data;
+				::std::ptrdiff_t size;
+
+				DataUnion()
+				{
+					memset(this, 0, sizeof(DataUnion));
+				} //init with 0
+				explicit DataUnion(T& t);
+				explicit DataUnion(const T& t);
+			} m_data;
+
+			long long m_next;
+		};
 
 #include "BaseType.hpp"
+	}
+}

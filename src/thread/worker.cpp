@@ -20,25 +20,29 @@
 **/
 
 #include "worker.h"
-
-Worker::Worker(TaskQueue& t) : m_tasks(t), m_thread(&Worker::doTask, this), m_running(true) {}
-
-Worker::~Worker()
+namespace jimdb
 {
-	m_running = false;
-	m_thread.join();
-}
+	namespace tasking {
+		Worker::Worker(TaskQueue& t) : m_tasks(t), m_thread(&Worker::doTask, this), m_running(true) {}
 
-void Worker::stop()
-{
-	m_running = false;
-}
+		Worker::~Worker()
+		{
+			m_running = false;
+			m_thread.join();
+		}
 
-void Worker::doTask()
-{
-	while (m_running)
-	{
-		auto task = m_tasks.pop_front();
-		task->execute();
+		void Worker::stop()
+		{
+			m_running = false;
+		}
+
+		void Worker::doTask()
+		{
+			while (m_running)
+			{
+				auto task = m_tasks.pop_front();
+				task->execute();
+			}
+		}
 	}
 }

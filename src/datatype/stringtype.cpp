@@ -20,16 +20,19 @@
 **/
 
 #include "stringtype.h"
+namespace jimdb {
+	namespace memorymanagement {
+		StringType::StringType() :BaseType<long long>()
+		{
+			m_data.size = 0;
+		}
 
-StringType::StringType() :BaseType<long long>()
-{
-	m_data.size = 0;
-}
-
-StringType::StringType(const std::string& s):BaseType<long long>()
-{
-	m_data.size = s.size();
-	m_next = 0;
-	//now memcpy the data into memory
-	memcpy(this + 1, s.c_str(), s.size()); //cpy the string
+		StringType::StringType(const std::string& s) : BaseType<long long>()
+		{
+			m_data.size = s.size();
+			m_next = 0;
+			//now memcpy the data into memory
+			memcpy(this + 1, s.c_str(), s.size()); //cpy the string
+		}
+	}
 }

@@ -20,13 +20,16 @@
 **/
 
 #include "freetype.h"
+namespace jimdb {
+	namespace memorymanagement {
+		FreeType::FreeType(const int& size) :StringType()
+		{
+			m_data.size = size;
+		}
 
-FreeType::FreeType(const int& size) :StringType()
-{
-	m_data.size = size;
-}
-
-int FreeType::getFree() const
-{
-	return m_data.size + sizeof(FreeType);
+		int FreeType::getFree() const
+		{
+			return m_data.size + sizeof(FreeType);
+		}
+	}
 }

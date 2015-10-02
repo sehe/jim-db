@@ -21,16 +21,20 @@
 
 #pragma once
 #include "task.h"
-
-/**
-\brief performs a handshake
-
-\author Benjamin Meyer
-\date 02.10.2015 16:21
-*/
-class HandshakeTask: public Task
+namespace jimdb
 {
-public:
-	explicit HandshakeTask(const std::shared_ptr<IClient> client);
-	void execute() override;
-};
+	namespace tasking {
+		/**
+		\brief performs a handshake
+
+		\author Benjamin Meyer
+		\date 02.10.2015 16:21
+		*/
+		class HandshakeTask : public Task
+		{
+		public:
+			explicit HandshakeTask(const std::shared_ptr<network::IClient> client);
+			void execute() override;
+		};
+	}
+}

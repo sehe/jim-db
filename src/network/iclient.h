@@ -20,20 +20,25 @@
 **/
 
 #pragma once
-#include <string>
 #include <memory>
+#include <string>
 #include "message.h"
-
-class IClient
+namespace jimdb
 {
-public:
-	virtual ~IClient() { }
+	namespace network {
 
-	virtual bool send(std::shared_ptr<std::string> s) = 0;
-	virtual bool hasData() = 0;
-	virtual bool isConnected() const = 0;
+		class IClient
+		{
+		public:
+			virtual ~IClient() { }
 
-	virtual std::shared_ptr<Message>  getData() = 0;
-	virtual int getSocketID() const = 0;
-	virtual void close() = 0;
-};
+			virtual bool send(std::shared_ptr<::std::string> s) = 0;
+			virtual bool hasData() = 0;
+			virtual bool isConnected() const = 0;
+
+			virtual std::shared_ptr<Message>  getData() = 0;
+			virtual int getSocketID() const = 0;
+			virtual void close() = 0;
+		};
+	}
+}

@@ -33,40 +33,44 @@
 
 #include "../tasking/taskqueue.h"
 #include "iserver.h"
-
-class TCPServer : public IServer
+namespace jimdb
 {
-public:
-	explicit TCPServer(TaskQueue& q);
-	~TCPServer();
-	/**
-    * Startup the listenting to a port
-    * \return true if started successfull false if not. try restarting it
-    */
-	bool start() override;
+	namespace network {
+		class TCPServer : public IServer
+		{
+		public:
+			explicit TCPServer(tasking::TaskQueue& q);
+			~TCPServer();
+			/**
+			* Startup the listenting to a port
+			* \return true if started successfull false if not. try restarting it
+			*/
+			bool start() override;
 
-	/**
-    * accepts a new client if a new connection is available.
-    * if not it does nothing.
-	* If the client list is empty it does a blocking connection
-	* \param[in] bool blocking if the accept should block
-    */
-	int accept(const bool& blocking) override;
-private:
+			/**
+			* accepts a new client if a new connection is available.
+			* if not it does nothing.
+			* If the client list is empty it does a blocking connection
+			* \param[in] bool blocking if the accept should block
+			*/
+			int accept(const bool& blocking) override;
+		private:
 
-	/**
-	\brief check for new connections
+			/**
+			\brief check for new connections
 
-	\return true if there is something to read in the socket. so new connection
-	\author Benjamin Meyer
-	\date 14.09.2015 09:04
-	*/
-	bool checkConnection();
+			\return true if there is something to read in the socket. so new connection
+			\author Benjamin Meyer
+			\date 14.09.2015 09:04
+			*/
+			bool checkConnection();
 
-	static const char DEFAULT_PORT[];
-	static const int DEFAULT_BUFFER_SIZE;
+			static const char DEFAULT_PORT[];
+			static const int DEFAULT_BUFFER_SIZE;
 
-	//the listen socket
-	SOCKET m_listensocket;
-	fd_set m_set;
-};
+			//the listen socket
+			SOCKET m_listensocket;
+			fd_set m_set;
+		};
+	}
+}

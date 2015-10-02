@@ -21,23 +21,27 @@
 
 #pragma once
 #include "../network/clienthandle.h"
-
-/**
-\brief basic Task
-
-Holds all information that is needed and always refares to a client!
-\author Benjamin Meyer
-\date 15.09.2015 14:21
-*/
-class Task
+namespace jimdb
 {
-public:
-	explicit Task(std::shared_ptr<IClient> client) :m_client(client) { };
+	namespace tasking {
+		/**
+		\brief basic Task
 
-	virtual ~Task() { }
+		Holds all information that is needed and always refares to a client!
+		\author Benjamin Meyer
+		\date 15.09.2015 14:21
+		*/
+		class Task
+		{
+		public:
+			explicit Task(std::shared_ptr<network::IClient> client) :m_client(client) { };
 
-	virtual void execute() = 0;
+			virtual ~Task() { }
 
-protected:
-	std::shared_ptr<IClient> m_client;
-};
+			virtual void execute() = 0;
+
+		protected:
+			std::shared_ptr<network::IClient> m_client;
+		};
+	}
+}
