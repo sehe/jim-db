@@ -20,51 +20,19 @@
 **/
 
 #pragma once
-#include <WinSock2.h>
-#include <ostream>
-#include<memory>
-#include "IClient.h"
+#include <string>
+#include <memory>
+#include "message.h"
 
-/**
-\breif A Simple client handler
-
-It allows to receive and send data to the underlaying sock
-Make sure not to WSACleanup here! This would terminate the whole service.
-
-\author Benjamin Meyer
-*/
-class ClientHandle:public IClient
+class IClient
 {
 public:
-	explicit ClientHandle(const SOCKET& s, const sockaddr_storage& add);
-	~ClientHandle();
+	virtual ~IClient() { }
 
-	/**
-    * It need to be nullterminating!
-    */
-	bool operator<<(std::shared_ptr<std::string> s);
-	bool send(std::shared_ptr<std::string> s) override;
-	bool hasData() override;
-	bool isConnected() const override;
+	virtual bool send(std::shared_ptr<std::string> s) = 0;
+	virtual bool hasData() = 0;
+	virtual bool isConnected() const = 0;
 
-	/**
-	\brief Get data from client
-
-	\return returns false if getData failed or the cleint disconnected
-	\author Benjamin Meyer
-	\date 09.09.2015 14:00
-	*/
-	std::shared_ptr<Message> getData() override;
-
-	int getSocketID() const override;
-
-private:
-	SOCKET m_sock;
-	sockaddr_storage m_addr;
-	std::string m_user;
-	std::string m_address;
-	bool m_connected;
-
-	bool checkRetValRecv(const int& i);
-	bool handShake();
+	virtual std::shared_ptr<Message>  getData() = 0;
+	virtual int getSocketID() const = 0;
 };

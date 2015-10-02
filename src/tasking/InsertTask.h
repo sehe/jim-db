@@ -20,8 +20,9 @@
 **/
 
 #pragma once
-#include "Task.h"
+#include "task.h"
 #include "../rapidjson/document.h"
+#include "../network/iclient.h"
 
 class InsertTask:public Task
 {

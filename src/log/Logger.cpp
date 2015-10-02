@@ -19,8 +19,8 @@
 ############################################################################
 **/
 
-#include "Logger.h"
-#include "../Configuration.h"
+#include "logger.h"
+#include "../configuration.h"
 
 #include <string>
 #include <sstream>

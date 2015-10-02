@@ -19,7 +19,7 @@
 ############################################################################
 **/
 
-#include "TaskQueue.h"
+#include "taskqueue.h"
 #include <mutex>
 TaskQueue TaskQueue::m_instance;
 

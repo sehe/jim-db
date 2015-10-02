@@ -19,7 +19,7 @@
 ############################################################################
 **/
 
-#include "FreeType.h"
+#include "freetype.h"
 
 FreeType::FreeType(const int& size) :StringType()
 {

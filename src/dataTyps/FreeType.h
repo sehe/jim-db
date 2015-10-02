@@ -20,7 +20,7 @@
 **/
 
 #pragma once
-#include "StringType.h"
+#include "stringtype.h"
 
 class FreeType : public StringType
 {

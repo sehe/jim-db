@@ -19,12 +19,12 @@
 ############################################################################
 **/
 
-#include "TCPServer.h"
-#include "../tasking/ClientPollTask.h"
+#include "tcpserver.h"
+#include "../tasking/clientpolltask.h"
 
 const char TCPServer::DEFAULT_PORT[] = "6060";
 const int TCPServer::DEFAULT_BUFFER_SIZE = 512;
-#include "../log/Logger.h"
+#include "../log/logger.h"
 
 
 TCPServer::TCPServer(TaskQueue& q) : m_listensocket(INVALID_SOCKET) {}

@@ -19,9 +19,9 @@
 ############################################################################
 **/
 
-#include "Configuration.h"
+#include "configuration.h"
 #include <fstream>
-#include "log/Logger.h"
+#include "log/logger.h"
 #include <algorithm>
 #include <cctype>
 Configuration Configuration::m_instance;

@@ -19,7 +19,7 @@
 ############################################################################
 **/
 
-#include "LogTimer.h"
+#include "logtimer.h"
 
 LogTimer::LogTimer(const LoggerTypes& type, const std::string& file,
                    const int& i): LogMessage(type, file, i),

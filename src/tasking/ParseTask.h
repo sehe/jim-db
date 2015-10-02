@@ -21,8 +21,8 @@
 
 #pragma once
 #include <memory>
-#include <string>
-#include "Task.h"
+#include "task.h"
+#include "../network/iclient.h"
 
 /**
 \brief A simple task to Parse a json request

@@ -19,7 +19,7 @@
 ############################################################################
 **/
 
-#include "Worker.h"
+#include "worker.h"
 
 Worker::Worker(TaskQueue& t) : m_tasks(t), m_thread(&Worker::doTask, this), m_running(true) {}
 

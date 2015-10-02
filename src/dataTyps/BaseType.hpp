@@ -19,7 +19,7 @@
 ############################################################################
 **/
 
-#include "BaseType.h"
+#include "basetype.h"
 
 template <typename T>
 BaseType<T>::DataUnion::DataUnion(T& t)

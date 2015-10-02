@@ -19,7 +19,7 @@
 ############################################################################
 **/
 
-#include "StringType.h"
+#include "stringtype.h"
 
 StringType::StringType() :BaseType<long long>()
 {

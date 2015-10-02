@@ -20,7 +20,7 @@
 **/
 
 #pragma once
-#include "log/Logger.h"
+#include "log/logger.h"
 
 //line and file is added automaticaly 
 #ifdef _DEBUG

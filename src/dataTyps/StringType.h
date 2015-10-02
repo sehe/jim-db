@@ -20,7 +20,7 @@
 **/
 
 #pragma once
-#include "BaseType.h"
+#include "basetype.h"
 
 /**
 \brief The String Type for throwing strings into memory

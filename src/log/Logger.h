@@ -21,9 +21,9 @@
 
 #pragma once
 #include <fstream>
-#include "LogMessage.h"
-#include "LogTimer.h"
-#include "SpinLock.h"
+#include "logmessage.h"
+#include "logtimer.h"
+#include "spinlock.h"
 
 //custom macro for filename shorten but only for windows
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)

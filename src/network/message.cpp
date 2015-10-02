@@ -18,7 +18,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 ############################################################################
 **/
-#include "Message.h"
+#include "message.h"
 
 Message::Message(char* message) : m_message(message)
 {

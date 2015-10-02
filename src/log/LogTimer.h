@@ -20,7 +20,7 @@
 **/
 
 #pragma once
-#include "LogMessage.h"
+#include "logmessage.h"
 #include <chrono>
 #include <utility>
 

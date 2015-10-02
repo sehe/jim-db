@@ -19,9 +19,9 @@
 ############################################################################
 **/
 
-#include "ClientHandle.h"
-#include "../log/Logger.h"
-#include "Message.h"
+#include "clienthandle.h"
+#include "../log/logger.h"
+#include "message.h"
 #include "../rapidjson/stringbuffer.h"
 #include "../rapidjson/writer.h"
 

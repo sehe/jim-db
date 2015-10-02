@@ -19,8 +19,8 @@
 ############################################################################
 **/
 
-#include "Page.h"
-#include "../log/Logger.h"
+#include "page.h"
+#include "../log/logger.h"
 #include "../assert.h"
 long long Page::m_s_idCounter = 0;
 

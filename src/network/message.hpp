@@ -20,55 +20,8 @@
 **/
 
 #pragma once
+#include "message.h"
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <iphlpapi.h>
-#include <stdio.h>
-#pragma comment(lib, "Ws2_32.lib")
-
-#include "ClientHandle.h"
-#include <vector>
-#include "../tasking/TaskQueue.h"
-#include "IServer.h"
-
-class TCPServer : public IServer
-{
-public:
-	explicit TCPServer(TaskQueue& q);
-	~TCPServer();
-	/**
-    * Startup the listenting to a port
-    * \return true if started successfull false if not. try restarting it
-    */
-	bool start() override;
-
-	/**
-    * accepts a new client if a new connection is available.
-    * if not it does nothing.
-	* If the client list is empty it does a blocking connection
-	* \param[in] bool blocking if the accept should block
-    */
-	int accept(const bool& blocking) override;
-private:
-
-	/**
-	\brief check for new connections
-
-	\return true if there is something to read in the socket. so new connection
-	\author Benjamin Meyer
-	\date 14.09.2015 09:04
-	*/
-	bool checkConnection();
-
-	static const char DEFAULT_PORT[];
-	static const int DEFAULT_BUFFER_SIZE;
-
-	//the listen socket
-	SOCKET m_listensocket;
-	fd_set m_set;
-};
+inline rapidjson::Document& Message::operator()() {
+	return m_doc;
+}

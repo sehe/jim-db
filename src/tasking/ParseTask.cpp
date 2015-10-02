@@ -19,12 +19,7 @@
 ############################################################################
 **/
 
-#include "ParseTask.h"
-#include "../rapidjson/document.h"
-#include "../log/Logger.h"
-#include "TaskQueue.h"
-#include "ClientPollTask.h"
-#include "InsertTask.h"
+#include "parsetask.h"
 
 ParseTask::ParseTask(std::shared_ptr<IClient> client, std::shared_ptr<Message> s) :Task(client)
 {

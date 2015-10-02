@@ -21,7 +21,7 @@
 
 #pragma once
 #include <memory>
-#include "../dataTyps/FreeType.h"
+#include "../dataTyps/freetype.h"
 
 class Page
 {

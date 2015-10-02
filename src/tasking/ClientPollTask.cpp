@@ -19,9 +19,9 @@
 ############################################################################
 **/
 
-#include "ClientPollTask.h"
-#include "TaskQueue.h"
-#include "ParseTask.h"
+#include "clientpolltask.h"
+#include "taskqueue.h"
+#include "parsetask.h"
 
 
 ClientPollTask::ClientPollTask(std::shared_ptr<IClient> client):Task(client) {}

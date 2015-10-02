@@ -19,8 +19,8 @@
 ############################################################################
 **/
 
-#include "LogMessage.h"
-#include "Logger.h"
+#include "logmessage.h"
+#include "logger.h"
 #include <ctime>
 #include <thread>
 std::map<LoggerTypes, std::string> LogMessage::m_enum_string_mapping = {{DEBUG, "debug"},{INFO, "info"},{WARNING, "warn"},{ERROR_L, "error"},{EXCAPTION, "excaption"},{TIMER, "timer"}};

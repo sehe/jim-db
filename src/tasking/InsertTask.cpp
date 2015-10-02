@@ -20,7 +20,7 @@
 **/
 
 #include "InsertTask.h"
-#include "../log/Logger.h"
+#include "../log/logger.h"
 
 InsertTask::InsertTask(const std::shared_ptr<IClient>& client, std::shared_ptr<rapidjson::Document> doc): Task(client),m_doc(doc) {}
 

@@ -19,7 +19,7 @@
 ############################################################################
 **/
 
-#include "StringType.h"
+#include "stringtype.h"
 
 std::shared_ptr<std::string> StringType::getString() const
 {

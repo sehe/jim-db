@@ -29,13 +29,13 @@ of memory and allow to querry them.
 \date DATE
 */
 
-#include "net/TCPServer.h"
-#include "log/Logger.h"
+#include "network/tcpserver.h"
+#include "log/logger.h"
 #include <thread>
 #include <list>
 #include "configuration.h"
-#include "tasking/TaskQueue.h"
-#include "thread/Worker.h"
+#include "tasking/taskqueue.h"
+#include "thread/worker.h"
 #pragma comment(lib,"user32.lib")
 #include <iostream>
 

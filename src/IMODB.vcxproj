@@ -120,43 +120,43 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="dataTyps\StringType.cpp" />
-    <ClCompile Include="dataTyps\FreeType.cpp" />
-    <ClCompile Include="net\Message.cpp" />
-    <ClCompile Include="page\Page.cpp" />
-    <ClCompile Include="tasking\ClientPollTask.cpp" />
+    <ClCompile Include="dataTyps\stringtype.cpp" />
+    <ClCompile Include="dataTyps\freetype.cpp" />
+    <ClCompile Include="network\message.cpp" />
+    <ClCompile Include="page\page.cpp" />
+    <ClCompile Include="tasking\clientpolltask.cpp" />
     <ClCompile Include="configuration.cpp" />
-    <ClCompile Include="log\LogTimer.cpp" />
-    <ClCompile Include="log\Logger.cpp" />
-    <ClCompile Include="log\LogMessage.cpp" />
-    <ClCompile Include="net\ClientHandle.cpp" />
+    <ClCompile Include="log\logtimer.cpp" />
+    <ClCompile Include="log\logger.cpp" />
+    <ClCompile Include="log\logmessage.cpp" />
+    <ClCompile Include="network\clienthandle.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="net\TCPServer.cpp" />
-    <ClCompile Include="tasking\InsertTask.cpp" />
-    <ClCompile Include="tasking\ParseTask.cpp" />
-    <ClCompile Include="tasking\TaskQueue.cpp" />
-    <ClCompile Include="thread\Worker.cpp" />
+    <ClCompile Include="network\tcpserver.cpp" />
+    <ClCompile Include="tasking\inserttask.cpp" />
+    <ClCompile Include="tasking\parsetask.cpp" />
+    <ClCompile Include="tasking\taskqueue.cpp" />
+    <ClCompile Include="thread\worker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assert.h" />
-    <ClInclude Include="dataTyps\BaseType.hpp" />
-    <ClInclude Include="dataTyps\BaseType.h" />
-    <ClInclude Include="dataTyps\StringType.h" />
-    <ClInclude Include="dataTyps\StringType.hpp" />
-    <ClInclude Include="dataTyps\FreeType.h" />
-    <ClInclude Include="net\Message.h" />
-    <ClInclude Include="net\IClient.h" />
-    <ClInclude Include="net\IServer.h" />
-    <ClInclude Include="net\Message.hpp" />
-    <ClInclude Include="page\Page.h" />
-    <ClInclude Include="tasking\ClientPollTask.h" />
+    <ClInclude Include="dataTyps\basetype.hpp" />
+    <ClInclude Include="dataTyps\basetype.h" />
+    <ClInclude Include="dataTyps\stringtype.h" />
+    <ClInclude Include="dataTyps\stringtype.hpp" />
+    <ClInclude Include="dataTyps\freetype.h" />
+    <ClInclude Include="network\message.h" />
+    <ClInclude Include="network\iclient.h" />
+    <ClInclude Include="network\iserver.h" />
+    <ClInclude Include="network\message.hpp" />
+    <ClInclude Include="page\page.h" />
+    <ClInclude Include="tasking\clientpolltask.h" />
     <ClInclude Include="configuration.h" />
-    <ClInclude Include="log\LogTimer.h" />
-    <ClInclude Include="log\Logger.h" />
-    <ClInclude Include="log\LogMessage.h" />
-    <ClInclude Include="net\ClientHandle.h" />
-    <ClInclude Include="net\TCPServer.h" />
-    <ClInclude Include="log\SpinLock.h" />
+    <ClInclude Include="log\logtimer.h" />
+    <ClInclude Include="log\logger.h" />
+    <ClInclude Include="log\logmessage.h" />
+    <ClInclude Include="network\clienthandle.h" />
+    <ClInclude Include="network\tcpserver.h" />
+    <ClInclude Include="log\spinlock.h" />
     <ClInclude Include="stx\btree.h" />
     <ClInclude Include="stx\btree_map.h" />
     <ClInclude Include="stx\btree_multimap.h" />
@@ -193,9 +193,9 @@
     <ClInclude Include="rapidjson\reader.h" />
     <ClInclude Include="rapidjson\stringbuffer.h" />
     <ClInclude Include="rapidjson\writer.h" />
-    <ClInclude Include="tasking\Task.h" />
-    <ClInclude Include="tasking\TaskQueue.h" />
-    <ClInclude Include="thread\Worker.h" />
+    <ClInclude Include="tasking\task.h" />
+    <ClInclude Include="tasking\taskqueue.h" />
+    <ClInclude Include="thread\worker.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="config.cfg">

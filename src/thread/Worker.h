@@ -21,7 +21,7 @@
 
 #pragma once
 #include <thread>
-#include "../tasking/TaskQueue.h"
+#include "../tasking/taskqueue.h"
 
 class Worker
 {
