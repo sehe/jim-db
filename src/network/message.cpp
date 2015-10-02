@@ -20,11 +20,6 @@
 **/
 #include "message.h"
 
-Message::Message(char* message) : m_message(message)
-{
-	m_doc.ParseInsitu(m_message);//parse the message
-}
-
 Message::~Message()
 {
 	delete[] m_message;

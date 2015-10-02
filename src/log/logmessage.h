@@ -65,7 +65,7 @@ public:
     returns self reference
     */
 	template <typename T>
-	LogMessage& operator<<(const T& m);
+	inline LogMessage& operator<<(const T& m);
 
 
 	LogMessage(const LogMessage& other);
@@ -80,10 +80,4 @@ private:
 	LoggerTypes m_type;
 };
 
-template <typename T>
-inline
-LogMessage& LogMessage::operator<<(const T& m)
-{
-	m_stream << m;
-	return *this;
-}
+#include "logmessage.hpp"

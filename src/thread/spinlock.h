@@ -29,20 +29,10 @@ private:
 
 public:
 	//since atomic_flag has no assignement we need to clear it like this.
-	inline SpinLock()
-	{
-		lck.clear(std::memory_order_release);
-	};
-
+	inline SpinLock();
 	~SpinLock() {};
-
-	inline void lock()
-	{
-		while (lck.test_and_set(std::memory_order_acquire)) { }
-	}
-
-	inline void unlock()
-	{
-		lck.clear(std::memory_order_release);
-	}
+	inline void lock();
+	inline void unlock();
 };
+
+#include "spinlock.hpp"

@@ -21,6 +21,10 @@
 
 #pragma once
 #include "message.h"
+inline Message::Message(char* message) : m_message(message)
+{
+	m_doc.ParseInsitu(m_message);//parse the message
+}
 
 inline rapidjson::Document& Message::operator()() {
 	return m_doc;

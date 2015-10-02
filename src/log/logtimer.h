@@ -52,39 +52,13 @@ public:
 	template <typename T>
 	LogTimer& operator<<(const T& m);
 
-	LogTimer(const LogTimer& other)
-		: LogMessage(other),
-		  m_start(other.m_start) { }
+	LogTimer(const LogTimer& other);
+	LogTimer(LogTimer&& other);
 
-	LogTimer(LogTimer&& other)
-		: LogMessage(std::move(other)),
-		  m_start(std::move(other.m_start)) { }
-
-	LogTimer& operator=(const LogTimer& other)
-	{
-		if (this == &other)
-			return *this;
-		LogMessage::operator =(other);
-		m_start = other.m_start;
-		return *this;
-	}
-
-	LogTimer& operator=(LogTimer&& other)
-	{
-		if (this == &other)
-			return *this;
-		LogMessage::operator =(std::move(other));
-		m_start = std::move(other.m_start);
-		return *this;
-	}
-
+	inline LogTimer& operator=(const LogTimer& other);
+	inline LogTimer& operator=(LogTimer&& other);
 private:
 	std::chrono::high_resolution_clock::time_point m_start;
 };
 
-template <typename T>
-LogTimer& LogTimer::operator<<(const T& m)
-{
-	LogMessage::operator<<(m);
-	return *this;
-}
+#include "logtimer.hpp"

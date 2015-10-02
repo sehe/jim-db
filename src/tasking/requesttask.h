@@ -1,4 +1,4 @@
-/**
+﻿/**
 ############################################################################
 # GPL License                                                              #
 #                                                                          #
@@ -19,24 +19,21 @@
 ############################################################################
 **/
 
+
 #pragma once
-#include <memory>
 #include "task.h"
-#include "../network/iclient.h"
 
 /**
-\brief A simple task to Parse a json request
+\brief This task accepts a new request 
 
+It comes right after the handshake and does get the data itself to process.
+Moreover it does check which type it is and generates the depending task for it.
 \author Benjamin Meyer
-\date 15.09.2015 14:23
+\date 02.10.2015 16:20
 */
-class ParseTask: public Task
+class RequestTask:public Task
 {
 public:
-	ParseTask(std::shared_ptr<IClient> client, std::shared_ptr<Message> s);
-	~ParseTask();
-
+	explicit RequestTask(const std::shared_ptr<IClient> client);
 	void execute() override;
-private:
-	std::shared_ptr<Message> m_message;
 };

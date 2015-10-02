@@ -35,4 +35,5 @@ public:
 
 	virtual std::shared_ptr<Message>  getData() = 0;
 	virtual int getSocketID() const = 0;
+	virtual void close() = 0;
 };

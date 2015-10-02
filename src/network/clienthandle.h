@@ -46,6 +46,7 @@ public:
 	bool send(std::shared_ptr<std::string> s) override;
 	bool hasData() override;
 	bool isConnected() const override;
+	void close() override;
 
 	/**
 	\brief Get data from client
@@ -66,5 +67,4 @@ private:
 	bool m_connected;
 
 	bool checkRetValRecv(const int& i);
-	bool handShake();
 };

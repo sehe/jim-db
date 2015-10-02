@@ -1,4 +1,4 @@
-/**
+﻿/**
 ############################################################################
 # GPL License                                                              #
 #                                                                          #
@@ -19,30 +19,18 @@
 ############################################################################
 **/
 
-#include "clientpolltask.h"
-#include "taskqueue.h"
-#include "parsetask.h"
+#pragma once
+#include "task.h"
 
+/**
+\brief performs a handshake
 
-ClientPollTask::ClientPollTask(std::shared_ptr<IClient> client):Task(client) {}
-
-
-ClientPollTask::~ClientPollTask() {}
-
-
-void ClientPollTask::execute()
+\author Benjamin Meyer
+\date 02.10.2015 16:21
+*/
+class HandshakeTask: public Task
 {
-	if (!m_client->isConnected())
-	{
-		//nothing todo here so the task is over
-		return;
-	}
-	//we are connected check for data
-	if (m_client->hasData())
-	{
-		//get into the next task which is parsing
-		TaskQueue::getInstance().push_pack(std::make_shared<ParseTask>(m_client, m_client->getData()));
-		return;
-	}
-	TaskQueue::getInstance().push_pack(std::make_shared<ClientPollTask>(m_client));
-}
+public:
+	explicit HandshakeTask(const std::shared_ptr<IClient> client);
+	void execute() override;
+};

@@ -20,7 +20,7 @@
 **/
 
 #include "tcpserver.h"
-#include "../tasking/clientpolltask.h"
+#include "../tasking/handshake.h"
 
 const char TCPServer::DEFAULT_PORT[] = "6060";
 const int TCPServer::DEFAULT_BUFFER_SIZE = 512;
@@ -142,7 +142,8 @@ int TCPServer::accept(const bool& blocking)
 
 	//add new Client handler Task
 	auto newCl = std::make_shared<ClientHandle>(ClientSocket, their_addr);
-	TaskQueue::getInstance().push_pack(std::make_shared<ClientPollTask>(newCl));
+	//start with the handshake
+	TaskQueue::getInstance().push_pack(std::make_shared<HandshakeTask>(newCl));
 
 	//now do whatever you want
 	char s[INET6_ADDRSTRLEN];

@@ -32,12 +32,12 @@ ClientHandle::ClientHandle(const SOCKET& s, const sockaddr_storage& add) : m_soc
 	clientTv.tv_sec = 0;
 	clientTv.tv_usec = 100;
 	setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char *>(&clientTv), sizeof(struct timeval));
-	handShake();
 }
 
 ClientHandle::~ClientHandle()
 {
 	closesocket(m_sock);
+	LOG_DEBUG << "Client:" << m_sock << " closed";
 }
 
 bool ClientHandle::operator<<(std::shared_ptr<std::string> s)
@@ -93,6 +93,12 @@ bool ClientHandle::hasData()
 bool ClientHandle::isConnected() const
 {
 	return m_connected;
+}
+
+void ClientHandle::close()
+{
+	m_connected = false;
+	closesocket(m_sock);
 }
 
 std::shared_ptr<Message> ClientHandle::getData()
@@ -152,43 +158,6 @@ bool ClientHandle::checkRetValRecv(const int& n)
 	if (n == 0)
 	{
 		LOG_INFO << "Client disconnected.";
-		m_connected = false;
-		return false;
-	}
-	return true;
-}
-
-bool ClientHandle::handShake()
-{
-	rapidjson::Document doc;
-	doc.SetObject();
-
-	doc.AddMember("type", "handshake", doc.GetAllocator());
-	doc.AddMember("data", "hi", doc.GetAllocator());
-
-	// Convert JSON document to string
-	rapidjson::StringBuffer strbuf;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
-	doc.Accept(writer);
-
-	auto handshake = std::make_shared<std::string>(strbuf.GetString());
-	//sending a handshake HI and wait 1s to return a hi as shake
-	send(handshake);
-	if (!hasData())
-	{
-		LOG_INFO << "handshake Failed";
-		m_connected = false;
-		return false;
-	}
-
-	auto mes = getData();
-	//check if handshaje is valid
-
-	if (std::string("hi") == mes->operator()()["data"].GetString())
-		LOG_DEBUG << "Handshake successful";
-	else
-	{
-		LOG_WARN << "handshake Failed";
 		m_connected = false;
 		return false;
 	}

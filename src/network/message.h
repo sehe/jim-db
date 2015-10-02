@@ -34,7 +34,7 @@ and also manipulates it right after creation. ( In Situ parsing)
 class Message
 {
 public:
-	explicit Message(char* message);
+	inline explicit Message(char* message);
 	~Message();
 
 	/**

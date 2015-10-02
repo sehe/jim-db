@@ -33,8 +33,9 @@
 #define LOG_ERROR Logger::Log(LoggerTypes::ERROR_L,__FILENAME__,__LINE__)
 #define LOG_INFO Logger::Log(LoggerTypes::INFO,__FILENAME__,__LINE__)
 #define LOG_WARN Logger::Log(LoggerTypes::WARNING,__FILENAME__,__LINE__)
-#define LOG_DEBUG Logger::Log(LoggerTypes::DEBUG,__FILENAME__,__LINE__)
 #define LOG_EXCAPT Logger::Log(LoggerTypes::EXCAPTION,__FILENAME__,__LINE__)
+#define LOG_DEBUG Logger::Log(LoggerTypes::DEBUG,__FILENAME__,__LINE__)
+
 
 /**
 to prevent from copy elision
