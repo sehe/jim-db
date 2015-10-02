@@ -21,7 +21,6 @@
 
 #include "logger.h"
 #include "../configuration.h"
-
 #include <string>
 #include <sstream>
 #include <mutex>
@@ -29,55 +28,54 @@
 
 namespace jimdb
 {
-	namespace common
-	{
-		std::ofstream* Logger::m_file = nullptr;
-		Logger Logger::m_instance;
-		tasking::SpinLock Logger::m_lock;
-		const std::string Logger::DEFAULT_LOG_FILE = "defaultLogFile.txt";
+    namespace common
+    {
+        std::ofstream* Logger::m_file = nullptr;
+        Logger Logger::m_instance;
+        tasking::SpinLock Logger::m_lock;
+        const std::string Logger::DEFAULT_LOG_FILE = "defaultLogFile.txt";
 
-		LogMessage Logger::Log(LoggerTypes type, const std::string& file, const int& i)
-		{
-			return LogMessage(type, file, i);
-		}
+        LogMessage Logger::Log(LoggerTypes type, const std::string& file, const int& i)
+        {
+            return LogMessage(type, file, i);
+        }
 
-		LogTimer Logger::Timer(const std::string& file, const int& i)
-		{
-			return LogTimer(LoggerTypes::TIMER, file, i);
-		}
+        LogTimer Logger::Timer(const std::string& file, const int& i)
+        {
+            return LogTimer(LoggerTypes::TIMER, file, i);
+        }
 
-		Logger& Logger::getInstance()
-		{
-			if (m_file == nullptr)
-				m_file = new std::ofstream(Configuration::getInstance().get(LOG_FILE),
-				                           std::ofstream::out | std::ofstream::app);
+        Logger& Logger::getInstance()
+        {
+            if (m_file == nullptr)
+                m_file = new std::ofstream(Configuration::getInstance().get(LOG_FILE),
+                                           std::ofstream::out | std::ofstream::app);
+            return m_instance;
+        }
 
-			return m_instance;
-		}
+        void Logger::setLogLevel(const int& i)
+        {
+            m_logLevel = i;
+        }
 
-		void Logger::setLogLevel(const int& i)
-		{
-			m_logLevel = i;
-		}
+        int Logger::getLogLevel() const
+        {
+            return m_logLevel;
+        }
 
-		int Logger::getLogLevel() const
-		{
-			return m_logLevel;
-		}
+        void Logger::operator<<(const std::ostringstream& message) const
+        {
+            std::lock_guard<tasking::SpinLock> lock(m_lock);
+            std::cout << message.str() << "\n";
+            *m_file << message.str() << "\n";
+            m_file->flush();
+        }
 
-		void Logger::operator<<(const std::ostringstream& message) const
-		{
-			std::lock_guard<tasking::SpinLock> lock(m_lock);
-			std::cout << message.str() << "\n";
-			*m_file << message.str() << "\n";
-			m_file->flush();
-		}
-
-		Logger::~Logger()
-		{
-			//clean up
-			m_file->flush();
-			delete m_file;
-		}
-	}
+        Logger::~Logger()
+        {
+            //clean up
+            m_file->flush();
+            delete m_file;
+        }
+    }
 }

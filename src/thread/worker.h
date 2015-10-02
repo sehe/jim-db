@@ -24,19 +24,20 @@
 #include "../tasking/taskqueue.h"
 namespace jimdb
 {
-	namespace tasking {
-		class Worker
-		{
-		public:
-			explicit Worker(TaskQueue& t);
-			~Worker();
-			void stop();
+    namespace tasking
+    {
+        class Worker
+        {
+        public:
+            explicit Worker(TaskQueue& t);
+            ~Worker();
+            void stop();
 
-		private:
-			TaskQueue& m_tasks;
-			std::thread m_thread;
-			bool m_running;
-			void doTask();
-		};
-	}
+        private:
+            TaskQueue& m_tasks;
+            std::thread m_thread;
+            bool m_running;
+            void doTask();
+        };
+    }
 }

@@ -23,16 +23,16 @@
 #include "message.h"
 namespace jimdb
 {
-	namespace network
-	{
-		inline Message::Message(char* message) : m_message(message)
-		{
-			m_doc.ParseInsitu(m_message);//parse the message
-		}
+    namespace network
+    {
+        inline Message::Message(char* message) : m_message(message)
+        {
+            m_doc.ParseInsitu(m_message);//parse the message
+        }
 
-		inline rapidjson::Document& Message::operator()()
-		{
-			return m_doc;
-		}
-	}
+        inline rapidjson::Document& Message::operator()()
+        {
+            return m_doc;
+        }
+    }
 }

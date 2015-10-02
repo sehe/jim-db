@@ -44,79 +44,71 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
 int main(int argc, char* argv[])
 {
-	std::string configFile = "config.cfg";
-	if (argc > 1)
-		configFile = argv[1];
-	//get the config instance
-	auto& cfg = jimdb::common::Configuration::getInstance();
-	if (!cfg.parse(configFile))
-	{
-		std::cout << "Missing a config file!" << std::endl;
-		return 0;
-	}
-	//set the loglevel of the config or the default log level
-	jimdb::common::Logger::getInstance().setLogLevel(cfg.getInt(jimdb::common::LOG_LEVEL));
-	LOG_INFO << cfg; //print out the config
-
-	//setup the console handle:
-	if (SetConsoleCtrlHandler(
-		static_cast<PHANDLER_ROUTINE>(ConsoleHandler), TRUE) == FALSE)
-	{
-		LOG_WARN << "Unable to install console handler!";
-	}
-
-	//Page p(4096, 4 * 4096);
-
-	/**
-	//checking type
-	char buffer[100];
-	auto typ0 = new(&buffer) StringType("Testing a Type");
-	//put a second behind the first. since the first is 16bit + text ... don't forget the class itself!
-	auto typ1 = new(&buffer[14 + sizeof(StringType)]) StringType("One more Type");
-	auto typ2 = new(&buffer[27 + 2 * sizeof(BaseType<double>)]) BaseType<double>(22.15);
-	LOG_INFO << *typ0->getString();
-	LOG_INFO << *typ1->getString();
-	LOG_INFO << typ2->getData(); 
-	LOG_INFO << typ0->getData(); //size of type0
-	//no need for deletion since buffer will be deleted and everything is inside the buffer.
-	*/
-
-	auto& tasks = jimdb::tasking::TaskQueue::getInstance();
-
-	std::shared_ptr<jimdb::network::IServer> tcpServer = std::make_shared<jimdb::network::TCPServer>(tasks);
-	tcpServer->start();
-
-	//start the workers
-	auto threads = cfg.getInt(jimdb::common::THREADS);
-	//if the config value is 0 take hardware conc.
-	if (threads == 0)
-	{
-		threads = std::thread::hardware_concurrency() - 1; //since the mainthread
-	}
-
-	LOG_INFO << "Starting: " << threads + 1 << " Workers";
-	std::list<std::unique_ptr<jimdb::tasking::Worker>> m_workers;
-	for (auto i = 0; i < std::thread::hardware_concurrency(); ++i)
-	{
-		m_workers.push_back(std::make_unique<jimdb::tasking::Worker>(tasks));
-	}
-
-	//use this as acceptor and handshaker 
-	//do nothing else here!
-	while (true)
-	{
-		tcpServer->accept(true); //call accept blocking
-	}
+    std::string configFile = "config.cfg";
+    if (argc > 1)
+        configFile = argv[1];
+    //get the config instance
+    auto& cfg = jimdb::common::Configuration::getInstance();
+    if (!cfg.parse(configFile))
+    {
+        std::cout << "Missing a config file!" << std::endl;
+        return 0;
+    }
+    //set the loglevel of the config or the default log level
+    jimdb::common::Logger::getInstance().setLogLevel(cfg.getInt(jimdb::common::LOG_LEVEL));
+    LOG_INFO << cfg; //print out the config
+    //setup the console handle:
+    if (SetConsoleCtrlHandler(
+                static_cast<PHANDLER_ROUTINE>(ConsoleHandler), TRUE) == FALSE)
+    {
+        LOG_WARN << "Unable to install console handler!";
+    }
+    //Page p(4096, 4 * 4096);
+    /**
+    //checking type
+    char buffer[100];
+    auto typ0 = new(&buffer) StringType("Testing a Type");
+    //put a second behind the first. since the first is 16bit + text ... don't forget the class itself!
+    auto typ1 = new(&buffer[14 + sizeof(StringType)]) StringType("One more Type");
+    auto typ2 = new(&buffer[27 + 2 * sizeof(BaseType<double>)]) BaseType<double>(22.15);
+    LOG_INFO << *typ0->getString();
+    LOG_INFO << *typ1->getString();
+    LOG_INFO << typ2->getData();
+    LOG_INFO << typ0->getData(); //size of type0
+    //no need for deletion since buffer will be deleted and everything is inside the buffer.
+    */
+    auto& tasks = jimdb::tasking::TaskQueue::getInstance();
+    std::shared_ptr<jimdb::network::IServer> tcpServer = std::make_shared<jimdb::network::TCPServer>(tasks);
+    tcpServer->start();
+    //start the workers
+    auto threads = cfg.getInt(jimdb::common::THREADS);
+    //if the config value is 0 take hardware conc.
+    if (threads == 0)
+    {
+        threads = std::thread::hardware_concurrency() - 1; //since the mainthread
+    }
+    LOG_INFO << "Starting: " << threads + 1 << " Workers";
+    std::list<std::unique_ptr<jimdb::tasking::Worker>> m_workers;
+    for (auto i = 0; i < std::thread::hardware_concurrency(); ++i)
+    {
+        m_workers.push_back(std::make_unique<jimdb::tasking::Worker>(tasks));
+    }
+    //use this as acceptor and handshaker
+    //do nothing else here!
+    while (true)
+    {
+        tcpServer->accept(true); //call accept blocking
+    }
 }
 
 
 BOOL WINAPI ConsoleHandler(DWORD CEvent)
 {
-	switch (CEvent)
-	{
-	case CTRL_CLOSE_EVENT:
-		MessageBox(nullptr,
-		           "Program being closed!", "CEvent", MB_OK);
-	}
-	return true;
+    switch (CEvent)
+    {
+        case CTRL_CLOSE_EVENT:
+            MessageBox(nullptr,
+                       "Program being closed!", "CEvent", MB_OK);
+    }
+    return true;
 }

@@ -22,27 +22,28 @@
 #include "worker.h"
 namespace jimdb
 {
-	namespace tasking {
-		Worker::Worker(TaskQueue& t) : m_tasks(t), m_thread(&Worker::doTask, this), m_running(true) {}
+    namespace tasking
+    {
+        Worker::Worker(TaskQueue& t) : m_tasks(t), m_thread(&Worker::doTask, this), m_running(true) {}
 
-		Worker::~Worker()
-		{
-			m_running = false;
-			m_thread.join();
-		}
+        Worker::~Worker()
+        {
+            m_running = false;
+            m_thread.join();
+        }
 
-		void Worker::stop()
-		{
-			m_running = false;
-		}
+        void Worker::stop()
+        {
+            m_running = false;
+        }
 
-		void Worker::doTask()
-		{
-			while (m_running)
-			{
-				auto task = m_tasks.pop_front();
-				(*task)(); //execute the task
-			}
-		}
-	}
+        void Worker::doTask()
+        {
+            while (m_running)
+            {
+                auto task = m_tasks.pop_front();
+                (*task)(); //execute the task
+            }
+        }
+    }
 }

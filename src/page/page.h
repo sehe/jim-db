@@ -22,33 +22,35 @@
 #pragma once
 #include <memory>
 #include "../datatype/freetype.h"
-namespace jimdb {
-	namespace memorymanagement {
-		class Page
-		{
-		public:
-			Page(long long header, long long body);
-			~Page();
+namespace jimdb
+{
+    namespace memorymanagement
+    {
+        class Page
+        {
+        public:
+            Page(long long header, long long body);
+            ~Page();
 
-			void setNext(const long long& id);
-			long long getNext() const;
+            void setNext(const long long& id);
+            long long getNext() const;
 
-		private:
-			char* m_header;
-			char* m_body;
+        private:
+            char* m_header;
+            char* m_body;
 
-			//pointer to the free typ chain start
-			FreeType* m_free;
-			//position of the free typ object start info
-			long long* m_freepos;
-			//holds the information of free space
-			long long m_freeSpace;
-			//holds the ID of the next page
-			long long m_next;
-			long long m_id;
+            //pointer to the free typ chain start
+            FreeType* m_free;
+            //position of the free typ object start info
+            long long* m_freepos;
+            //holds the information of free space
+            long long m_freeSpace;
+            //holds the ID of the next page
+            long long m_next;
+            long long m_id;
 
-			//id generation with static counter
-			static long long m_s_idCounter;
-		};
-	}
+            //id generation with static counter
+            static long long m_s_idCounter;
+        };
+    }
 }

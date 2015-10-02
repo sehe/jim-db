@@ -26,51 +26,52 @@
 #include <deque>
 namespace jimdb
 {
-	namespace tasking {
-		/**
-		\brief Thread Safe Queue for Tasks
+    namespace tasking
+    {
+        /**
+        \brief Thread Safe Queue for Tasks
 
-		\author Benjamin Meyer
-		\date 15.09.2015 14:25
-		*/
-		class TaskQueue
-		{
-		public:
-			static TaskQueue& getInstance();
-			/**\brief Add a new task
-			*
-			* Pushs a new task to the task queues back
-			*\param[in] std::unique_ptr<Task> t the task to add
-			*@author Benjamin Meyer
-			*@date Mittwoch, 22. Juli 2015
-			*/
-			void push_pack(std::shared_ptr<Task> t);
+        \author Benjamin Meyer
+        \date 15.09.2015 14:25
+        */
+        class TaskQueue
+        {
+        public:
+            static TaskQueue& getInstance();
+            /**\brief Add a new task
+            *
+            * Pushs a new task to the task queues back
+            *\param[in] std::unique_ptr<Task> t the task to add
+            *@author Benjamin Meyer
+            *@date Mittwoch, 22. Juli 2015
+            */
+            void push_pack(std::shared_ptr<Task> t);
 
-			/**\brief returns a task without copying it
-			*
-			* get the next task of the queues front
-			*\return unique_ptr<Task> from the front
-			*@author Benjamin Meyer
-			*@date Mittwoch, 22. Juli 2015
-			*/
+            /**\brief returns a task without copying it
+            *
+            * get the next task of the queues front
+            *\return unique_ptr<Task> from the front
+            *@author Benjamin Meyer
+            *@date Mittwoch, 22. Juli 2015
+            */
 
-			std::shared_ptr<Task> pop_front();
-			/**\brief Returns the current size of the taskqueue
-			*
-			* If its 0 do not execute a task of it!
-			*@author Benjamin Meyer
-			*@date Mittwoch, 22. Juli 2015
-			*/
-			int size() const;
+            std::shared_ptr<Task> pop_front();
+            /**\brief Returns the current size of the taskqueue
+            *
+            * If its 0 do not execute a task of it!
+            *@author Benjamin Meyer
+            *@date Mittwoch, 22. Juli 2015
+            */
+            int size() const;
 
-		private:
-			TaskQueue();
-			~TaskQueue();
+        private:
+            TaskQueue();
+            ~TaskQueue();
 
-			static TaskQueue m_instance;
-			std::deque<std::shared_ptr<Task>> m_tasks;
-			std::condition_variable m_cond;
-			std::mutex m_mutex;
-		};
-	}
+            static TaskQueue m_instance;
+            std::deque<std::shared_ptr<Task>> m_tasks;
+            std::condition_variable m_cond;
+            std::mutex m_mutex;
+        };
+    }
 }

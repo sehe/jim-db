@@ -23,45 +23,46 @@
 #include "logmessage.h"
 #include <chrono>
 #include <utility>
-namespace jimdb {
-	namespace common {
-		/**
-		\brief Extends the regular LogMessage by a µs timer
+namespace jimdb
+{
+    namespace common
+    {
+        /**
+        \brief Extends the regular LogMessage by a µs timer
 
-		It starts a timer and ends it when its distroyed. While it is Distroyed the
-		time between start and end is taken and appended to the log data to know the execution time of the
-		current scope.
+        It starts a timer and ends it when its distroyed. While it is Distroyed the
+        time between start and end is taken and appended to the log data to know the execution time of the
+        current scope.
 
-		Use it like this
-		\code
-		{
-			LogTimer timer;
-			timer << "something";
-			//do something you want to mesure
-		}//here it will be logged
-		\endcode
-		\author Benjamin Meyer
-		*/
-		class LogTimer : public jimdb::common::LogMessage
-		{
-		public:
+        Use it like this
+        \code
+        {
+        	LogTimer timer;
+        	timer << "something";
+        	//do something you want to mesure
+        }//here it will be logged
+        \endcode
+        \author Benjamin Meyer
+        */
+        class LogTimer : public jimdb::common::LogMessage
+        {
+        public:
 
-			explicit LogTimer(const jimdb::common::LoggerTypes& type, const std::string& file = "",
-				const int& i = 0);
-			~LogTimer();
+            explicit LogTimer(const jimdb::common::LoggerTypes& type, const std::string& file = "",
+                              const int& i = 0);
+            ~LogTimer();
 
-			template <typename T>
-			LogTimer& operator<<(const T& m);
+            template <typename T>
+            LogTimer& operator<<(const T& m);
 
-			LogTimer(const LogTimer& other);
-			LogTimer(LogTimer&& other);
+            LogTimer(const LogTimer& other);
+            LogTimer(LogTimer&& other);
 
-			inline LogTimer& operator=(const LogTimer& other);
-			inline LogTimer& operator=(LogTimer&& other);
-		private:
-			std::chrono::high_resolution_clock::time_point m_start;
-		};
-
-#include "logtimer.hpp"
-	}
+            inline LogTimer& operator=(const LogTimer& other);
+            inline LogTimer& operator=(LogTimer&& other);
+        private:
+            std::chrono::high_resolution_clock::time_point m_start;
+        };
+    }
 }
+#include "logtimer.hpp"

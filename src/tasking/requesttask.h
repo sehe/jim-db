@@ -24,20 +24,21 @@
 #include "task.h"
 namespace jimdb
 {
-	namespace tasking {
-		/**
-		\brief This task accepts a new request
+    namespace tasking
+    {
+        /**
+        \brief This task accepts a new request
 
-		It comes right after the handshake and does get the data itself to process.
-		Moreover it does check which type it is and generates the depending task for it.
-		\author Benjamin Meyer
-		\date 02.10.2015 16:20
-		*/
-		class RequestTask :public Task
-		{
-		public:
-			explicit RequestTask(const std::shared_ptr<network::IClient> client);
-			void operator()() override;
-		};
-	}
+        It comes right after the handshake and does get the data itself to process.
+        Moreover it does check which type it is and generates the depending task for it.
+        \author Benjamin Meyer
+        \date 02.10.2015 16:20
+        */
+        class RequestTask :public Task
+        {
+        public:
+            explicit RequestTask(const std::shared_ptr<network::IClient> client);
+            void operator()() override;
+        };
+    }
 }

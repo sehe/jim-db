@@ -24,37 +24,37 @@
 
 namespace jimdb
 {
-	namespace network
-	{
-		/**
-		\brief Message type which holds the Message of a client
+    namespace network
+    {
+        /**
+        \brief Message type which holds the Message of a client
 
-		It also holds the parsed document since it refares to the message (char*)
-		and also manipulates it right after creation. ( In Situ parsing)
+        It also holds the parsed document since it refares to the message (char*)
+        and also manipulates it right after creation. ( In Situ parsing)
 
-		\author Benjamin Meyer
-		\date 01.10.2015 19:23
-		*/
-		class Message
-		{
-		public:
-			inline explicit Message(char* message);
-			~Message();
+        \author Benjamin Meyer
+        \date 01.10.2015 19:23
+        */
+        class Message
+        {
+        public:
+            inline explicit Message(char* message);
+            ~Message();
 
-			/**
-			\brief Method to get the document of the message
+            /**
+            \brief Method to get the document of the message
 
-			\return A Reference to the rapidjson::Document of the message
-			\author Benjamin Meyer
-			\date 01.10.2015 19:24
-			*/
-			inline rapidjson::Document& operator()();
+            \return A Reference to the rapidjson::Document of the message
+            \author Benjamin Meyer
+            \date 01.10.2015 19:24
+            */
+            inline rapidjson::Document& operator()();
 
-		private:
-			char* m_message;
-			rapidjson::Document m_doc;
-		};
+        private:
+            char* m_message;
+            rapidjson::Document m_doc;
+        };
 
-	}
+    }
 }
 #include "Message.hpp"

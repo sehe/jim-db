@@ -25,27 +25,27 @@
 
 namespace jimdb
 {
-	namespace network
-	{
-		enum MessageTypes
-		{
-			HANDSHAKE,
-		};
+    namespace network
+    {
+        enum MessageTypes
+        {
+            HANDSHAKE,
+        };
 
-/**
-\brief Prototyp of a message Factory
+        /**
+        \brief Prototyp of a message Factory
 
-just a prototyp to use now
-\author Benjamin Meyer
-\date 02.10.2015 18:23
-*/
-		class MessageFactory
-		{
-		public:
-			MessageFactory();
-			std::shared_ptr<std::string> generate(const MessageTypes& t) const;
-		};
-	}
+        just a prototyp to use now
+        \author Benjamin Meyer
+        \date 02.10.2015 18:23
+        **/
+        class MessageFactory
+        {
+            public:
+                MessageFactory();
+                std::shared_ptr<std::string> generate(const MessageTypes& t) const;
+        };
+    }
 }
 
 #include "message.hpp"

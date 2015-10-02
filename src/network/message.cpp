@@ -21,10 +21,11 @@
 #include "message.h"
 namespace jimdb
 {
-	namespace network {
-		Message::~Message()
-		{
-			delete[] m_message;
-		}
-	}
+    namespace network
+    {
+        Message::~Message()
+        {
+            delete[] m_message;
+        }
+    }
 }

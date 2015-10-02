@@ -22,27 +22,28 @@
 #pragma once
 namespace jimdb
 {
-	namespace network {
-		class IServer
-		{
-		public:
-			virtual ~IServer() { }
+    namespace network
+    {
+        class IServer
+        {
+        public:
+            virtual ~IServer() { }
 
-			/**
-			* accepts a new client if a new connection is available.
-			* if not it does nothing.
-			* If the client list is empty it does a blocking connection
-			* \param[in] bool blocking if the accept should block
-			*/
-			virtual int accept(const bool& blocking) = 0;
+            /**
+            * accepts a new client if a new connection is available.
+            * if not it does nothing.
+            * If the client list is empty it does a blocking connection
+            * \param[in] bool blocking if the accept should block
+            */
+            virtual int accept(const bool& blocking) = 0;
 
-			/**
-		*\brief start the server
-		*
-		*\author Benjamin Meyer
-		*\date 30.09.2015 19:41
-		*/
-			virtual bool start() = 0;
-		};
-	}
+            /**
+            *\brief start the server
+            *
+            *\author Benjamin Meyer
+            *\date 30.09.2015 19:41
+            */
+            virtual bool start() = 0;
+        };
+    }
 }

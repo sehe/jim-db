@@ -23,25 +23,26 @@
 #include "../network/clienthandle.h"
 namespace jimdb
 {
-	namespace tasking {
-		/**
-		\brief basic Task
+    namespace tasking
+    {
+        /**
+        \brief basic Task
 
-		Holds all information that is needed and always refares to a client!
-		\author Benjamin Meyer
-		\date 15.09.2015 14:21
-		*/
-		class Task
-		{
-		public:
-			explicit Task(std::shared_ptr<network::IClient> client) :m_client(client) { };
+        Holds all information that is needed and always refares to a client!
+        \author Benjamin Meyer
+        \date 15.09.2015 14:21
+        */
+        class Task
+        {
+        public:
+            explicit Task(std::shared_ptr<network::IClient> client) :m_client(client) { };
 
-			virtual ~Task() { }
+            virtual ~Task() { }
 
-			virtual void operator()() = 0;
+            virtual void operator()() = 0;
 
-		protected:
-			std::shared_ptr<network::IClient> m_client;
-		};
-	}
+        protected:
+            std::shared_ptr<network::IClient> m_client;
+        };
+    }
 }

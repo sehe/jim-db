@@ -27,10 +27,10 @@
 #include "../thread/spinlock.h"
 
 
-		//custom macro for filename shorten but only for windows
+//custom macro for filename shorten but only for windows
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
-		//LINUX
-		//#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+//LINUX
+//#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define LOG_ERROR jimdb::common::Logger::Log(jimdb::common::LoggerTypes::ERROR_L,__FILENAME__,__LINE__)
 #define LOG_INFO jimdb::common::Logger::Log(jimdb::common::LoggerTypes::INFO,__FILENAME__,__LINE__)
@@ -39,7 +39,7 @@
 #define LOG_DEBUG jimdb::common::Logger::Log(jimdb::common::LoggerTypes::DEBUG,__FILENAME__,__LINE__)
 
 
-		/**
+/**
 to prevent from copy elision
 \see http://stackoverflow.com/questions/30372466/logger-logs-2-times-instead-of-one-time-because-of-copy/30372847#30372847
 */
@@ -47,74 +47,74 @@ to prevent from copy elision
 
 namespace jimdb
 {
-	namespace common
-	{
-		/**
-		\brief threadsafe Logger
+    namespace common
+    {
+        /**
+        \brief threadsafe Logger
 
-		It is a threadsafe logger which also can handle scope time logging
-		several makros to log are given like LOG_DEBUG LOG_INFO and so on.
-		To log a scope time use LOG_SCOPE_TIME and dont forget to scope!
+        It is a threadsafe logger which also can handle scope time logging
+        several makros to log are given like LOG_DEBUG LOG_INFO and so on.
+        To log a scope time use LOG_SCOPE_TIME and dont forget to scope!
 
-		\author Benjamin Meyer
-		*/
-		class Logger
-		{
-		public:
+        \author Benjamin Meyer
+        */
+        class Logger
+        {
+        public:
 
-			/**
-			\brief Get a LogMessage
+            /**
+            \brief Get a LogMessage
 
-			Returns a message which can be shifted ostream to with <<.
-			The Message will be written to consol and log.
-			\author Benjamin Meyer
-			\date
-			*/
-			static LogMessage Log(LoggerTypes type, const std::string& file,
-			                      const int& i);
+            Returns a message which can be shifted ostream to with <<.
+            The Message will be written to consol and log.
+            \author Benjamin Meyer
+            \date
+            */
+            static LogMessage Log(LoggerTypes type, const std::string& file,
+                                  const int& i);
 
 
-			/**
-			\brief Get a Timer Message to mesure the time of a scope
+            /**
+            \brief Get a Timer Message to mesure the time of a scope
 
-			Returns a Timer message which can be shifted ostream to with <<.
-			The Message will be written to consol and log.
+            Returns a Timer message which can be shifted ostream to with <<.
+            The Message will be written to consol and log.
 
-			The message will automatically append the time since creation and leaving
-			the local scope. So if use without the macro create a local variable for it.
-			\code
-			{//start a scope
-				LogTimer t = Logger::Timer(__FILE__,__LINE__);
-				//do some thing wou want to mesure the time of
-			} //here it well be logged automatically!
-			\endcode
-			\author Benjamin Meyer
-			\date
-			*/
-			static LogTimer Timer(const std::string& file, const int& i);
+            The message will automatically append the time since creation and leaving
+            the local scope. So if use without the macro create a local variable for it.
+            \code
+            {//start a scope
+            	LogTimer t = Logger::Timer(__FILE__,__LINE__);
+            	//do some thing wou want to mesure the time of
+            } //here it well be logged automatically!
+            \endcode
+            \author Benjamin Meyer
+            \date
+            */
+            static LogTimer Timer(const std::string& file, const int& i);
 
-			static Logger& getInstance();
+            static Logger& getInstance();
 
-			void setLogLevel(const int& i);
-			int getLogLevel() const;
-			void operator<<(const std::ostringstream& message) const;
+            void setLogLevel(const int& i);
+            int getLogLevel() const;
+            void operator<<(const std::ostringstream& message) const;
 
-		private:
-			//default log everything
-			Logger() :m_logLevel(INFO) { };
+        private:
+            //default log everything
+            Logger() :m_logLevel(INFO) { };
 
-			~Logger();
-			//no copy no move no swap
-			Logger(const Logger&) = delete;
-			Logger(Logger&&) = delete;
-			Logger& operator=(const Logger& other) = delete;
-			Logger& operator=(Logger& other) = delete;
+            ~Logger();
+            //no copy no move no swap
+            Logger(const Logger&) = delete;
+            Logger(Logger&&) = delete;
+            Logger& operator=(const Logger& other) = delete;
+            Logger& operator=(Logger& other) = delete;
 
-			static std::ofstream* m_file;
-			static Logger m_instance;
-			static tasking::SpinLock m_lock;
-			static const std::string DEFAULT_LOG_FILE;
-			int m_logLevel;
-		};
-	}
+            static std::ofstream* m_file;
+            static Logger m_instance;
+            static tasking::SpinLock m_lock;
+            static const std::string DEFAULT_LOG_FILE;
+            int m_logLevel;
+        };
+    }
 }

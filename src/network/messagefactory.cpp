@@ -25,32 +25,29 @@
 
 namespace jimdb
 {
-	namespace network
-	{
-		MessageFactory::MessageFactory() {}
+    namespace network
+    {
+        MessageFactory::MessageFactory() {}
 
-		std::shared_ptr<std::string> MessageFactory::generate(const MessageTypes& t) const
-		{
-			rapidjson::Document doc;
-			doc.SetObject();
-			
-			switch (t)
-			{
-			case HANDSHAKE:
-			{
-				//todo maybe a better handshake?!
-				doc.AddMember("type", "handshake", doc.GetAllocator());
-				doc.AddMember("data", "hi", doc.GetAllocator());
-			}
-			break;
-			}
-
-			// Convert JSON document to string
-			rapidjson::StringBuffer strbuf;
-			rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
-			doc.Accept(writer);
-
-			return std::make_shared<std::string>(strbuf.GetString());
-		}
-	}
+        std::shared_ptr<std::string> MessageFactory::generate(const MessageTypes& t) const
+        {
+            rapidjson::Document doc;
+            doc.SetObject();
+            switch (t)
+            {
+                case HANDSHAKE:
+                {
+                    //todo maybe a better handshake?!
+                    doc.AddMember("type", "handshake", doc.GetAllocator());
+                    doc.AddMember("data", "hi", doc.GetAllocator());
+                }
+                break;
+            }
+            // Convert JSON document to string
+            rapidjson::StringBuffer strbuf;
+            rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
+            doc.Accept(writer);
+            return std::make_shared<std::string>(strbuf.GetString());
+        }
+    }
 }

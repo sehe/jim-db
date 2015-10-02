@@ -22,149 +22,132 @@
 #include "clienthandle.h"
 #include "../log/logger.h"
 #include "message.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/writer.h"
 
 namespace jimdb
 {
-	namespace network
-	{
-		ClientHandle::ClientHandle(const SOCKET& s, const sockaddr_storage& add) : m_sock(s), m_addr(add), m_connected(true)
-		{
-			struct timeval clientTv;
-			clientTv.tv_sec = 0;
-			clientTv.tv_usec = 100;
-			setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char *>(&clientTv), sizeof(struct timeval));
-		}
+    namespace network
+    {
+        ClientHandle::ClientHandle(const SOCKET& s, const sockaddr_storage& add) : m_sock(s), m_addr(add), m_connected(true)
+        {
+            struct timeval clientTv;
+            clientTv.tv_sec = 0;
+            clientTv.tv_usec = 100;
+            setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&clientTv), sizeof(struct timeval));
+        }
 
-		ClientHandle::~ClientHandle()
-		{
-			closesocket(m_sock);
-			LOG_DEBUG << "Client:" << m_sock << " closed";
-		}
+        ClientHandle::~ClientHandle()
+        {
+            closesocket(m_sock);
+            LOG_DEBUG << "Client:" << m_sock << " closed";
+        }
 
-		bool ClientHandle::operator<<(std::shared_ptr<std::string> s)
-		{
-			return send(s);
-		}
+        bool ClientHandle::operator<<(std::shared_ptr<std::string> s)
+        {
+            return send(s);
+        }
 
-		bool ClientHandle::send(std::shared_ptr<std::string> s)
-		{
-			if (!m_connected)
-				return false;
+        bool ClientHandle::send(std::shared_ptr<std::string> s)
+        {
+            if (!m_connected)
+                return false;
+            char length[sizeof(int) + 1];
+            sprintf(length, "%4d", static_cast<int>(s->size()));
+            auto toSend = std::string(length);
+            toSend += *s; //add the message
+            int iSendResult;
+            iSendResult = ::send(m_sock, toSend.c_str(), toSend.size(), 0);
+            if (iSendResult == SOCKET_ERROR)
+            {
+                LOG_ERROR << "send failed: " << WSAGetLastError() << ": Closing the sock";
+                m_connected = false;
+                closesocket(m_sock);
+                return false;
+            }
+            LOG_INFO << "Sent: " << *s;
+            return true;
+        }
 
-			char length[sizeof(int) + 1];
-			sprintf(length, "%4d", static_cast<int>(s->size()));
-			auto toSend = std::string(length);
-			toSend += *s; //add the message
+        bool ClientHandle::hasData()
+        {
+            fd_set temp;
+            FD_ZERO(&temp);
+            FD_SET(m_sock, &temp);
+            //setup the timeout to 1000ms
+            struct timeval tv;
+            tv.tv_sec = 1;
+            tv.tv_usec = 0;
+            if (select(m_sock + 1, &temp, nullptr, nullptr, &tv) == -1)
+            {
+                return false;
+            }
+            if (FD_ISSET(m_sock, &temp))
+                return true;
+            return false;
+        }
 
-			int iSendResult;
-			iSendResult = ::send(m_sock, toSend.c_str(), toSend.size(), 0);
-			if (iSendResult == SOCKET_ERROR)
-			{
-				LOG_ERROR << "send failed: " << WSAGetLastError() << ": Closing the sock";
-				m_connected = false;
-				closesocket(m_sock);
-				return false;
-			}
-			LOG_INFO << "Sent: " << *s;
-			return true;
-		}
+        bool ClientHandle::isConnected() const
+        {
+            return m_connected;
+        }
 
-		bool ClientHandle::hasData()
-		{
-			fd_set temp;
-			FD_ZERO(&temp);
-			FD_SET(m_sock, &temp);
+        void ClientHandle::close()
+        {
+            m_connected = false;
+            closesocket(m_sock);
+        }
 
-			//setup the timeout to 1000ms
-			struct timeval tv;
-			tv.tv_sec = 1;
-			tv.tv_usec = 0;
+        std::shared_ptr<Message> ClientHandle::getData()
+        {
+            int n;
+            char size[4];
+            n = recv(m_sock, size, sizeof(size), 0);
+            //check if retval passed
+            if (!checkRetValRecv(n))
+                return nullptr;
+            //calc how much data
+            auto msgLen = atoi(size);
+            LOG_DEBUG << "recv a message with size: " << msgLen;
+            //create buffer for the data
+            auto buffer = new char[msgLen + 1]; //one more for nullterm
+            //read buffer
+            n = recv(m_sock, buffer, msgLen, 0);
+            buffer[msgLen] = '\0';//add null term
+            //check retval if it passes
+            if (!checkRetValRecv(n))
+                return nullptr;
+            LOG_DEBUG << "Buffer Message: " << buffer;
+            //return ne Message
+            return std::make_shared<Message>(buffer);
+        }
 
-			if (select(m_sock + 1, &temp, nullptr, nullptr, &tv) == -1)
-			{
-				return false;
-			}
+        int ClientHandle::getSocketID() const
+        {
+            return m_sock;
+        }
 
-			if (FD_ISSET(m_sock, &temp))
-				return true;
-
-			return false;
-		}
-
-		bool ClientHandle::isConnected() const
-		{
-			return m_connected;
-		}
-
-		void ClientHandle::close()
-		{
-			m_connected = false;
-			closesocket(m_sock);
-		}
-
-		std::shared_ptr<Message> ClientHandle::getData()
-		{
-			int n;
-
-			char size[4];
-			n = recv(m_sock, size, sizeof(size), 0);
-
-			//check if retval passed
-			if (!checkRetValRecv(n))
-				return nullptr;
-
-			//calc how much data
-			auto msgLen = atoi(size);
-			LOG_DEBUG << "recv a message with size: " << msgLen;
-
-			//create buffer for the data
-			auto buffer = new char[msgLen + 1]; //one more for nullterm
-
-			//read buffer
-			n = recv(m_sock, buffer, msgLen, 0);
-
-			buffer[msgLen] = '\0';//add null term
-
-			//check retval if it passes
-			if (!checkRetValRecv(n))
-				return nullptr;
-
-			LOG_DEBUG << "Buffer Message: " << buffer;
-			//return ne Message
-			return std::make_shared<Message>(buffer);
-		}
-
-		int ClientHandle::getSocketID() const
-		{
-			return m_sock;
-		}
-
-		bool ClientHandle::checkRetValRecv(const int& n)
-		{
-			if (n == SOCKET_ERROR)
-			{
-				size_t err = WSAGetLastError();
-				if (err == WSAECONNRESET)
-				{
-					LOG_ERROR << "Failed to recv! Disconnecting from client: " << "Connection reset by peer.";
-				}
-				else
-				{
-					LOG_ERROR << "Disconnecting from client. WSAError: " << err;
-				}
-				m_connected = false;
-				return false;
-			}
-
-			if (n == 0)
-			{
-				LOG_INFO << "Client disconnected.";
-				m_connected = false;
-				return false;
-			}
-			return true;
-		}
-	}
+        bool ClientHandle::checkRetValRecv(const int& n)
+        {
+            if (n == SOCKET_ERROR)
+            {
+                size_t err = WSAGetLastError();
+                if (err == WSAECONNRESET)
+                {
+                    LOG_ERROR << "Failed to recv! Disconnecting from client: " << "Connection reset by peer.";
+                }
+                else
+                {
+                    LOG_ERROR << "Disconnecting from client. WSAError: " << err;
+                }
+                m_connected = false;
+                return false;
+            }
+            if (n == 0)
+            {
+                LOG_INFO << "Client disconnected.";
+                m_connected = false;
+                return false;
+            }
+            return true;
+        }
+    }
 }

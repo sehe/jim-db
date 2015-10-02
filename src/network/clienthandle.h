@@ -26,49 +26,50 @@
 #include "iclient.h"
 namespace jimdb
 {
-	namespace network {
-		/**
-		\breif A Simple client handler
+    namespace network
+    {
+        /**
+        \breif A Simple client handler
 
-		It allows to receive and send data to the underlaying sock
-		Make sure not to WSACleanup here! This would terminate the whole service.
+        It allows to receive and send data to the underlaying sock
+        Make sure not to WSACleanup here! This would terminate the whole service.
 
-		\author Benjamin Meyer
-		*/
-		class ClientHandle :public IClient
-		{
-		public:
-			explicit ClientHandle(const SOCKET& s, const sockaddr_storage& add);
-			~ClientHandle();
+        \author Benjamin Meyer
+        */
+        class ClientHandle :public IClient
+        {
+        public:
+            explicit ClientHandle(const SOCKET& s, const sockaddr_storage& add);
+            ~ClientHandle();
 
-			/**
-			* It need to be nullterminating!
-			*/
-			bool operator<<(std::shared_ptr<std::string> s);
-			bool send(std::shared_ptr<std::string> s) override;
-			bool hasData() override;
-			bool isConnected() const override;
-			void close() override;
+            /**
+            * It need to be nullterminating!
+            */
+            bool operator<<(std::shared_ptr<std::string> s);
+            bool send(std::shared_ptr<std::string> s) override;
+            bool hasData() override;
+            bool isConnected() const override;
+            void close() override;
 
-			/**
-			\brief Get data from client
+            /**
+            \brief Get data from client
 
-			\return returns false if getData failed or the cleint disconnected
-			\author Benjamin Meyer
-			\date 09.09.2015 14:00
-			*/
-			std::shared_ptr<Message> getData() override;
+            \return returns false if getData failed or the cleint disconnected
+            \author Benjamin Meyer
+            \date 09.09.2015 14:00
+            */
+            std::shared_ptr<Message> getData() override;
 
-			int getSocketID() const override;
+            int getSocketID() const override;
 
-		private:
-			SOCKET m_sock;
-			sockaddr_storage m_addr;
-			std::string m_user;
-			std::string m_address;
-			bool m_connected;
+        private:
+            SOCKET m_sock;
+            sockaddr_storage m_addr;
+            std::string m_user;
+            std::string m_address;
+            bool m_connected;
 
-			bool checkRetValRecv(const int& i);
-		};
-	}
+            bool checkRetValRecv(const int& i);
+        };
+    }
 }

@@ -23,19 +23,20 @@
 #include <atomic>
 namespace jimdb
 {
-	namespace tasking {
-		class SpinLock
-		{
-		private:
-			std::atomic_flag lck;
+    namespace tasking
+    {
+        class SpinLock
+        {
+        private:
+            std::atomic_flag lck;
 
-		public:
-			//since atomic_flag has no assignement we need to clear it like this.
-			inline SpinLock();
-			~SpinLock() {};
-			inline void lock();
-			inline void unlock();
-		};
-	}
+        public:
+            //since atomic_flag has no assignement we need to clear it like this.
+            inline SpinLock();
+            ~SpinLock() {};
+            inline void lock();
+            inline void unlock();
+        };
+    }
 }
 #include "spinlock.hpp"

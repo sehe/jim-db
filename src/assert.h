@@ -22,7 +22,7 @@
 #pragma once
 #include "log/logger.h"
 
-//line and file is added automaticaly 
+//line and file is added automaticaly
 #ifdef _DEBUG
 #define ASSERT(cond)\
 if(!(cond))\
