@@ -3,7 +3,6 @@
 ############################################################################
 # LGPL License                                                             #
 #                                                                          #
-# This file is part of the High Performance Multi-Agent Simulation.        #
 # Copyright (c) 2015, Philipp Kraus, <philipp.kraus@tu-clausthal.de>       #
 # This program is free software: you can redistribute it and/or modify     #
 # it under the terms of the GNU Lesser General Public License as           #
@@ -32,15 +31,12 @@ import Utilities
 
 
 
-conf.env.Replace(CPPDEFINES  = ["HPMAS_DARWIN"])
+conf.env.Replace(CPPDEFINES  = ["JIMDB_WINDOWS"])
 conf.env.Replace(CPPFLAGS    = ["-std=c++11", "-stdlib=libc++"])
 conf.env.Replace(LINKFLAGS   = ["-stdlib=libc++"])
 
 if conf.env["buildtype"] == "release" :
-    conf.env.AppendUnique(CPPDEFINES     = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "HPMAS_NDEBUG"])
-    conf.env.AppendUnique(CPPFLAGS       = ["-O2", "-finline-functions"])
-elif conf.env["buildtype"] == "profile" :
-    conf.env.AppendUnique(CPPDEFINES     = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "HPMAS_PROFILE"])
+    conf.env.AppendUnique(CPPDEFINES     = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "JIMDB_NDEBUG"])
     conf.env.AppendUnique(CPPFLAGS       = ["-O2", "-finline-functions"])
 elif conf.env["buildtype"] == "debug" :
     conf.env.AppendUnique(LINKFLAGS   = ["-g"])
@@ -49,19 +45,15 @@ elif conf.env["buildtype"] == "debug" :
 
 
 # set library for linking & copying
-libraries = {
-    "lua"            : ["lua"],
-    "database"       : [],
-    "openscenegraph" : [],
-    "mpi"            : ["boost_mpi-mt", "boost_serialization-mt", "mpi", "mpi_cxx"],
-    "boost"          : ["boost_program_options-mt", "boost_filesystem-mt"]
-}
+#libraries = {
+#    "lua"            : ["lua"],
+#    "boost"          : ["boost_program_options-mt", "boost_filesystem-mt"]
+#}
 
-conf.env.AppendUnique(
-                      LIBS = libraries["lua"] +
-                      libraries["boost"] +
-                      libraries["database"]
-                      )
+#conf.env.AppendUnique(
+#                      LIBS = libraries["lua"] +
+#                      libraries["boost"] +
+#                      )
 
 
 

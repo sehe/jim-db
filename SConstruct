@@ -38,9 +38,8 @@ import SCons.Node.Alias, Utilities
 def CreateEnvironment( notparallelbuild = [] ) :
     vars = Variables()
 
-    vars.Add(EnumVariable("buildtype", "value of the buildtype", "release", allowed_values=("debug", "release", "profile"), ignorecase=True))
+    vars.Add(EnumVariable("buildtype", "value of the buildtype", "release", allowed_values=("debug", "release"), ignorecase=True))
     vars.Add(EnumVariable("buildtoolkit", "value for the build toolkit", "default", allowed_values=("default", "mingw", "msvc"), ignorecase=True))
-    vars.Add(BoolVariable("cppcheck", "run cppcheck instead of the build command", False))
 
     vars.Add(BoolVariable("withlocallibrary", "use the library in the local directory only", True))
     vars.Add(ListVariable("withoutlibrary", "skipping library builds / downloads", "", ["json", "bstar"]))
