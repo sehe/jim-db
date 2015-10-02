@@ -19,10 +19,16 @@
 ############################################################################
 **/
 #pragma once
-std::shared_ptr<std::string> StringType::getString() const
+namespace jimdb
 {
-	auto string = std::make_shared<std::string>();
-	//get the char array
-	string->append(reinterpret_cast<const char*>(this + 1), m_data.size);//appand it
-	return string;//return the shared_ptr as copy
+	namespace memorymanagement
+	{
+		std::shared_ptr<std::string> StringType::getString() const
+		{
+			auto string = std::make_shared<std::string>();
+			//get the char array
+			string->append(reinterpret_cast<const char*>(this + 1), m_data.size);//appand it
+			return string;//return the shared_ptr as copy
+		}
+	}
 }

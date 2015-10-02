@@ -37,7 +37,7 @@ namespace jimdb
 		{
 		public:
 			explicit RequestTask(const std::shared_ptr<network::IClient> client);
-			void execute() override;
+			void operator()() override;
 		};
 	}
 }

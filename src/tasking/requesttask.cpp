@@ -29,7 +29,7 @@ namespace jimdb
 	{
 		RequestTask::RequestTask(const std::shared_ptr<network::IClient> client) : Task(client) { }
 
-		void RequestTask::execute()
+		void RequestTask::operator()()
 		{
 			//this tasks follows right after a handshake so we should have data
 			//to be safe check for data

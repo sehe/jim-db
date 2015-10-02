@@ -41,7 +41,7 @@ namespace jimdb
 			while (m_running)
 			{
 				auto task = m_tasks.pop_front();
-				task->execute();
+				(*task)(); //execute the task
 			}
 		}
 	}

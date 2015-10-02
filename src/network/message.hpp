@@ -20,6 +20,7 @@
 **/
 
 #pragma once
+#include "message.h"
 namespace jimdb
 {
 	namespace network

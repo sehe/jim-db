@@ -54,6 +54,7 @@ namespace jimdb
 			char* m_message;
 			rapidjson::Document m_doc;
 		};
+
 	}
 }
 #include "Message.hpp"

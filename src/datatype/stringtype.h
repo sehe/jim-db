@@ -49,7 +49,6 @@ It actually uses the BaseType<int> to store the size of the string.
 			//just chain it at the end of the free space type
 			~StringType() {};
 		};
-
-#include "StringType.hpp"
 	}
 }
+#include "StringType.hpp"

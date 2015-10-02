@@ -38,7 +38,7 @@ namespace jimdb
 
 			virtual ~Task() { }
 
-			virtual void execute() = 0;
+			virtual void operator()() = 0;
 
 		protected:
 			std::shared_ptr<network::IClient> m_client;
