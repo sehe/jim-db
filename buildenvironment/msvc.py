@@ -37,7 +37,6 @@ if " " in os.path.abspath(os.curdir) :
 conf.env.Replace(CPPDEFINES  = ["JIMDB_WINDOWS"])
 conf.env.Replace(LINKFLAGS   = [])
 conf.env.Replace(CPPFLAGS    = [])
-conf.env["TOOLKIT_ARCH"] = "x86_64"
 
 if conf.env["buildtype"] == "release" :
     conf.env.AppendUnique(CPPDEFINES     = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "JIMDB_NDEBUG"])

@@ -28,8 +28,6 @@ import os, platform, multiprocessing
 import SCons.Node.Alias, Utilities
 
 
-
-
 #=== build environment =================================================================================================================
 
 # create the environment
