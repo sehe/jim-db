@@ -34,21 +34,17 @@ import os
 if " " in os.path.abspath(os.curdir) :
     raise SCons.Errors.StopError("Windows needs a path without spaces")
 
-
-
-
 conf.env.Replace(CPPDEFINES  = ["JIMDB_WINDOWS"])
 conf.env.Replace(LINKFLAGS   = [])
 conf.env.Replace(CPPFLAGS    = [])
+conf.env["TOOLKIT_ARCH"] = "x86_64"
 
 if conf.env["buildtype"] == "release" :
     conf.env.AppendUnique(CPPDEFINES     = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "JIMDB_NDEBUG"])
-    conf.env.AppendUnique(CPPFLAGS       = [])
+    conf.env.AppendUnique(CPPFLAGS       = ["/O2"])
 elif conf.env["buildtype"] == "debug" :
-    conf.env.AppendUnique(LINKFLAGS   = ["/od"])
-    conf.env.AppendUnique(CPPFLAGS    = ["/Od", "/Wall"])
-
-
+    conf.env.AppendUnique(LINKFLAGS   = ["/od"]) 
+    conf.env.AppendUnique(CPPFLAGS    = ["/Od"])
 
 # set library for linking & copying
 #libraries = {

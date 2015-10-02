@@ -22,8 +22,8 @@
 #include "clienthandle.h"
 #include "../log/logger.h"
 #include "message.h"
-#include "../rapidjson/stringbuffer.h"
-#include "../rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 
 ClientHandle::ClientHandle(const SOCKET& s, const sockaddr_storage& add) : m_sock(s), m_addr(add),m_connected(true)

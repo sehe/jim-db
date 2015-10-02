@@ -20,7 +20,7 @@
 **/
 
 #pragma once
-#include "../rapidjson/document.h"
+#include "rapidjson/document.h"
 
 /**
 \brief Message type which holds the Message of a client
