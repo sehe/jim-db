@@ -1,33 +1,11 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+*.*
 
-# Precompiled Headers
-*.gch
-*.pch
+!.gitignore
+!SConstruct
+!*.md
+!*.h
+!*.hpp
+!*.cpp
+!*.py
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-*.sdf
-src/x64
-src/.vs
-src/log.txt
-src/JIM-DB.opensdf
+library/build/**
