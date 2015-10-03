@@ -36,8 +36,9 @@ namespace jimdb
             long long getNext() const;
 
         private:
-            char* m_header;
-            char* m_body;
+			//voidptr to memory to static cast as we like
+            void* m_header;
+			void* m_body;
 
             //pointer to the free typ chain start
             FreeType* m_free;

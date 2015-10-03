@@ -32,11 +32,12 @@ namespace jimdb
          *@author Benjamin Meyer
          *@date Dienstag, 28. Juli 2015
          */
-        enum ConfigValues
-        {
-            LOG_LEVEL = 0,
-            LOG_FILE,
-            THREADS,
+		enum ConfigValues
+		{
+			LOG_LEVEL = 0,
+			LOG_FILE,
+			THREADS,
+			PORT,
         };
 
         /**

@@ -38,6 +38,7 @@ of memory and allow to querry them.
 #include "thread/worker.h"
 #pragma comment(lib,"user32.lib")
 #include <iostream>
+#include "page/page.h"
 
 //forward declare
 BOOL WINAPI ConsoleHandler(DWORD CEvent);
@@ -47,6 +48,7 @@ int main(int argc, char* argv[])
     std::string configFile = "config.cfg";
     if (argc > 1)
         configFile = argv[1];
+
     //get the config instance
     auto& cfg = jimdb::common::Configuration::getInstance();
     if (!cfg.parse(configFile))
@@ -54,16 +56,19 @@ int main(int argc, char* argv[])
         std::cout << "Missing a config file!" << std::endl;
         return 0;
     }
+
     //set the loglevel of the config or the default log level
     jimdb::common::Logger::getInstance().setLogLevel(cfg.getInt(jimdb::common::LOG_LEVEL));
     LOG_INFO << cfg; //print out the config
+
     //setup the console handle:
     if (SetConsoleCtrlHandler(
                 static_cast<PHANDLER_ROUTINE>(ConsoleHandler), TRUE) == FALSE)
     {
         LOG_WARN << "Unable to install console handler!";
     }
-    //Page p(4096, 4 * 4096);
+
+	//jimdb::memorymanagement::Page p(4096, 4 * 4096);
     /**
     //checking type
     char buffer[100];
@@ -77,6 +82,7 @@ int main(int argc, char* argv[])
     LOG_INFO << typ0->getData(); //size of type0
     //no need for deletion since buffer will be deleted and everything is inside the buffer.
     */
+
     auto& tasks = jimdb::tasking::TaskQueue::getInstance();
     std::shared_ptr<jimdb::network::IServer> tcpServer = std::make_shared<jimdb::network::TCPServer>(tasks);
     tcpServer->start();
@@ -87,6 +93,7 @@ int main(int argc, char* argv[])
     {
         threads = std::thread::hardware_concurrency() - 1; //since the mainthread
     }
+
     LOG_INFO << "Starting: " << threads + 1 << " Workers";
     std::list<std::unique_ptr<jimdb::tasking::Worker>> m_workers;
     for (auto i = 0; i < std::thread::hardware_concurrency(); ++i)

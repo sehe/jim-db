@@ -34,9 +34,10 @@ namespace jimdb
             m_body = new char[body];
             //put free type info in header
             //so at pos 0 is a long long with the pos of the free type
-            m_freepos = new(&m_header[0]) long long(0);
+            m_freepos = new(&static_cast<char*>(m_header)[0]) long long(0);
+
             //throw in the free type into the body
-            m_free = new(&m_body[0]) jimdb::memorymanagement::FreeType(body - sizeof(jimdb::memorymanagement::FreeType));
+            m_free = new(&static_cast<char*>(m_body)[0]) FreeType(body - sizeof(FreeType));
             ASSERT(m_free->getFree() == body);
         }
 

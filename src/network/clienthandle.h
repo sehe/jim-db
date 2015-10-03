@@ -39,7 +39,7 @@ namespace jimdb
         class ClientHandle :public IClient
         {
         public:
-            explicit ClientHandle(const SOCKET& s, const sockaddr_storage& add);
+            explicit ClientHandle(const SOCKET& s, const sockaddr& add);
             ~ClientHandle();
 
             /**
@@ -64,7 +64,7 @@ namespace jimdb
 
         private:
             SOCKET m_sock;
-            sockaddr_storage m_addr;
+			sockaddr m_addr;
             std::string m_user;
             std::string m_address;
             bool m_connected;

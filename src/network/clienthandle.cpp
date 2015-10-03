@@ -27,7 +27,7 @@ namespace jimdb
 {
     namespace network
     {
-        ClientHandle::ClientHandle(const SOCKET& s, const sockaddr_storage& add) : m_sock(s), m_addr(add), m_connected(true)
+        ClientHandle::ClientHandle(const SOCKET& s, const sockaddr& add) : m_sock(s), m_addr(add), m_connected(true)
         {
             struct timeval clientTv;
             clientTv.tv_sec = 0;

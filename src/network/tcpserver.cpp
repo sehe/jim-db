@@ -22,14 +22,12 @@
 #include "tcpserver.h"
 #include "../tasking/handshake.h"
 #include "../log/logger.h"
+#include "../configuration.h"
 
 namespace jimdb
 {
     namespace network
     {
-        const char TCPServer::DEFAULT_PORT[] = "6060";
-        const int TCPServer::DEFAULT_BUFFER_SIZE = 512;
-
         TCPServer::TCPServer(tasking::TaskQueue& q) : m_listensocket(INVALID_SOCKET) {}
 
         TCPServer::~TCPServer()
@@ -51,6 +49,7 @@ namespace jimdb
                 LOG_ERROR << "WSAStartup failed: " << iResult;
                 return false;
             }
+
             struct addrinfo* result = nullptr, *ptr = nullptr, hints;
             ZeroMemory(&hints, sizeof(hints));
             hints.ai_family = AF_INET ;
@@ -58,12 +57,13 @@ namespace jimdb
             hints.ai_protocol = IPPROTO_TCP;
             hints.ai_flags = AI_PASSIVE ;
             // Resolve the local address and port to be used by the server
-            iResult = getaddrinfo(nullptr, DEFAULT_PORT, &hints, &result);
+            iResult = getaddrinfo(nullptr, common::Configuration::getInstance().get(common::PORT).c_str(), &hints, &result);
             if (iResult != 0)
             {
                 LOG_ERROR << "getaddrinfo failed: " << iResult;
                 return false;
             }
+
             // Create a SOCKET for the server to listen for client connections
             //create socket to listen for clients
             m_listensocket = INVALID_SOCKET;
@@ -75,6 +75,7 @@ namespace jimdb
                 freeaddrinfo(result);
                 return false;
             }
+
             // Setup the TCP listening socket
             iResult = bind(m_listensocket, result->ai_addr,
                            static_cast<int>(result->ai_addrlen));
@@ -85,8 +86,10 @@ namespace jimdb
                 closesocket(m_listensocket);
                 return false;
             }
+
             //free the result
             freeaddrinfo(result);
+
             //start listening
             if (listen(m_listensocket, SOMAXCONN) == SOCKET_ERROR)
             {
@@ -94,10 +97,13 @@ namespace jimdb
                 closesocket(m_listensocket);
                 return false;
             }
+
             //clear master set
             FD_ZERO(&m_set);
             //add the listen socket to the set
             FD_SET(m_listensocket, &m_set);
+
+            LOG_INFO << "Server started on port: " << common::Configuration::getInstance().get(common::PORT);
             return true;
         }
 
@@ -122,10 +128,10 @@ namespace jimdb
             SOCKET ClientSocket;
             ClientSocket = INVALID_SOCKET;
             // Accept a client socket
-            struct sockaddr_storage their_addr; //stored address
+            struct sockaddr their_addr; //stored address
             int sin_size = sizeof their_addr;
             ClientSocket = ::accept(m_listensocket,
-                                    reinterpret_cast<struct sockaddr*>(&their_addr),
+                                    &their_addr,
                                     &sin_size);
             if (ClientSocket == INVALID_SOCKET)
             {
@@ -136,12 +142,14 @@ namespace jimdb
             }
             //add new Client handler Task
             auto newCl = std::make_shared<ClientHandle>(ClientSocket, their_addr);
+
             //start with the handshake
             tasking::TaskQueue::getInstance().push_pack(std::make_shared<tasking::HandshakeTask>(newCl));
-            //now do whatever you want
+            
+			//now do whatever you want
             char s[INET6_ADDRSTRLEN];
-            inet_ntop(their_addr.ss_family,
-                      get_in_addr(reinterpret_cast<struct sockaddr*>(&their_addr)), s,
+            inet_ntop(their_addr.sa_family,
+                      get_in_addr(&their_addr), s,
                       sizeof s);
             LOG_INFO << "TCPServer: got connection from " << s << " ID: " << newCl->getSocketID();
             return true;

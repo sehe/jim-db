@@ -66,9 +66,6 @@ namespace jimdb
             */
             bool checkConnection();
 
-            static const char DEFAULT_PORT[];
-            static const int DEFAULT_BUFFER_SIZE;
-
             //the listen socket
             SOCKET m_listensocket;
             fd_set m_set;
