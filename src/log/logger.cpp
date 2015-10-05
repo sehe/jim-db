@@ -20,7 +20,7 @@
 **/
 
 #include "logger.h"
-#include "../configuration.h"
+#include "../common/configuration.h"
 #include <string>
 #include <sstream>
 #include <mutex>
@@ -74,7 +74,8 @@ namespace jimdb
         Logger::~Logger()
         {
             //clean up
-            m_file->flush();
+            if(m_file != nullptr)
+                m_file->flush();
             delete m_file;
         }
     }

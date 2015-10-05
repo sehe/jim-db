@@ -21,14 +21,13 @@
 
 #include "configuration.h"
 #include <fstream>
-#include "log/logger.h"
+#include "../log/logger.h"
 #include <algorithm>
 #include <cctype>
 #include "assert.h"
 #include <iostream>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/PrettyWriter.h>
-#include <memory>
 
 namespace jimdb
 {
@@ -70,28 +69,23 @@ namespace jimdb
                 m_values.Parse(stream.str().c_str());//parse the file into json doc
                 configFile.close();
             }
+            else
+            {
+                throw std::runtime_error("missing config file");
+            }
+
+            if (m_values.HasParseError())
+                throw std::runtime_error("config cannot be parsed - syntax error");
 
             //if it is no obj (empty file or no file or invalid json parsed create new obj)
             if (!m_values.IsObject())
-                m_values.SetObject();
+                throw std::runtime_error("document is not an object");
 
             //check for default values or values that are not set
-            setDefault(LOG_FILE, "default.log");
-            setDefault(LOG_LEVEL, "5");
-            setDefault(THREADS, "0"); //0 means take system default
-            setDefault(PORT, "6060");
-
-
-            //write config to new with all defaults
-            rapidjson::StringBuffer strbuf;
-            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
-            m_values.Accept(writer);
-
-            std::ofstream file(filename, std::ios::out);
-            ASSERT(file || file.is_open());
-            file << strbuf.GetString();
-            file.flush();
-            file.close();
+			check(LOG_FILE);
+			check(LOG_LEVEL);
+			check(THREADS); //0 means take system default
+			check(PORT);
 
             return true;
         }
@@ -115,19 +109,38 @@ namespace jimdb
             }) == s.end();
         }
 
-        void Configuration::setDefault(const ConfigValues& c, const std::string& value)
+        std::string Configuration::generate() const
         {
-            if(m_values.FindMember(ConfigValuesMapper::get(c)) == m_values.MemberEnd())
+			rapidjson::Document doc;
+			auto &alloc = doc.GetAllocator();
+			doc.SetObject();
+			
+			rapidjson::Value name;
+			name.SetString(ConfigValuesMapper::get(LOG_LEVEL), alloc);
+			doc.AddMember(name, "5", doc.GetAllocator());
+
+			name.SetString(ConfigValuesMapper::get(LOG_FILE), alloc);
+			doc.AddMember(name, "default.log", doc.GetAllocator());
+
+			name.SetString(ConfigValuesMapper::get(THREADS), alloc);
+			doc.AddMember(name, "0", doc.GetAllocator());
+
+			name.SetString(ConfigValuesMapper::get(PORT), alloc);
+			doc.AddMember(name, "6060", doc.GetAllocator());
+
+            rapidjson::StringBuffer strbuf;
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
+			doc.Accept(writer);
+            return strbuf.GetString();
+        }
+
+        void Configuration::check(const ConfigValues& c)
+        {
+            if (m_values.FindMember(ConfigValuesMapper::get(c)) == m_values.MemberEnd())
             {
-                std::cout << "Logfile misses: " << ConfigValuesMapper::get(c) << std::endl;
-
-                rapidjson::Value val;
-                val.SetString(value.c_str(), m_values.GetAllocator());
-
-                rapidjson::Value name;
-                name.SetString(ConfigValuesMapper::get(c), m_values.GetAllocator());
-
-                m_values.AddMember(name, val, m_values.GetAllocator());
+                std::string error = "Missing Config value: ";
+                error += ConfigValuesMapper::get(c);
+                throw new std::runtime_error(error);
             }
         }
 

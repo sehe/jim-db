@@ -22,7 +22,7 @@
 #include "tcpserver.h"
 #include "../tasking/handshake.h"
 #include "../log/logger.h"
-#include "../configuration.h"
+#include "../common/configuration.h"
 
 namespace jimdb
 {

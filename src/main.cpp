@@ -33,25 +33,38 @@ of memory and allow to querry them.
 #include "log/logger.h"
 #include <thread>
 #include <list>
-#include "configuration.h"
+#include "common/configuration.h"
 #include "tasking/taskqueue.h"
 #include "thread/worker.h"
 #pragma comment(lib,"user32.lib")
 #include <iostream>
-#include "page/page.h"
+#include "common/CmdArgs.h"
 
 //forward declare
 BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
 int main(int argc, char* argv[])
 {
-    std::string configFile = "config.cfg";
-    if (argc > 1)
-        configFile = argv[1];
+    auto& args = jimdb::common::CmdArgs::getInstance();
+    args.init(argc, argv);
+
+    if (args.contains("-h"))
+        std::cout << "todo print some help if help is needed!" << std::endl;
+
+    if (args.contains("-generate"))
+    {
+        std::ofstream file(args["-generate"]);
+        if (!file || !file.is_open())
+            throw std::runtime_error("couldn't generate config");
+        file << jimdb::common::Configuration::getInstance().generate();
+        file.flush();
+        std::cout << "generated example configuration" << std::endl;
+        return EXIT_SUCCESS;
+    }
 
     //get the config instance
     auto& cfg = jimdb::common::Configuration::getInstance();
-	cfg.init("config.json");
+    cfg.init(args["-config"]);
 
     //set the loglevel of the config or the default log level
     jimdb::common::Logger::getInstance().setLogLevel(cfg.getInt(jimdb::common::LOG_LEVEL));
@@ -63,21 +76,6 @@ int main(int argc, char* argv[])
     {
         LOG_WARN << "Unable to install console handler!";
     }
-
-	//jimdb::memorymanagement::Page p(4096, 4 * 4096);
-    /**
-    //checking type
-    char buffer[100];
-    auto typ0 = new(&buffer) StringType("Testing a Type");
-    //put a second behind the first. since the first is 16bit + text ... don't forget the class itself!
-    auto typ1 = new(&buffer[14 + sizeof(StringType)]) StringType("One more Type");
-    auto typ2 = new(&buffer[27 + 2 * sizeof(BaseType<double>)]) BaseType<double>(22.15);
-    LOG_INFO << *typ0->getString();
-    LOG_INFO << *typ1->getString();
-    LOG_INFO << typ2->getData();
-    LOG_INFO << typ0->getData(); //size of type0
-    //no need for deletion since buffer will be deleted and everything is inside the buffer.
-    */
 
     auto& tasks = jimdb::tasking::TaskQueue::getInstance();
     std::shared_ptr<jimdb::network::IServer> tcpServer = std::make_shared<jimdb::network::TCPServer>(tasks);

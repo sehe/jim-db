@@ -21,7 +21,6 @@
 
 #pragma once
 #include <string>
-#include <map>
 #include <rapidjson/document.h>
 
 namespace jimdb
@@ -29,9 +28,9 @@ namespace jimdb
     namespace common
     {
         /**
-        All values that can be obtained. 
+        All values that can be obtained.
 
-		SIZE_OF_ENUM is not obtainable!
+        SIZE_OF_ENUM is not obtainable!
         */
         enum ConfigValues
         {
@@ -39,7 +38,7 @@ namespace jimdb
             LOG_FILE,
             THREADS,
             PORT,
-			SIZE_OF_ENUM,
+            SIZE_OF_ENUM,
         };
 
         /**
@@ -57,7 +56,7 @@ namespace jimdb
         };
 
         /**
-        * \brief The Configuration class
+        * \brief The Configuration class to obtain config values
         *
         * \author Benjamin Meyer
         */
@@ -102,6 +101,8 @@ namespace jimdb
             int getInt(const ConfigValues& key);
             bool isNumber(const ConfigValues& key);
 
+            std::string generate() const;
+
             friend std::ostream& operator<<(std::ostream& os, const Configuration& obj);
 
         private:
@@ -114,12 +115,12 @@ namespace jimdb
             Configuration& operator=(const Configuration& other) = delete;
             Configuration& operator=(Configuration& other) = delete;
 
-            /** checks if a value exsists. If not, it set the value
-
+            /**
+            Check if the document contains the config value
             @author Benjamin Meyer
-            @date 05.10.2015 10:32
+            @date 05.10.2015 11:50
             */
-            void setDefault(const ConfigValues& c, const std::string& value);
+            void check(const ConfigValues& c);
 
             rapidjson::Document m_values;
 
