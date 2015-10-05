@@ -29,7 +29,9 @@ namespace jimdb
     namespace common
     {
         /**
-        All values that can be obtained
+        All values that can be obtained. 
+
+		SIZE_OF_ENUM is not obtainable!
         */
         enum ConfigValues
         {
@@ -37,6 +39,7 @@ namespace jimdb
             LOG_FILE,
             THREADS,
             PORT,
+			SIZE_OF_ENUM,
         };
 
         /**
@@ -71,6 +74,8 @@ namespace jimdb
             Parses a config file into the configuration object.
             if it has missing filds this function will add the
             default values to the file and to the config.
+
+            If the file is missing it writes the default config to the file
 
             \author Benjamin Meyer
             \date 09.07.2015 13:02

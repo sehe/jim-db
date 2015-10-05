@@ -45,7 +45,7 @@ namespace jimdb
         };
 
         //check if valid numer must be the size of the enum!
-        static_assert(sizeof(ConfigValuesMapper::EnumString) / sizeof(char*) == 4, "size dont match!");
+        static_assert(sizeof(ConfigValuesMapper::EnumString) / sizeof(char*) == SIZE_OF_ENUM, "size dont match!");
 
         const char* ConfigValuesMapper::get(const ConfigValues& e)
         {
