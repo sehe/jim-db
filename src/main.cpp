@@ -51,11 +51,7 @@ int main(int argc, char* argv[])
 
     //get the config instance
     auto& cfg = jimdb::common::Configuration::getInstance();
-    if (!cfg.parse(configFile))
-    {
-        std::cout << "Missing a config file!" << std::endl;
-        return 0;
-    }
+	cfg.init("config.json");
 
     //set the loglevel of the config or the default log level
     jimdb::common::Logger::getInstance().setLogLevel(cfg.getInt(jimdb::common::LOG_LEVEL));

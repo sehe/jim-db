@@ -22,22 +22,35 @@
 #pragma once
 #include <string>
 #include <map>
+#include <rapidjson/document.h>
+
 namespace jimdb
 {
     namespace common
     {
-        /**\brief Config Enum
-         *
-         * Make sure to define all values at the Mapping!
-         *@author Benjamin Meyer
-         *@date Dienstag, 28. Juli 2015
-         */
-		enum ConfigValues
-		{
-			LOG_LEVEL = 0,
-			LOG_FILE,
-			THREADS,
-			PORT,
+        /**
+        All values that can be obtained
+        */
+        enum ConfigValues
+        {
+            LOG_LEVEL = 0,
+            LOG_FILE,
+            THREADS,
+            PORT,
+        };
+
+        /**
+        small mapping function struct
+        */
+        struct ConfigValuesMapper
+        {
+            //need the strings for the size
+            static const char* EnumString[];
+
+            /**
+            @return the configValue as const char*
+            */
+            static const char* get(const ConfigValues& e);
         };
 
         /**
@@ -51,23 +64,18 @@ namespace jimdb
             static std::string m_logFileName;
             static Configuration& getInstance();
 
+
             /**
             \brief Parse config file into the config
 
-            Parses a config file into the configuration object. Make sure it has all needed fields defined!
+            Parses a config file into the configuration object.
+            if it has missing filds this function will add the
+            default values to the file and to the config.
+
             \author Benjamin Meyer
             \date 09.07.2015 13:02
             */
-            bool parse(const std::string& file);
-
-            /**
-            \brief check if it contains a value for a key
-            \param[in] key the key to check
-            \return true if the value to the key exsists
-            \author Benjamin Meyer
-            \date 09.07.2015 13:03
-            */
-            bool contains(const std::string& key) const;
+            bool init(const std::string& filename);
 
             /**\brief Returns the value to the key
             *
@@ -93,7 +101,6 @@ namespace jimdb
 
         private:
             Configuration() { };
-
             ~Configuration() { };
 
             //no copy no move no swap
@@ -102,18 +109,18 @@ namespace jimdb
             Configuration& operator=(const Configuration& other) = delete;
             Configuration& operator=(Configuration& other) = delete;
 
-            struct ConfigMapping
-            {
-                std::string configKeyString;
-                std::string defaultValue;
+            /** checks if a value exsists. If not, it set the value
 
-                ConfigMapping(const std::string& key, const std::string& def) :configKeyString(key), defaultValue(def) { };
-            };
+            @author Benjamin Meyer
+            @date 05.10.2015 10:32
+            */
+            void setDefault(const ConfigValues& c, const std::string& value);
+
+            rapidjson::Document m_values;
 
             //member
             static Configuration m_instance;
-            std::map<std::string, std::string> m_values;
-            const static std::map<ConfigValues, ConfigMapping> m_mapping;
+            //std::map<std::string, std::string> m_values;
         };
     }
 }

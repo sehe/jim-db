@@ -24,84 +24,81 @@
 #include "log/logger.h"
 #include <algorithm>
 #include <cctype>
+#include "assert.h"
+#include <iostream>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/PrettyWriter.h>
+#include <memory>
 
 namespace jimdb
 {
     namespace common
     {
         Configuration Configuration::m_instance;
-        //definition of the mapping. ALWAYS map all enum values!
-        const std::map<ConfigValues, Configuration::ConfigMapping> Configuration::m_mapping =
+
+        const char* ConfigValuesMapper::EnumString[] =
         {
-            {LOG_LEVEL,{"logLevel", "5"}},
-            {LOG_FILE,{"logFile", "defaultLogFile.txt"}},
-            {THREADS,{"threads", "0"}},
-			{PORT, {"port","6060"}},
+            "loglevel",
+            "logfile",
+            "thread",
+            "port",
         };
 
+        //check if valid numer must be the size of the enum!
+        static_assert(sizeof(ConfigValuesMapper::EnumString) / sizeof(char*) == 4, "size dont match!");
+
+        const char* ConfigValuesMapper::get(const ConfigValues& e)
+        {
+            return EnumString[e];
+        }
 
         Configuration& Configuration::getInstance()
         {
             return m_instance;
         }
 
-        bool Configuration::parse(const std::string& file)
+        bool Configuration::init(const std::string& filename)
         {
-            std::ifstream configFile(file, std::ios_base::in);
-            if (!configFile || !configFile.is_open())
-            {
-                // do not use logger here since it depends on the config which is not parsed yet!
-                //LOG_ERROR << "Couldn't open file:" << file;
-                return false;
-            }
-            //check for utf-8 signatur
-            char a, b, c;
-            a = configFile.get();
-            b = configFile.get();
-            c = configFile.get();
-            if (a != static_cast<char>(0xEF) || b != static_cast<char>(0xBB)
-                    || c != static_cast<char>(0xBF))
-            {
-                configFile.seekg(0);
-            }
-            else
-            {
-                // do not use logger here since it depends on the config which is not parsed yet!
-                //LOG_WARN << "file contains the 'UTF-8 signature' script this";
-            }
-            std::string line;
-            while (std::getline(configFile, line))
-            {
-                //check if no = or # at the beginning so no key value pair or comment
-                if (line.find("=") != std::string::npos && line.compare(0, 1, "#") != 0)
-                {
-                    std::string delim = "=";
-                    auto key = line.substr(0, line.find(delim));
-                    auto value = line.substr(line.find(delim) + 1, line.length());
-                    //push back the value to the key
-                    m_values[key] = value;
-                }
-            }
-            configFile.close();
-            return true;
-        }
+            //parse first
+            std::ifstream configFile(filename);
 
-        bool Configuration::contains(const std::string& key) const
-        {
-            if (m_values.count(key))
-                return true;
-            return false;
+            //if the file doenst exsist scip reading it
+            if(configFile || configFile.is_open())
+            {
+                std::stringstream stream;
+                stream << configFile.rdbuf();//get full string
+                m_values.Parse(stream.str().c_str());//parse the file into json doc
+                configFile.close();
+            }
+
+            //if it is no obj (empty file or no file or invalid json parsed create new obj)
+            if (!m_values.IsObject())
+                m_values.SetObject();
+
+            //check for default values or values that are not set
+            setDefault(LOG_FILE, "default.log");
+            setDefault(LOG_LEVEL, "5");
+            setDefault(THREADS, "0"); //0 means take system default
+            setDefault(PORT, "6060");
+
+
+            //write config to new with all defaults
+            rapidjson::StringBuffer strbuf;
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
+            m_values.Accept(writer);
+
+            std::ofstream file(filename, std::ios::out);
+            ASSERT(file || file.is_open());
+            file << strbuf.GetString();
+            file.flush();
+            file.close();
+
+            return true;
         }
 
         std::string Configuration::get(const ConfigValues& key)
         {
-            if (contains(m_mapping.at(key).configKeyString))
-            {
-                return m_values[m_mapping.at(key).configKeyString];
-            }
-            //return default value if not exsist
-            LOG_WARN << "The config does not contain: " << m_mapping.at(key).configKeyString;
-            return m_mapping.at(key).defaultValue;
+            return m_values[ConfigValuesMapper::get(key)].GetString();
         }
 
         int Configuration::getInt(const ConfigValues& key)
@@ -118,13 +115,28 @@ namespace jimdb
             }) == s.end();
         }
 
+        void Configuration::setDefault(const ConfigValues& c, const std::string& value)
+        {
+            if(m_values.FindMember(ConfigValuesMapper::get(c)) == m_values.MemberEnd())
+            {
+                std::cout << "Logfile misses: " << ConfigValuesMapper::get(c) << std::endl;
+
+                rapidjson::Value val;
+                val.SetString(value.c_str(), m_values.GetAllocator());
+
+                rapidjson::Value name;
+                name.SetString(ConfigValuesMapper::get(c), m_values.GetAllocator());
+
+                m_values.AddMember(name, val, m_values.GetAllocator());
+            }
+        }
+
         std::ostream& operator<<(std::ostream& os, const Configuration& obj)
         {
-            os << "Configuration:";
-            for (auto& element : obj.m_values)
-            {
-                os << std::endl << element.first << "->" << element.second;
-            }
+            rapidjson::StringBuffer strbuf;
+            rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
+            obj.m_values.Accept(writer);
+            os << strbuf.GetString();
             return os;
         }
     }
