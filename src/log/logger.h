@@ -95,13 +95,22 @@ namespace jimdb
 
             static Logger& getInstance();
 
+            /**
+            static set method for the file so it can be accessed out of the getInstance
+            @param[in] filename the new logfile name. Closes the old
+            @author Benjamin Meyer
+            @date 07.10.2015 11:27
+            */
+            static void setLogFile(const std::string& filename);
+
             void setLogLevel(const int& i);
             int getLogLevel() const;
+
             void operator<<(const std::ostringstream& message) const;
 
         private:
             //default log everything
-            Logger() :m_logLevel(INFO) { };
+            Logger() : m_logLevel(INFO) { };
 
             ~Logger();
             //no copy no move no swap

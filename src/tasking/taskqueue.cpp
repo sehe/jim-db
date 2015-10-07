@@ -28,8 +28,7 @@ namespace jimdb
     {
         TaskQueue TaskQueue::m_instance;
 
-        TaskQueue::TaskQueue() {}
-
+        TaskQueue::TaskQueue(): m_maxSize(0) {}
 
         TaskQueue::~TaskQueue() {}
 
@@ -38,23 +37,11 @@ namespace jimdb
             return m_instance;
         }
 
-        void TaskQueue::push_pack(std::shared_ptr<Task> t)
+        void TaskQueue::setMaxSize(const size_t& size)
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            m_tasks.push_back(t);
-            //notify that there is one more task, so one thread can work now
-            m_cond.notify_one();
-        }
-
-        std::shared_ptr<Task> TaskQueue::pop_front()
-        {
-            //regular lock so noone else acces this area now
-            std::unique_lock<std::mutex> lock(m_mutex);
-            while (m_tasks.size() == 0)
-                m_cond.wait(lock);
-            auto task = m_tasks.front();
-            m_tasks.pop_front();
-            return task;
+			//make sure noone else uses the queue obj right now
+			std::unique_lock<std::mutex> lock(m_mutex);
+            m_maxSize = size;
         }
 
         int TaskQueue::size() const

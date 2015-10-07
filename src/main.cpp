@@ -38,37 +38,79 @@ of memory and allow to querry them.
 #include "thread/worker.h"
 #pragma comment(lib,"user32.lib")
 #include <iostream>
-#include "common/CmdArgs.h"
+#include "common/cmdargs.h"
 
 //forward declare
 BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
 int main(int argc, char* argv[])
 {
+    //set the highest level at first since we use the startup.log here
+    jimdb::common::Logger::getInstance().setLogLevel(5);
+
     auto& args = jimdb::common::CmdArgs::getInstance();
     args.init(argc, argv);
 
     if (args.contains("-h"))
-        std::cout << "todo print some help if help is needed!" << std::endl;
+    {
+        LOG_INFO << "todo print some help if help is needed!";
+        return EXIT_SUCCESS;
+    }
 
     if (args.contains("-generate"))
     {
-        std::ofstream file(args["-generate"]);
+        std::ofstream file;
+
+        try
+        {
+            //if second param is missing catch it.
+            file.open(args["-generate"]);
+        }
+        catch (const std::exception& e)
+        {
+            LOG_EXCAPT << e.what();
+            return EXIT_FAILURE;
+        }
+
         if (!file || !file.is_open())
-            throw std::runtime_error("couldn't generate config");
+        {
+            LOG_ERROR << "couldn't generate config";
+            return EXIT_FAILURE;
+        }
+
         file << jimdb::common::Configuration::getInstance().generate();
         file.flush();
-        std::cout << "generated example configuration" << std::endl;
+        LOG_INFO << "generated example configuration";
         return EXIT_SUCCESS;
+    }
+
+    if (!args.contains("-config"))
+    {
+        std::cout << "missing argument -config CONFIGFILE" << std::endl;
+        return EXIT_FAILURE;
     }
 
     //get the config instance
     auto& cfg = jimdb::common::Configuration::getInstance();
-    cfg.init(args["-config"]);
+
+    try
+    {
+        cfg.init(args["-config"]);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
     //set the loglevel of the config or the default log level
-    jimdb::common::Logger::getInstance().setLogLevel(cfg.getInt(jimdb::common::LOG_LEVEL));
+    auto& log = jimdb::common::Logger::getInstance();
+    log.setLogLevel(cfg.getInt(jimdb::common::LOG_LEVEL));
+    //set the "real logfile" before this we used a "default to log excaptions"
+    jimdb::common::Logger::setLogFile(cfg[jimdb::common::LOG_FILE]);
+
     LOG_INFO << cfg; //print out the config
+    //after this the logger can be used as regular!
 
     //setup the console handle:
     if (SetConsoleCtrlHandler(
@@ -78,6 +120,9 @@ int main(int argc, char* argv[])
     }
 
     auto& tasks = jimdb::tasking::TaskQueue::getInstance();
+    //set up the max number of tasks
+    tasks.setMaxSize(cfg.getInt(jimdb::common::MAX_TASKS));
+
     std::shared_ptr<jimdb::network::IServer> tcpServer = std::make_shared<jimdb::network::TCPServer>(tasks);
     tcpServer->start();
     //start the workers
@@ -109,7 +154,7 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent)
     {
         case CTRL_CLOSE_EVENT:
             MessageBox(nullptr,
-                       "Program being closed!", "CEvent", MB_OK);
+                       "Closing JIMDB!", "CEvent", MB_OK);
     }
     return true;
 }

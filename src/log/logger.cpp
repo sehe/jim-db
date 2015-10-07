@@ -42,14 +42,14 @@ namespace jimdb
 
         LogTimer Logger::Timer(const std::string& file, const int& i)
         {
-            return LogTimer(LoggerTypes::TIMER, file, i);
+            return LogTimer(TIMER, file, i);
         }
 
         Logger& Logger::getInstance()
         {
             if (m_file == nullptr)
-                m_file = new std::ofstream(Configuration::getInstance().get(LOG_FILE),
-                                           std::ofstream::out | std::ofstream::app);
+                //use a fixed name so it can always be used!
+                setLogFile("startup.log");
             return m_instance;
         }
 
@@ -63,12 +63,25 @@ namespace jimdb
             return m_logLevel;
         }
 
+        void Logger::setLogFile(const std::string& filename)
+        {
+            if (m_file != nullptr)
+            {
+                m_file->flush();
+                delete m_file;
+            }
+            m_file = new std::ofstream(filename, std::ofstream::out | std::ofstream::app);
+        }
+
         void Logger::operator<<(const std::ostringstream& message) const
         {
             std::lock_guard<tasking::SpinLock> lock(m_lock);
             std::cout << message.str() << "\n";
-            *m_file << message.str() << "\n";
-            m_file->flush();
+            if (m_file != nullptr)
+            {
+                *m_file << message.str() << "\n";
+                m_file->flush();
+            }
         }
 
         Logger::~Logger()

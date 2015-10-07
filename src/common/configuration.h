@@ -38,6 +38,7 @@ namespace jimdb
             LOG_FILE,
             THREADS,
             PORT,
+            MAX_TASKS,
             SIZE_OF_ENUM,
         };
 
@@ -74,8 +75,7 @@ namespace jimdb
             if it has missing filds this function will add the
             default values to the file and to the config.
 
-            If the file is missing it writes the default config to the file
-
+            @throws runtime_error if there are missing values
             \author Benjamin Meyer
             \date 09.07.2015 13:02
             */
@@ -83,13 +83,13 @@ namespace jimdb
 
             /**\brief Returns the value to the key
             *
-            * If the key does not exist in the config, it return the default value
+            * If the key does not exist in the config
             \param[in] key
             \return the value as string
             *@author Benjamin Meyer
             *@date Dienstag, 28. Juli 2015
             */
-            std::string get(const ConfigValues& key);
+            std::string operator[](const ConfigValues& key);
 
             /**
             \brief get a value to a key Take care it can fail if its not parseable!
@@ -99,8 +99,22 @@ namespace jimdb
             \date Donnerstag, 23. Juli 2015
             */
             int getInt(const ConfigValues& key);
+
+            /**
+            \brief checks if a value is a valid number
+            @return true if it can be @ref{getInt}
+            @author Benjamin Meyer
+            @date 07.10.2015 11:35
+            */
             bool isNumber(const ConfigValues& key);
 
+            /**
+            \brief generates a default configuration
+
+            @return a default json configuration as string
+            @author Benjamin Meyer
+            @date 07.10.2015 11:33
+            */
             std::string generate() const;
 
             friend std::ostream& operator<<(std::ostream& os, const Configuration& obj);

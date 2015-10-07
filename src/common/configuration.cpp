@@ -41,6 +41,7 @@ namespace jimdb
             "logfile",
             "thread",
             "port",
+            "max_tasks",
         };
 
         //check if valid numer must be the size of the enum!
@@ -82,27 +83,29 @@ namespace jimdb
                 throw std::runtime_error("document is not an object");
 
             //check for default values or values that are not set
-			check(LOG_FILE);
-			check(LOG_LEVEL);
-			check(THREADS); //0 means take system default
-			check(PORT);
+
+            check(LOG_FILE);
+            check(LOG_LEVEL);
+            check(THREADS); //0 means take system default
+            check(PORT);
+            check(MAX_TASKS);
 
             return true;
         }
 
-        std::string Configuration::get(const ConfigValues& key)
+        std::string Configuration::operator[](const ConfigValues& key)
         {
             return m_values[ConfigValuesMapper::get(key)].GetString();
         }
 
         int Configuration::getInt(const ConfigValues& key)
         {
-            return stoi(get(key));
+            return stoi(operator[](key));
         }
 
         bool Configuration::isNumber(const ConfigValues& key)
         {
-            auto s = get(key);
+            auto s = operator[](key);
             return !s.empty() && std::find_if(s.begin(), s.end(), [](char c)
             {
                 return !isdigit(c);
@@ -111,26 +114,31 @@ namespace jimdb
 
         std::string Configuration::generate() const
         {
-			rapidjson::Document doc;
-			auto &alloc = doc.GetAllocator();
-			doc.SetObject();
-			
-			rapidjson::Value name;
-			name.SetString(ConfigValuesMapper::get(LOG_LEVEL), alloc);
-			doc.AddMember(name, "5", doc.GetAllocator());
+            rapidjson::Document doc;
+            auto& alloc = doc.GetAllocator();
+            doc.SetObject();
 
-			name.SetString(ConfigValuesMapper::get(LOG_FILE), alloc);
-			doc.AddMember(name, "default.log", doc.GetAllocator());
+            //atm everything is a string per default
+            //TODO make it work without stringify everything!
+            rapidjson::Value name;
+            name.SetString(ConfigValuesMapper::get(LOG_LEVEL), alloc);
+            doc.AddMember(name, "5", doc.GetAllocator());
 
-			name.SetString(ConfigValuesMapper::get(THREADS), alloc);
-			doc.AddMember(name, "0", doc.GetAllocator());
+            name.SetString(ConfigValuesMapper::get(LOG_FILE), alloc);
+            doc.AddMember(name, "default.log", doc.GetAllocator());
 
-			name.SetString(ConfigValuesMapper::get(PORT), alloc);
-			doc.AddMember(name, "6060", doc.GetAllocator());
+            name.SetString(ConfigValuesMapper::get(THREADS), alloc);
+            doc.AddMember(name, "0", doc.GetAllocator());
+
+            name.SetString(ConfigValuesMapper::get(PORT), alloc);
+            doc.AddMember(name, "6060", doc.GetAllocator());
+
+            name.SetString(ConfigValuesMapper::get(MAX_TASKS), alloc);
+            doc.AddMember(name, "1024", doc.GetAllocator());
 
             rapidjson::StringBuffer strbuf;
             rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
-			doc.Accept(writer);
+            doc.Accept(writer);
             return strbuf.GetString();
         }
 
@@ -138,9 +146,9 @@ namespace jimdb
         {
             if (m_values.FindMember(ConfigValuesMapper::get(c)) == m_values.MemberEnd())
             {
-                std::string error = "Missing Config value: ";
+                std::string error = "Missing config value: ";
                 error += ConfigValuesMapper::get(c);
-                throw new std::runtime_error(error);
+                throw std::runtime_error(error);
             }
         }
 

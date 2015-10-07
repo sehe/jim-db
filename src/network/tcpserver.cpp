@@ -57,7 +57,7 @@ namespace jimdb
             hints.ai_protocol = IPPROTO_TCP;
             hints.ai_flags = AI_PASSIVE ;
             // Resolve the local address and port to be used by the server
-            iResult = getaddrinfo(nullptr, common::Configuration::getInstance().get(common::PORT).c_str(), &hints, &result);
+            iResult = getaddrinfo(nullptr, common::Configuration::getInstance()[common::PORT].c_str(), &hints, &result);
             if (iResult != 0)
             {
                 LOG_ERROR << "getaddrinfo failed: " << iResult;
@@ -103,7 +103,7 @@ namespace jimdb
             //add the listen socket to the set
             FD_SET(m_listensocket, &m_set);
 
-            LOG_INFO << "Server started on port: " << common::Configuration::getInstance().get(common::PORT);
+            LOG_INFO << "Server started on port: " << common::Configuration::getInstance()[common::PORT];
             return true;
         }
 
@@ -144,9 +144,12 @@ namespace jimdb
             auto newCl = std::make_shared<ClientHandle>(ClientSocket, their_addr);
 
             //start with the handshake
-            tasking::TaskQueue::getInstance().push_pack(std::make_shared<tasking::HandshakeTask>(newCl));
-            
-			//now do whatever you want
+            if(!tasking::TaskQueue::getInstance().push_pack(std::make_shared<tasking::HandshakeTask>(newCl)))
+            {
+                //TODO send feedback that the queue is full
+            }
+
+            //now do whatever you want
             char s[INET6_ADDRSTRLEN];
             inet_ntop(their_addr.sa_family,
                       get_in_addr(&their_addr), s,
