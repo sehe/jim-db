@@ -38,7 +38,7 @@ namespace jimdb
         public:
 
 			static CmdArgs& getInstance();
-            void init(int argc, char* argv[]);
+            void init(const int &argc, char* argv[]);
             ~CmdArgs();
 
             std::string operator[](const std::string& v);

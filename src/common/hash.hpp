@@ -11,10 +11,8 @@ namespace jimdb
             return operator()(s.c_str(), hash);
         }
 
-
         inline size_t Hash::operator()(const char* c, size_t hash) const
         {
-
             ASSERT(c);
             while (*c)
                 hash ^= m_prime * static_cast<unsigned char>(*c++);
@@ -29,7 +27,6 @@ namespace jimdb
 
         inline size_t Hash::operator()(const char* c, size_t hash) const
         {
-
             return operator()(std::string(c), hash);
         }
 #endif

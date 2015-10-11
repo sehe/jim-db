@@ -27,7 +27,7 @@ namespace jimdb
     {
         CmdArgs CmdArgs::m_instance;
 
-        void CmdArgs::init(int argc, char* argv[])
+        void CmdArgs::init(const int &argc, char* argv[])
         {
             //pushback all values
             m_args.insert(m_args.end(), argv + 1, argv + argc);
