@@ -20,36 +20,68 @@
 // **/
 #pragma once
 #include <string>
+
 namespace jimdb
 {
     namespace common
     {
+        /**
+        \brief Simple hash class
 
-        // see http://create.stephan-brumme.com/fnv-hash/
+        see http://create.stephan-brumme.com/fnv-hash/ for the hashfunction.
+        It generates a 64bit Hash value.
+
+        It is slower then the std::hash BUT it takes all chars into account while,
+        the std::hash meight not take all. It can takes a subset of them depending on the
+        implementation which is not in the standart!
+        http://stackoverflow.com/questions/7968674/unexpected-collision-with-stdhash
+
+        @author Benjamin Meyer
+        @date 11.10.2015 17:31
+        */
         class Hash
         {
         public:
-            //hash a c++ string
+            Hash() {};
+            ~Hash() {};
+
+            /**
+            \brief hash a c++ string
+            @return a 64bit hashvalue
+            @author Benjamin Meyer
+            @date 11.10.2015 17:48
+            */
             inline size_t operator()(const std::string& s, size_t hash = m_seed) const ;
-            //hash a c string with '\0'
+
+            /**
+            \brief hash a c string with '\0'
+            @return a 64bit hashvalue
+            @author Benjamin Meyer
+            @date 11.10.2015 17:48
+            */
             inline size_t operator()(const char* c , size_t hash = m_seed) const;
 
-            //hash one byte
+
+            /**
+            \brief hash one byte
+            @return a 64bit hashvalue
+            @author Benjamin Meyer
+            @date 11.10.2015 17:48
+            */
             inline size_t byte(const char& c, size_t hash = m_seed) const;
-            //hash a block of memory
+            /**
+            \brief hash memory
+
+            @return a 64bit hashvalue
+            @author Benjamin Meyer
+            @date 11.10.2015 17:48
+            */
             inline size_t memory(const void* data, size_t length, size_t hash = m_seed) const;
 
         private:
-            Hash() {};
-            ~Hash() {};
-            Hash(const Hash& other) {}
-            Hash(Hash&& other) {}
-            Hash& operator=(const Hash& other) = delete;
-            Hash& operator=(Hash&& other) = delete;
-
             /* magic 64bit numbers from http://www.isthe.com/chongo/tech/comp/fnv/ */
-            static const size_t m_seed = 14695981039346656037;
-            static const size_t m_prime = 1099511628211;
+            static const size_t m_seed = 0xcbf29ce484222325ULL; // 14695981039346656037
+            static const size_t m_prime = 0x100000001b3ULL;// 1099511628211
         };
     }
 }
