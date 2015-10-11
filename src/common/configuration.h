@@ -85,28 +85,11 @@ namespace jimdb
             *
             * If the key does not exist in the config
             \param[in] key
-            \return the value as string
+            \return the rapidjson value to check what it is an get the right value of it
             *@author Benjamin Meyer
             *@date Dienstag, 28. Juli 2015
             */
-            std::string operator[](const ConfigValues& key);
-
-            /**
-            \brief get a value to a key Take care it can fail if its not parseable!
-            \param[in] key
-            \return the value as Int
-            \author Benjamin Meyer
-            \date Donnerstag, 23. Juli 2015
-            */
-            int getInt(const ConfigValues& key);
-
-            /**
-            \brief checks if a value is a valid number
-            @return true if it can be @ref{getInt}
-            @author Benjamin Meyer
-            @date 07.10.2015 11:35
-            */
-            bool isNumber(const ConfigValues& key);
+            rapidjson::Value& operator[](const ConfigValues& key);
 
             /**
             \brief generates a default configuration

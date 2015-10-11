@@ -93,23 +93,9 @@ namespace jimdb
             return true;
         }
 
-        std::string Configuration::operator[](const ConfigValues& key)
+		rapidjson::Value& Configuration::operator[](const ConfigValues& key)
         {
-            return m_values[ConfigValuesMapper::get(key)].GetString();
-        }
-
-        int Configuration::getInt(const ConfigValues& key)
-        {
-            return stoi(operator[](key));
-        }
-
-        bool Configuration::isNumber(const ConfigValues& key)
-        {
-            auto s = operator[](key);
-            return !s.empty() && std::find_if(s.begin(), s.end(), [](char c)
-            {
-                return !isdigit(c);
-            }) == s.end();
+			return m_values[ConfigValuesMapper::get(key)];
         }
 
         std::string Configuration::generate() const
@@ -122,19 +108,19 @@ namespace jimdb
             //TODO make it work without stringify everything!
             rapidjson::Value name;
             name.SetString(ConfigValuesMapper::get(LOG_LEVEL), alloc);
-            doc.AddMember(name, "5", doc.GetAllocator());
+            doc.AddMember(name, 5, doc.GetAllocator());
 
             name.SetString(ConfigValuesMapper::get(LOG_FILE), alloc);
             doc.AddMember(name, "default.log", doc.GetAllocator());
 
             name.SetString(ConfigValuesMapper::get(THREADS), alloc);
-            doc.AddMember(name, "0", doc.GetAllocator());
+            doc.AddMember(name, 0, doc.GetAllocator());
 
             name.SetString(ConfigValuesMapper::get(PORT), alloc);
             doc.AddMember(name, "6060", doc.GetAllocator());
 
             name.SetString(ConfigValuesMapper::get(MAX_TASKS), alloc);
-            doc.AddMember(name, "1024", doc.GetAllocator());
+            doc.AddMember(name, 1024, doc.GetAllocator());
 
             rapidjson::StringBuffer strbuf;
             rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);

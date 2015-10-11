@@ -105,9 +105,9 @@ int main(int argc, char* argv[])
 
     //set the loglevel of the config or the default log level
     auto& log = jimdb::common::Logger::getInstance();
-    log.setLogLevel(cfg.getInt(jimdb::common::LOG_LEVEL));
+    log.setLogLevel(cfg[jimdb::common::LOG_LEVEL].GetInt());
     //set the "real logfile" before this we used a "default to log excaptions"
-    jimdb::common::Logger::setLogFile(cfg[jimdb::common::LOG_FILE]);
+    jimdb::common::Logger::setLogFile(cfg[jimdb::common::LOG_FILE].GetString());
 
     LOG_INFO << cfg; //print out the config
     //after this the logger can be used as regular!
@@ -121,12 +121,12 @@ int main(int argc, char* argv[])
 
     auto& tasks = jimdb::tasking::TaskQueue::getInstance();
     //set up the max number of tasks
-    tasks.setMaxSize(cfg.getInt(jimdb::common::MAX_TASKS));
+    tasks.setMaxSize(cfg[jimdb::common::MAX_TASKS].GetInt());
 
     std::shared_ptr<jimdb::network::IServer> tcpServer = std::make_shared<jimdb::network::TCPServer>(tasks);
     tcpServer->start();
     //start the workers
-    auto threads = cfg.getInt(jimdb::common::THREADS);
+    auto threads = cfg[jimdb::common::THREADS].GetInt();
     //if the config value is 0 take hardware conc.
     if (threads == 0)
     {

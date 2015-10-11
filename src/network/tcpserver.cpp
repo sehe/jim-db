@@ -57,7 +57,7 @@ namespace jimdb
             hints.ai_protocol = IPPROTO_TCP;
             hints.ai_flags = AI_PASSIVE ;
             // Resolve the local address and port to be used by the server
-            iResult = getaddrinfo(nullptr, common::Configuration::getInstance()[common::PORT].c_str(), &hints, &result);
+            iResult = getaddrinfo(nullptr, common::Configuration::getInstance()[common::PORT].GetString(), &hints, &result);
             if (iResult != 0)
             {
                 LOG_ERROR << "getaddrinfo failed: " << iResult;
@@ -103,7 +103,7 @@ namespace jimdb
             //add the listen socket to the set
             FD_SET(m_listensocket, &m_set);
 
-            LOG_INFO << "Server started on port: " << common::Configuration::getInstance()[common::PORT];
+            LOG_INFO << "Server started on port: " << common::Configuration::getInstance()[common::PORT].GetString();
             return true;
         }
 
