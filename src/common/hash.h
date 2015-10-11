@@ -51,7 +51,7 @@ namespace jimdb
             @author Benjamin Meyer
             @date 11.10.2015 17:48
             */
-            inline size_t operator()(const std::string& s, size_t hash = m_seed) const ;
+            inline size_t operator()(const std::string& s, const size_t& hash = m_seed) const ;
 
             /**
             \brief hash a c string with '\0'
@@ -60,23 +60,6 @@ namespace jimdb
             @date 11.10.2015 17:48
             */
             inline size_t operator()(const char* c , size_t hash = m_seed) const;
-
-
-            /**
-            \brief hash one byte
-            @return a 64bit hashvalue
-            @author Benjamin Meyer
-            @date 11.10.2015 17:48
-            */
-            inline size_t byte(const char& c, size_t hash = m_seed) const;
-            /**
-            \brief hash memory
-
-            @return a 64bit hashvalue
-            @author Benjamin Meyer
-            @date 11.10.2015 17:48
-            */
-            inline size_t memory(const void* data, size_t length, size_t hash = m_seed) const;
 
         private:
             /* magic 64bit numbers from http://www.isthe.com/chongo/tech/comp/fnv/ */
