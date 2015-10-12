@@ -209,7 +209,7 @@ def __emitter( target, source, env ) :
 
     # we check if the source file exists, because we would like to read the data
     if not source[0].exists() :
-        raise SCons.Errors.StopError( "source file [%s] must be exist" % (source[0]) )
+		raise SCons.Errors.StopError( "source file [%s] must be exist" % (source[0]) )
 
     # create the list command and run it in a subprocess and pipes the output to a variable,
     # we need the shell for reading data from the stdout
@@ -342,42 +342,42 @@ def generate( env ) :
             toolset["EXTRACTOR"]["TARGZ"]["LISTFLAGS"]     = "x"
             toolset["EXTRACTOR"]["TARGZ"]["LISTSUFFIX"]    = "-so -y | ${UNPACK['EXTRACTOR']['TARGZ']['RUN']} l -sii -ttar -y -so"
             toolset["EXTRACTOR"]["TARGZ"]["EXTRACTFLAGS"]  = "x"
-            toolset["EXTRACTOR"]["TARGZ"]["EXTRACTSUFFIX"] = "-so -y | ${UNPACK['EXTRACTOR']['TARGZ']['RUN']} x -sii -ttar -y -oc:${UNPACK['EXTRACTDIR']}"
+            toolset["EXTRACTOR"]["TARGZ"]["EXTRACTSUFFIX"] = "-so -y | ${UNPACK['EXTRACTOR']['TARGZ']['RUN']} x -sii -ttar -y -o${UNPACK['EXTRACTDIR']}"
 
             toolset["EXTRACTOR"]["TARBZ"]["RUN"]           = "7z"
             toolset["EXTRACTOR"]["TARBZ"]["LISTEXTRACTOR"] = __fileextractor_win_7zip
             toolset["EXTRACTOR"]["TARBZ"]["LISTFLAGS"]     = "x"
             toolset["EXTRACTOR"]["TARBZ"]["LISTSUFFIX"]    = "-so -y | ${UNPACK['EXTRACTOR']['TARGZ']['RUN']} l -sii -ttar -y -so"
             toolset["EXTRACTOR"]["TARBZ"]["EXTRACTFLAGS"]  = "x"
-            toolset["EXTRACTOR"]["TARBZ"]["EXTRACTSUFFIX"] = "-so -y | ${UNPACK['EXTRACTOR']['TARGZ']['RUN']} x -sii -ttar -y -oc:${UNPACK['EXTRACTDIR']}"
+            toolset["EXTRACTOR"]["TARBZ"]["EXTRACTSUFFIX"] = "-so -y | ${UNPACK['EXTRACTOR']['TARGZ']['RUN']} x -sii -ttar -y -o${UNPACK['EXTRACTDIR']}"
 
             toolset["EXTRACTOR"]["BZIP"]["RUN"]            = "7z"
             toolset["EXTRACTOR"]["BZIP"]["LISTEXTRACTOR"]  = __fileextractor_win_7zip
             toolset["EXTRACTOR"]["BZIP"]["LISTFLAGS"]      = "l"
             toolset["EXTRACTOR"]["BZIP"]["LISTSUFFIX"]     = "-y -so"
             toolset["EXTRACTOR"]["BZIP"]["EXTRACTFLAGS"]   = "x"
-            toolset["EXTRACTOR"]["BZIP"]["EXTRACTSUFFIX"]  = "-y -oc:${UNPACK['EXTRACTDIR']}"
+            toolset["EXTRACTOR"]["BZIP"]["EXTRACTSUFFIX"]  = "-y -o${UNPACK['EXTRACTDIR']}"
 
             toolset["EXTRACTOR"]["GZIP"]["RUN"]            = "7z"
             toolset["EXTRACTOR"]["GZIP"]["LISTEXTRACTOR"]  = __fileextractor_win_7zip
             toolset["EXTRACTOR"]["GZIP"]["LISTFLAGS"]      = "l"
             toolset["EXTRACTOR"]["GZIP"]["LISTSUFFIX"]     = "-y -so"
             toolset["EXTRACTOR"]["GZIP"]["EXTRACTFLAGS"]   = "x"
-            toolset["EXTRACTOR"]["GZIP"]["EXTRACTSUFFIX"]  = "-y -oc:${UNPACK['EXTRACTDIR']}"
+            toolset["EXTRACTOR"]["GZIP"]["EXTRACTSUFFIX"]  = "-y -o${UNPACK['EXTRACTDIR']}"
 
             toolset["EXTRACTOR"]["ZIP"]["RUN"]             = "7z"
             toolset["EXTRACTOR"]["ZIP"]["LISTEXTRACTOR"]   = __fileextractor_win_7zip
             toolset["EXTRACTOR"]["ZIP"]["LISTFLAGS"]       = "l"
             toolset["EXTRACTOR"]["ZIP"]["LISTSUFFIX"]      = "-y -so"
             toolset["EXTRACTOR"]["ZIP"]["EXTRACTFLAGS"]    = "x"
-            toolset["EXTRACTOR"]["ZIP"]["EXTRACTSUFFIX"]   = "-y -oc:${UNPACK['EXTRACTDIR']}"
+            toolset["EXTRACTOR"]["ZIP"]["EXTRACTSUFFIX"]   = "-y -o${UNPACK['EXTRACTDIR']}"
 
             toolset["EXTRACTOR"]["TAR"]["RUN"]             = "7z"
             toolset["EXTRACTOR"]["TAR"]["LISTEXTRACTOR"]   = __fileextractor_win_7zip
             toolset["EXTRACTOR"]["TAR"]["LISTFLAGS"]       = "l"
             toolset["EXTRACTOR"]["TAR"]["LISTSUFFIX"]      = "-y -ttar -so"
             toolset["EXTRACTOR"]["TAR"]["EXTRACTFLAGS"]    = "x"
-            toolset["EXTRACTOR"]["TAR"]["EXTRACTSUFFIX"]   = "-y -ttar -oc:${UNPACK['EXTRACTDIR']}"
+            toolset["EXTRACTOR"]["TAR"]["EXTRACTSUFFIX"]   = "-y -ttar -o${UNPACK['EXTRACTDIR']}"
 
         # here can add some other Windows tools, that can handle the archive files
         # but I don't know which ones can handle all file types
