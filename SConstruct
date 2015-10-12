@@ -188,6 +188,5 @@ env.Clean( default, [
     os.path.join("#", "documentation", "xml"),
     os.path.join("#", "build"),
     "config.log",
-    ".sconsign.dblite",
     ".sconf_temp"
 ])
