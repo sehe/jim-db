@@ -1,0 +1,7 @@
+{
+    "loglevel": 5,
+    "logfile": "default.log",
+    "thread": 0,
+	"port" : "6060",
+	"max_tasks" : 1024
+}
