@@ -45,9 +45,7 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
 int main(int argc, char* argv[])
 {
-    //set the highest level at first since we use the startup.log here
-    jimdb::common::Logger::getInstance().setLogLevel(5);
-
+    //logger can be at init using the startup log
     auto& args = jimdb::common::CmdArgs::getInstance();
     args.init(argc, argv);
 
@@ -66,7 +64,7 @@ int main(int argc, char* argv[])
             //if second param is missing catch it.
             file.open(args["-generate"]);
         }
-        catch (const std::exception& e)
+        catch (const std::runtime_error& e)
         {
             LOG_EXCAPT << e.what();
             return EXIT_FAILURE;
@@ -86,7 +84,7 @@ int main(int argc, char* argv[])
 
     if (!args.contains("-config"))
     {
-        std::cout << "missing argument -config CONFIGFILE" << std::endl;
+        LOG_ERROR << "missing argument -config CONFIGFILE";
         return EXIT_FAILURE;
     }
 
@@ -99,7 +97,7 @@ int main(int argc, char* argv[])
     }
     catch (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        LOG_ERROR << e.what();
         return EXIT_FAILURE;
     }
 

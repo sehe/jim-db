@@ -27,7 +27,7 @@ namespace jimdb
     {
         CmdArgs CmdArgs::m_instance;
 
-        void CmdArgs::init(const int &argc, char* argv[])
+        void CmdArgs::init(const int& argc, char* argv[])
         {
             //pushback all values
             m_args.insert(m_args.end(), argv + 1, argv + argc);
@@ -48,7 +48,7 @@ namespace jimdb
                 return *it; //return the value
             }
             auto error = v;
-            error +=  " needs a second parameter! -config FILENAME";
+            error += " needs a second parameter for example like the config: -config FILENAME";
             throw std::runtime_error(error);
         }
 
