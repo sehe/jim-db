@@ -21,6 +21,8 @@
 
 #pragma once
 #include "message.h"
+#include "../log/logger.h"
+
 namespace jimdb
 {
     namespace network

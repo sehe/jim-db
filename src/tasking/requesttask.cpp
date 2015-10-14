@@ -38,6 +38,13 @@ namespace jimdb
             auto message = m_client->getData();
             //check the json
             auto& doc = (*message)();
+			if(doc.HasParseError())
+			{
+				LOG_WARN << "invalid JSON";
+				//TODO send info back
+				return;
+			}
+
             if (doc.FindMember("type") == doc.MemberEnd() || doc.FindMember("data") == doc.MemberEnd())
             {
                 LOG_WARN << "invalid JSON";
@@ -50,16 +57,19 @@ namespace jimdb
                 //todo send info back
                 return;
             }
+
             if (doc["type"].GetString() == std::string("insert"))
             {
                 LOG_DEBUG << "insert message";
                 return;
             }
+
             if (doc["type"].GetString() == std::string("delete"))
             {
                 LOG_DEBUG << "delete message";
                 return;
             }
+
             if (doc["type"].GetString() == std::string("query"))
             {
                 LOG_DEBUG << "query message";
