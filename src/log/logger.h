@@ -21,11 +21,9 @@
 
 #pragma once
 #include <fstream>
-#include <string>
 #include "logmessage.h"
 #include "logtimer.h"
 #include "../thread/spinlock.h"
-
 
 //custom macro for filename shorten but only for windows
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
@@ -110,7 +108,7 @@ namespace jimdb
 
         private:
             //default log everything
-            Logger() : m_logLevel(INFO) { };
+            Logger() : m_logLevel(DEBUG) { };
 
             ~Logger();
             //no copy no move no swap
@@ -122,7 +120,6 @@ namespace jimdb
             static std::ofstream* m_file;
             static Logger m_instance;
             static tasking::SpinLock m_lock;
-            static const std::string DEFAULT_LOG_FILE;
             int m_logLevel;
         };
     }

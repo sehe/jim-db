@@ -21,6 +21,8 @@
 
 #include "CmdArgs.h"
 #include <iostream>
+#include "../log/logger.h"
+
 namespace jimdb
 {
     namespace common
@@ -30,7 +32,33 @@ namespace jimdb
         void CmdArgs::init(const int& argc, char* argv[])
         {
             //pushback all values
-            m_args.insert(m_args.end(), argv + 1, argv + argc);
+            std::string temp;
+            for (auto i = 1; i < argc; ++i)
+            {
+                temp.clear();
+                temp = argv[i];
+                if(temp.at(0) == '-')
+                {
+                    //check if thers a next and if its not a argument
+                    //todo add validation else -h can have a argument?!
+                    if (i + 1 < argc && std::string(argv[i + 1]).at(0) != '-')
+                    {
+                        m_args[temp] = argv[i + 1];
+                        ++i;//skip one
+                    }
+                    else
+                    {
+                        //no next or no argument
+                        m_args[temp] = "";
+                    }
+                }
+                else
+                {
+                    //else we got 2 times a non argument which we skip
+                    LOG_WARN << "Invalid argument: " << temp;
+                }
+            }
+            //todo validate ?!
         }
 
         CmdArgs& CmdArgs::getInstance()
@@ -42,23 +70,33 @@ namespace jimdb
 
         std::string CmdArgs::operator[](const std::string& v)
         {
-            auto it = find(m_args.begin(), m_args.end(), v);
-            if(it != m_args.end() && ++it != m_args.end())
+            if(m_args[v] != "")
             {
-                return *it; //return the value
+                return m_args[v]; //return the value
             }
             auto error = v;
             error += " needs a second parameter for example like the config: -config FILENAME";
             throw std::runtime_error(error);
         }
 
-        bool CmdArgs::contains(const std::string& v)
+        bool CmdArgs::contains(const std::string& v) const
         {
-            if (find(m_args.begin(), m_args.end(), v) != m_args.end())
+            if (m_args.count(v))
             {
                 return true;
             }
             return false;
+        }
+
+        std::ostream& operator<<(std::ostream& os, const CmdArgs& p)
+        {
+            os << "Arguments:";
+            for (auto it = p.m_args.begin(); it != p.m_args.end(); ++it)
+            {
+                os << std::endl;
+                os << it->first << ":" << it->second;
+            }
+            return os;
         }
     }
 }

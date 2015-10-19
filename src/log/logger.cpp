@@ -20,7 +20,6 @@
 **/
 
 #include "logger.h"
-#include "../common/configuration.h"
 #include <string>
 #include <sstream>
 #include <mutex>
@@ -33,7 +32,6 @@ namespace jimdb
         std::ofstream* Logger::m_file = nullptr;
         Logger Logger::m_instance;
         tasking::SpinLock Logger::m_lock;
-        const std::string Logger::DEFAULT_LOG_FILE = "defaultLogFile.txt";
 
         LogMessage Logger::Log(LoggerTypes type, const std::string& file, const int& i)
         {

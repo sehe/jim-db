@@ -48,9 +48,11 @@ namespace jimdb
             @author Benjamin Meyer
             @date 05.10.2015 12:56
             */
-            bool contains(const std::string& v);
+            bool contains(const std::string& v) const;
+			
+			friend std::ostream & operator<<(std::ostream &os, const CmdArgs& p);
         private:
-            std::vector<std::string> m_args;
+			std::map<std::string, std::string> m_args;
 			static CmdArgs m_instance;
         };
     }
