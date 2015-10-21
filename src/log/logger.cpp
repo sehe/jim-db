@@ -20,10 +20,6 @@
 **/
 
 #include "logger.h"
-#include <string>
-#include <sstream>
-#include <mutex>
-#include <iostream>
 
 namespace jimdb
 {
@@ -32,24 +28,6 @@ namespace jimdb
         std::ofstream* Logger::m_file = nullptr;
         Logger Logger::m_instance;
         tasking::SpinLock Logger::m_lock;
-
-        LogMessage Logger::Log(LoggerTypes type, const std::string& file, const int& i)
-        {
-            return LogMessage(type, file, i);
-        }
-
-        LogTimer Logger::Timer(const std::string& file, const int& i)
-        {
-            return LogTimer(TIMER, file, i);
-        }
-
-        Logger& Logger::getInstance()
-        {
-            if (m_file == nullptr)
-                //use a fixed name so it can always be used!
-                setLogFile("startup.log");
-            return m_instance;
-        }
 
         void Logger::setLogLevel(const int& i)
         {
@@ -69,17 +47,6 @@ namespace jimdb
                 delete m_file;
             }
             m_file = new std::ofstream(filename, std::ofstream::out | std::ofstream::app);
-        }
-
-        void Logger::operator<<(const std::ostringstream& message) const
-        {
-            std::lock_guard<tasking::SpinLock> lock(m_lock);
-            std::cout << message.str() << "\n";
-            if (m_file != nullptr)
-            {
-                *m_file << message.str() << "\n";
-                m_file->flush();
-            }
         }
 
         Logger::~Logger()

@@ -38,6 +38,7 @@ of memory and allow to querry them.
 #include "thread/worker.h"
 #pragma comment(lib,"user32.lib")
 #include "common/cmdargs.h"
+
 //forward declare
 BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
@@ -46,7 +47,7 @@ int main(int argc, char* argv[])
     //logger can be at init using the startup log
     auto& args = jimdb::common::CmdArgs::getInstance();
     args.init(argc, argv);
-	LOG_DEBUG << args;
+    LOG_DEBUG << args;
     if (args.contains("-h"))
     {
         LOG_INFO << "todo print some help if help is needed!";
@@ -131,7 +132,7 @@ int main(int argc, char* argv[])
 
     LOG_INFO << "Starting: " << threads + 1 << " Workers";
     std::list<std::unique_ptr<jimdb::tasking::Worker>> m_workers;
-    for (auto i = 0; i < std::thread::hardware_concurrency(); ++i)
+    for (unsigned int i = 0; i < std::thread::hardware_concurrency(); ++i)
     {
         m_workers.push_back(std::make_unique<jimdb::tasking::Worker>(tasks));
     }

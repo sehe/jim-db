@@ -21,22 +21,27 @@
 
 #include "logmessage.h"
 #include "logger.h"
-#include <ctime>
-#include <thread>
 namespace jimdb
 {
     namespace common
     {
-        std::map<LoggerTypes, std::string> LogMessage::m_enum_string_mapping = { {DEBUG, "debug"},{INFO, "info"},{WARNING, "warn"},{ERROR_L, "error"},{EXCAPTION, "excaption"},{TIMER, "timer"} };
-
-        LogMessage::LogMessage(const LoggerTypes& type, const std::string& file,
-                               const int& i) : m_stream(), m_type(type)
+        const char* LoggerTypeMap::EnumString[] =
         {
-            //build the logstring
-            m_stream << "[" + m_enum_string_mapping[type] + "][File:" + file + "][Line:" +
-                     std::to_string(i) + "][thread:" << std::this_thread::get_id() <<
-                     "]" + currentDateTime() + " ";
+            "error",
+            "excaption",
+            "warn",
+            "timer",
+            "info",
+            "debug"
+        };
+        //check if valid numer must be the size of the enum!
+        static_assert(sizeof(LoggerTypeMap::EnumString) / sizeof(char*) == SIZE_OF_ENUM_LOGGER_TYPES, "size dont match!");
+
+        std::string LoggerTypeMap::get(const LoggerTypes& e)
+        {
+            return EnumString[e]; //implicit convention and move
         }
+
 
         LogMessage::~LogMessage()
         {
@@ -56,7 +61,7 @@ namespace jimdb
             return buf;
         }
 
-        LogMessage::LogMessage(const LogMessage& other) :m_type(other.m_type)
+        LogMessage::LogMessage(const LogMessage& other) : m_type(other.m_type)
         {
             m_stream << other.m_stream.str();
         }

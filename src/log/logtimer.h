@@ -22,7 +22,7 @@
 #pragma once
 #include "logmessage.h"
 #include <chrono>
-#include <utility>
+#include <string>
 namespace jimdb
 {
     namespace common
@@ -44,11 +44,11 @@ namespace jimdb
         \endcode
         \author Benjamin Meyer
         */
-        class LogTimer : public jimdb::common::LogMessage
+        class LogTimer : public LogMessage
         {
         public:
 
-            explicit LogTimer(const jimdb::common::LoggerTypes& type, const std::string& file = "",
+            explicit inline LogTimer(const LoggerTypes& type, const std::string& file = "",
                               const int& i = 0);
             ~LogTimer();
 

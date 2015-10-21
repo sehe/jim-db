@@ -19,16 +19,24 @@
 ############################################################################
 **/
 #pragma once
-namespace jimdb
+
+inline StringType::StringType() : BaseType<long long>()
 {
-    namespace memorymanagement
-    {
-        std::shared_ptr<std::string> StringType::getString() const
-        {
-            auto string = std::make_shared<std::string>();
-            //get the char array
-            string->append(reinterpret_cast<const char*>(this + 1), m_data.size);//appand it
-            return string;//return the shared_ptr as copy
-        }
-    }
+    m_data.size = 0;
+}
+
+inline StringType::StringType(const std::string& s) : BaseType<long long>()
+{
+    m_data.size = s.size();
+    m_next = 0;
+    //now memcpy the data into memory
+    memcpy(this + 1, s.c_str(), s.size()); //cpy the string
+}
+
+inline std::shared_ptr<std::string> StringType::getString() const
+{
+    auto string = std::make_shared<std::string>();
+    //get the char array
+    string->append(reinterpret_cast<const char*>(this + 1), m_data.size);//appand it
+    return string;//return the shared_ptr as copy
 }

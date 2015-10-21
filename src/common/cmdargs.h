@@ -21,7 +21,6 @@
 
 #pragma once
 #include <map>
-#include <vector>
 
 namespace jimdb
 {
@@ -37,8 +36,8 @@ namespace jimdb
         {
         public:
 
-			static CmdArgs& getInstance();
-            void init(const int &argc, char* argv[]);
+            static CmdArgs& getInstance();
+            void init(const int& argc, char* argv[]);
             ~CmdArgs();
 
             std::string operator[](const std::string& v);
@@ -49,11 +48,11 @@ namespace jimdb
             @date 05.10.2015 12:56
             */
             bool contains(const std::string& v) const;
-			
-			friend std::ostream & operator<<(std::ostream &os, const CmdArgs& p);
+
+            friend std::ostream& operator<<(std::ostream& os, const CmdArgs& p);
         private:
-			std::map<std::string, std::string> m_args;
-			static CmdArgs m_instance;
+            std::map<std::string, std::string> m_args;
+            static CmdArgs m_instance;
         };
     }
 }

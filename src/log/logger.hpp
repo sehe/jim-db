@@ -1,4 +1,4 @@
-﻿/**
+/**
 ############################################################################
 # GPL License                                                              #
 #                                                                          #
@@ -19,12 +19,32 @@
 ############################################################################
 **/
 
-#include "stringtype.h"
-#include <string>
 
-namespace jimdb
+inline LogMessage Logger::Log(LoggerTypes type, const std::string& file, const int& i)
 {
-    namespace memorymanagement
-    {
-    }
+    return LogMessage(type, file, i);
+}
+
+inline LogTimer Logger::Timer(const std::string& file, const int& i)
+{
+    return LogTimer(TIMER, file, i);
+}
+
+inline Logger& Logger::getInstance()
+{
+    if (m_file == nullptr)
+        //use a fixed name so it can always be used!
+        setLogFile("startup.log");
+    return m_instance;
+}
+
+inline void Logger::operator<<(const std::ostringstream& message) const
+{
+	std::lock_guard<tasking::SpinLock> lock(m_lock);
+	std::cout << message.str() << "\n";
+	if (m_file != nullptr)
+	{
+		*m_file << message.str() << "\n";
+		m_file->flush();
+	}
 }

@@ -18,20 +18,30 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 ############################################################################
 **/
-
-#include "freetype.h"
-namespace jimdb
+template<typename T>
+inline RWLockGuard<T>::RWLockGuard(T& lock, const LockType& l) : m_lock(lock), m_type(l)
 {
-    namespace memorymanagement
+    switch (m_type)
     {
-        FreeType::FreeType(const int& size) :StringType()
-        {
-            m_data.size = size;
-        }
+        case READ:
+            m_lock.readLock();
+            break;
+        case WRITE:
+            m_lock.writeLock();
+            break;
+    }
+}
 
-        int FreeType::getFree() const
-        {
-            return m_data.size + sizeof(FreeType);
-        }
+template<typename T>
+inline RWLockGuard<T>::~RWLockGuard()
+{
+    switch (m_type)
+    {
+        case READ:
+            m_lock.readUnlock();
+            break;
+        case WRITE:
+            m_lock.writeUnlock();
+            break;
     }
 }

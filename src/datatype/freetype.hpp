@@ -1,4 +1,4 @@
-﻿/**
+/**
 ############################################################################
 # GPL License                                                              #
 #                                                                          #
@@ -19,12 +19,12 @@
 ############################################################################
 **/
 
-#include "stringtype.h"
-#include <string>
-
-namespace jimdb
+inline FreeType::FreeType(const size_t& size) :StringType()
 {
-    namespace memorymanagement
-    {
-    }
+	m_data.size = size;
+}
+
+inline size_t FreeType::getFree() const
+{
+	return m_data.size + sizeof(FreeType);
 }

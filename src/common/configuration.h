@@ -45,7 +45,7 @@ namespace jimdb
         /**
         small mapping function struct
         */
-        struct ConfigValuesMapper
+        struct ConfigValuesMap
         {
             //need the strings for the size
             static const char* EnumString[];
@@ -108,9 +108,7 @@ namespace jimdb
 
             //no copy no move no swap
             Configuration(const Configuration&) = delete;
-            Configuration(Configuration&&) = delete;
             Configuration& operator=(const Configuration& other) = delete;
-            Configuration& operator=(Configuration& other) = delete;
 
             /**
             Check if the document contains the config value

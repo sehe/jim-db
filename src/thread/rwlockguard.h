@@ -18,54 +18,43 @@
 // # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 // ############################################################################
 // **/
+
 #pragma once
-#include <string>
+#include "rwlock.h"
 
 namespace jimdb
 {
-    namespace common
+    namespace tasking
     {
+        enum LockType
+        {
+            READ,
+            WRITE
+        };
+
         /**
-        \brief Simple hash class
+        \brief a lockguard for R/W Locks
 
-        see http://create.stephan-brumme.com/fnv-hash/ for the hashfunction.
-        It generates a 64bit Hash value.
-
-        It is slower then the std::hash BUT it takes all chars into account while,
-        the std::hash meight not take all. It can takes a subset of them depending on the
-        implementation which is not in the standart!
-        http://stackoverflow.com/questions/7968674/unexpected-collision-with-stdhash
+        Can be used with all classes that have a
+        readLock/readUnlock and a writeLock/writeUnlock
 
         @author Benjamin Meyer
-        @date 11.10.2015 17:31
+        @date 21.10.2015 15:21
         */
-        class Hash
+        template<typename T = RWLock>
+        class RWLockGuard
         {
         public:
-            Hash() {};
-            ~Hash() {};
-
-            /**
-            \brief hash a c++ string
-            @return a 64bit hashvalue
-            @author Benjamin Meyer
-            @date 11.10.2015 17:48
-            */
-            inline size_t operator()(const std::string& s, const size_t& hash = m_seed) const ;
-
-            /**
-            \brief hash a c string with '\0'
-            @return a 64bit hashvalue
-            @author Benjamin Meyer
-            @date 11.10.2015 17:48
-            */
-            inline size_t operator()(const char* c , size_t hash = m_seed) const;
+            inline RWLockGuard(T& lock, const LockType& l);
+            inline ~RWLockGuard();
 
         private:
-            /* magic 64bit numbers from http://www.isthe.com/chongo/tech/comp/fnv/ */
-            static const size_t m_seed = 0xcbf29ce484222325ULL; // 14695981039346656037
-            static const size_t m_prime = 0x100000001b3ULL;// 1099511628211
+            RWLockGuard(const RWLockGuard& ) = delete;
+            RWLockGuard& operator=(const RWLockGuard& ) = delete;
+
+            T& m_lock;
+            LockType m_type;
         };
-#include "hash.hpp"
+#include "rwlockguard.hpp"
     }
 }

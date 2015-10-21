@@ -22,7 +22,6 @@
 #pragma once
 #include "task.h"
 #include <memory>
-#include <condition_variable>
 #include <deque>
 namespace jimdb
 {
@@ -74,7 +73,7 @@ namespace jimdb
             *@author Benjamin Meyer
             *@date Mittwoch, 22. Juli 2015
             */
-            int size() const;
+            size_t size() const;
 
         private:
             TaskQueue();
@@ -86,6 +85,6 @@ namespace jimdb
             std::mutex m_mutex;
             size_t m_maxSize;
         };
+#include "taskqueue.hpp"
     }
 }
-#include "taskqueue.hpp"

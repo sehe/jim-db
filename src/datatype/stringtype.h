@@ -22,6 +22,8 @@
 #pragma once
 #include "basetype.h"
 #include <string>
+#include <memory>
+
 namespace jimdb
 {
     namespace memorymanagement
@@ -38,8 +40,8 @@ namespace jimdb
         class StringType :public BaseType<long long>
         {
         public:
-            explicit StringType();
-            explicit StringType(const std::string& s);
+            explicit inline StringType();
+            explicit inline StringType(const std::string& s);
             inline std::shared_ptr<std::string> getString() const;
 
         protected:
@@ -49,6 +51,6 @@ namespace jimdb
             //just chain it at the end of the free space type
             ~StringType() {};
         };
+#include "StringType.hpp"
     }
 }
-#include "StringType.hpp"

@@ -22,7 +22,6 @@
 #pragma once
 #include <string>
 #include <sstream>
-#include <map>
 #include <utility>
 namespace jimdb
 {
@@ -31,12 +30,22 @@ namespace jimdb
 
         enum LoggerTypes
         {
-            DEBUG = 5,
-            INFO = 4,
-            TIMER = 3,
-            WARNING = 2,
-            EXCAPTION = 1,
             ERROR_L = 0,
+            EXCAPTION = 1,
+            WARNING = 2,
+            TIMER = 3,
+            INFO = 4,
+            DEBUG = 5,
+            SIZE_OF_ENUM_LOGGER_TYPES
+        };
+
+        struct LoggerTypeMap
+        {
+            static const char* EnumString[];
+            /**
+            @return the configValue as const char*
+            */
+            static std::string get(const LoggerTypes& e);
         };
 
         /**
@@ -61,8 +70,8 @@ namespace jimdb
             \author Benjamin Meyer
             \date 22.05.2015 16:05
             */
-            explicit LogMessage(const LoggerTypes& type, const std::string& file = "",
-                                const int& i = 0);
+            explicit inline LogMessage(const LoggerTypes& type, const std::string& file = "",
+                                       const int& i = 0);
             ~LogMessage();
             std::string currentDateTime() const;
             /**
@@ -80,7 +89,6 @@ namespace jimdb
 
         private:
             std::ostringstream m_stream;
-            static std::map<LoggerTypes, std::string> m_enum_string_mapping;
             LoggerTypes m_type;
         };
     }

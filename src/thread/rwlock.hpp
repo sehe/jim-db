@@ -1,4 +1,4 @@
-﻿/**
+/**
 ############################################################################
 # GPL License                                                              #
 #                                                                          #
@@ -19,12 +19,35 @@
 ############################################################################
 **/
 
-#include "stringtype.h"
-#include <string>
+inline RWLock::RWLock() : m_reader(0), m_writing(false) {}
 
-namespace jimdb
+inline void RWLock::readLock()
 {
-    namespace memorymanagement
-    {
-    }
+    std::unique_lock<std::mutex> lock(m_mutex);
+    while (m_writing)
+        m_cond.wait(lock);
+    m_reader++;
+}
+
+inline void RWLock::readUnlock()
+{
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_reader--;
+    if (!m_reader)
+        m_cond.notify_all();
+}
+
+inline void RWLock::writeLock()
+{
+    std::unique_lock<std::mutex> lock(m_mutex);
+    while (m_writing || m_reader)
+        m_cond.wait(lock);
+    m_writing = true;
+}
+
+inline void RWLock::writeUnlock()
+{
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_writing = false;
+    m_cond.notify_all();
 }

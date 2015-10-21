@@ -20,6 +20,7 @@
 **/
 
 #pragma once
+#include <thread>
 namespace jimdb
 {
     namespace common
@@ -29,6 +30,15 @@ namespace jimdb
         {
             m_stream << m;
             return *this;
+        }
+
+        inline LogMessage::LogMessage(const LoggerTypes& type, const std::string& file,
+                                      const int& i) : m_stream(), m_type(type)
+        {
+            //build the logstring
+            m_stream << "[" + LoggerTypeMap::get(type) + "][File:" + file + "][Line:" +
+                     std::to_string(i) + "][thread:" << std::this_thread::get_id() <<
+                     "]" + currentDateTime() + " ";
         }
     }
 }

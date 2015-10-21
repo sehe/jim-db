@@ -44,7 +44,7 @@ namespace jimdb
             m_maxSize = size;
         }
 
-        int TaskQueue::size() const
+        size_t TaskQueue::size() const
         {
             return m_tasks.size();
         }

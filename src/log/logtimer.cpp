@@ -24,10 +24,6 @@ namespace jimdb
 {
     namespace common
     {
-        LogTimer::LogTimer(const LoggerTypes& type, const std::string& file,
-                           const int& i) : LogMessage(type, file, i),
-            m_start(std::chrono::high_resolution_clock::now()) {}
-
         LogTimer::~LogTimer()
         {
             auto end = std::chrono::high_resolution_clock::now();

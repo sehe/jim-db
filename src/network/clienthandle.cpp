@@ -55,7 +55,7 @@ namespace jimdb
             auto toSend = std::string(length);
             toSend += *s; //add the message
             int iSendResult;
-            iSendResult = ::send(m_sock, toSend.c_str(), toSend.size(), 0);
+            iSendResult = ::send(m_sock, toSend.c_str(), static_cast<int>(toSend.length()), 0);
             if (iSendResult == SOCKET_ERROR)
             {
                 LOG_ERROR << "send failed: " << WSAGetLastError() << ": Closing the sock";

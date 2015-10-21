@@ -21,7 +21,6 @@
 
 #pragma once
 #include <memory>
-#include <string>
 #include "message.h"
 namespace jimdb
 {
@@ -33,7 +32,7 @@ namespace jimdb
         public:
             virtual ~IClient() { }
 
-            virtual bool send(std::shared_ptr<::std::string> s) = 0;
+            virtual bool send(std::shared_ptr<std::string> s) = 0;
             virtual bool hasData() = 0;
             virtual bool isConnected() const = 0;
 

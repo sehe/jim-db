@@ -69,7 +69,6 @@ namespace jimdb
 
             long long m_next;
         };
-
 #include "BaseType.hpp"
     }
 }

@@ -28,8 +28,9 @@ namespace jimdb
         class FreeType : public StringType
         {
         public:
-            explicit FreeType(const int& size);
-            int getFree() const;
+            explicit inline FreeType(const size_t& size);
+			inline size_t getFree() const;
         };
+#include "freetype.hpp"
     }
 }

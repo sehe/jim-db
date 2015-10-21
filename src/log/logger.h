@@ -24,7 +24,8 @@
 #include "logmessage.h"
 #include "logtimer.h"
 #include "../thread/spinlock.h"
-
+#include <mutex>
+#include <iostream>
 //custom macro for filename shorten but only for windows
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 //LINUX
@@ -68,8 +69,8 @@ namespace jimdb
             \author Benjamin Meyer
             \date
             */
-            static LogMessage Log(LoggerTypes type, const std::string& file,
-                                  const int& i);
+            static inline LogMessage Log(LoggerTypes type, const std::string& file,
+                                         const int& i);
 
 
             /**
@@ -89,9 +90,9 @@ namespace jimdb
             \author Benjamin Meyer
             \date
             */
-            static LogTimer Timer(const std::string& file, const int& i);
+            static inline LogTimer Timer(const std::string& file, const int& i);
 
-            static Logger& getInstance();
+            static inline Logger& getInstance();
 
             /**
             static set method for the file so it can be accessed out of the getInstance
@@ -104,23 +105,23 @@ namespace jimdb
             void setLogLevel(const int& i);
             int getLogLevel() const;
 
-            void operator<<(const std::ostringstream& message) const;
+            void inline operator<<(const std::ostringstream& message) const;
 
         private:
             //default log everything
             Logger() : m_logLevel(DEBUG) { };
 
             ~Logger();
-            //no copy no move no swap
+            //no copy no move no swap if not copy there is no move
+            //if copy it generates "move"
             Logger(const Logger&) = delete;
-            Logger(Logger&&) = delete;
             Logger& operator=(const Logger& other) = delete;
-            Logger& operator=(Logger& other) = delete;
 
             static std::ofstream* m_file;
             static Logger m_instance;
             static tasking::SpinLock m_lock;
             int m_logLevel;
         };
+#include "logger.hpp"
     }
 }
