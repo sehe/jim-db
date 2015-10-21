@@ -63,6 +63,6 @@ namespace jimdb
         private:
             std::chrono::high_resolution_clock::time_point m_start;
         };
+#include "logtimer.hpp"
     }
 }
-#include "logtimer.hpp"

@@ -19,44 +19,37 @@
 ############################################################################
 **/
 
-#include "logmessage.h"
-namespace jimdb
+LogTimer::LogTimer(const LoggerTypes& type, const std::string& file,
+                   const int& i) : LogMessage(type, file, i),
+    m_start(std::chrono::high_resolution_clock::now()) {}
+
+template <typename T>
+LogTimer& LogTimer::operator<<(const T& m)
 {
-    namespace common
-    {
-		LogTimer::LogTimer(const LoggerTypes& type, const std::string& file,
-			const int& i) : LogMessage(type, file, i),
-			m_start(std::chrono::high_resolution_clock::now()) {}
-
-        template <typename T>
-        LogTimer& LogTimer::operator<<(const T& m)
-        {
-            LogMessage::operator<<(m);
-            return *this;
-        }
+    LogMessage::operator<<(m);
+    return *this;
+}
 
 
-        inline LogTimer::LogTimer(const LogTimer& other) : LogMessage(other), m_start(other.m_start) { }
+inline LogTimer::LogTimer(const LogTimer& other) : LogMessage(other), m_start(other.m_start) { }
 
-        inline LogTimer::LogTimer(LogTimer&& other) : LogMessage(std::move(other)), m_start(std::move(other.m_start)) { }
+inline LogTimer::LogTimer(LogTimer&& other) : LogMessage(std::move(other)), m_start(std::move(other.m_start)) { }
 
-        inline LogTimer& LogTimer::operator=(const LogTimer& other)
-        {
-            if (this == &other)
-                return *this;
-            LogMessage::operator =(other);
-            m_start = other.m_start;
-            return *this;
-        }
+inline LogTimer& LogTimer::operator=(const LogTimer& other)
+{
+    if (this == &other)
+        return *this;
+    LogMessage::operator =(other);
+    m_start = other.m_start;
+    return *this;
+}
 
 
-        inline LogTimer& LogTimer::operator=(LogTimer&& other)
-        {
-            if (this == &other)
-                return *this;
-            LogMessage::operator =(std::move(other));
-            m_start = std::move(other.m_start);
-            return *this;
-        }
-    }
+inline LogTimer& LogTimer::operator=(LogTimer&& other)
+{
+    if (this == &other)
+        return *this;
+    LogMessage::operator =(std::move(other));
+    m_start = std::move(other.m_start);
+    return *this;
 }
