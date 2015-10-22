@@ -51,7 +51,7 @@ def RapidJson_DownloadURL() :
     return "https://github.com/miloyip/rapidjson/archive/v"+found.group(1)+".zip", found.group(1)
 
 
-def BStar_DownloadURL() :
+def BTree_DownloadURL() :
     found = re.search( "<a title=\"Download stx-btree(.*)\" href=\"stx-btree-(.*?)\.tar\.bz2\">", Utilities.URLReader("https://panthema.net/2007/stx-btree/") )
     if found == None :
         raise RuntimeError("STX BStar Download URL not found")
@@ -122,14 +122,14 @@ def RapidJson_BuildInstall(env) :
 
 
 def BStar_BuildInstall(env) :
-    # download the BStar source code package and stop if the version is installed
-    url, version = BStar_DownloadURL()
-    prefix       = os.path.join("build", "bstar", version)
+    # download the Btree source code package and stop if the version is installed
+    url, version = BTree_DownloadURL()
+    prefix       = os.path.join("build", "btree", version)
     if os.path.exists(prefix) :
         return [], prefix
 
     download     = env.URLDownload( url.split("/")[-1], url )
-    extract      = env.Unpack( "#bstar-extract", download, UNPACKLIST=[os.path.join("stx-btree-"+version, "include", "stx", i) for i in ["btree_map.h", "btree_multimap.h", "btree_multiset.h", "btree_set.h"]] )
+    extract      = env.Unpack( "#btree-extract", download, UNPACKLIST=[os.path.join("stx-btree-"+version, "include", "stx", i) for i in ["btree.h","btree_map.h", "btree_multimap.h", "btree_multiset.h", "btree_set.h"]] )
     return env.InstallInto( prefix, extract, INSTALLATIONDIRS=[os.path.join("include", "stx")]*4 )
 
 
