@@ -28,16 +28,15 @@ of memory and allow to querry them.
 \author Benjamin Meyer
 \date DATE
 */
-
 #include "network/tcpserver.h"
 #include "log/logger.h"
 #include <thread>
 #include <list>
 #include "common/configuration.h"
 #include "tasking/taskqueue.h"
+#include "common/cmdargs.h"
 #include "thread/worker.h"
 #pragma comment(lib,"user32.lib")
-#include "common/cmdargs.h"
 
 //forward declare
 BOOL WINAPI ConsoleHandler(DWORD CEvent);
@@ -101,8 +100,7 @@ int main(int argc, char* argv[])
     }
 
     //set the loglevel of the config or the default log level
-    auto& log = jimdb::common::Logger::getInstance();
-    log.setLogLevel(cfg[jimdb::common::LOG_LEVEL].GetInt());
+    jimdb::common::Logger::getInstance().setLogLevel(cfg[jimdb::common::LOG_LEVEL].GetInt());
     //set the "real logfile" before this we used a "default to log excaptions"
     jimdb::common::Logger::setLogFile(cfg[jimdb::common::LOG_FILE].GetString());
 

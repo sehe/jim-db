@@ -150,7 +150,7 @@ env = CreateEnvironment( ignoretargets )
 # directories within the library build directory which should be checked for a library
 librarydirs   = [
                  "rapidjson",
-                 "bstar"
+                 "btree"
 #                 "lua"
 ]
 # directories which are checked for build.py files

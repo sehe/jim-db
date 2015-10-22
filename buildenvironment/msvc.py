@@ -40,7 +40,7 @@ conf.env.Replace(CPPFLAGS    = [])
 
 if conf.env["buildtype"] == "release" :
     conf.env.AppendUnique(CPPDEFINES     = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "JIMDB_NDEBUG"])
-    conf.env.AppendUnique(CPPFLAGS       = ["/O2"])
+    conf.env.AppendUnique(CPPFLAGS       = ["/O2", "/EHsc"]) # also add unwind mechanic
 elif conf.env["buildtype"] == "debug" :
     conf.env.AppendUnique(LINKFLAGS   = ["/od"]) 
     conf.env.AppendUnique(CPPFLAGS    = ["/Od"])

@@ -19,42 +19,18 @@
 ############################################################################
 **/
 
-#include "logger.h"
-
 namespace jimdb
 {
-    namespace common
+    namespace meta
     {
-        std::ofstream* Logger::m_file = nullptr;
-        Logger Logger::m_instance;
-        tasking::SpinLock Logger::m_lock;
-
-        void Logger::setLogLevel(const int& i)
+        inline MetaData::MetaData(const std::string& name): m_objectName(name)
         {
-            m_logLevel = i;
+            m_hash = common::FNVHash()(name);
         }
 
-        int Logger::getLogLevel() const
+        inline size_t MetaData::getHash() const
         {
-            return m_logLevel;
-        }
-
-        void Logger::setLogFile(const std::string& filename)
-        {
-            if (m_file != nullptr)
-            {
-                m_file->flush();
-                delete m_file;
-            }
-            m_file = new std::ofstream(filename, std::ios::out | std::ios::app);
-        }
-
-        Logger::~Logger()
-        {
-            //clean up
-            if(m_file != nullptr)
-                m_file->flush();
-            delete m_file;
+            return m_hash;
         }
     }
 }

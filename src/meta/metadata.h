@@ -18,43 +18,58 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 ############################################################################
 **/
-
-#include "logger.h"
+#pragma once
+#include "../common/fnvhash.h"
+#include "../index/index.h"
 
 namespace jimdb
 {
-    namespace common
+    namespace meta
     {
-        std::ofstream* Logger::m_file = nullptr;
-        Logger Logger::m_instance;
-        tasking::SpinLock Logger::m_lock;
+        /**
+        \brief Typedef a index to a MetaManager
 
-        void Logger::setLogLevel(const int& i)
-        {
-            m_logLevel = i;
-        }
+        A Manager for the meta Data is simply just a index of the
+        hash and the shared_ptr to the MetaData which should be threadsafe again.
 
-        int Logger::getLogLevel() const
-        {
-            return m_logLevel;
-        }
+        @author Benjamin Meyer
+        @date 22.10.2015 14:00
+        */
+        typedef index::Index<size_t, std::shared_ptr<MetaData>> MetaManager;
 
-        void Logger::setLogFile(const std::string& filename)
+        enum AttributeTypes
         {
-            if (m_file != nullptr)
-            {
-                m_file->flush();
-                delete m_file;
-            }
-            m_file = new std::ofstream(filename, std::ios::out | std::ios::app);
-        }
+            OBJECT, ARRAY, INT, DOUBLE, STRING, BOOL
+        };
 
-        Logger::~Logger()
+        /**
+        @brief metdata for one object
+
+        A metadata set for objects. The set itself is a index
+        so its locked. So if someone changes the index while someone read
+        nothing should happen.
+
+        @author Benjamin Meyer
+        @date 22.10.2015 11:58
+        */
+        class MetaData: public index::Index<std::string, AttributeTypes>
         {
-            //clean up
-            if(m_file != nullptr)
-                m_file->flush();
-            delete m_file;
-        }
+        public:
+            /**
+            \brief Create a new metadata with the object name
+            @param[in] name the name of the object
+            @author Benjamin Meyer
+            @date 22.10.2015 13:29
+            */
+            explicit inline MetaData(const std::string& name);
+            ~MetaData() {};
+
+            size_t getHash() const;
+        private:
+            std::string m_objectName;
+            size_t m_hash;
+        };
     }
 }
+
+#include "metadata.hpp"
