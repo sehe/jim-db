@@ -52,18 +52,11 @@ namespace jimdb
         }
 
         template <typename KEY, typename VALUE>
-        inline const VALUE& Index<KEY, VALUE>::operator[](const KEY& name)
-        {
-            tasking::RWLockGuard<> lock(m_lock, tasking::READ);
-            return m_index[name];
-        }
-
-        template <typename KEY, typename VALUE>
-        inline const VALUE& Index<KEY, VALUE>::get(const KEY& name)
-        {
-            tasking::RWLockGuard<> lock(m_lock, tasking::READ);
-            return m_index[name];
-        }
+		inline const VALUE& Index<KEY, VALUE>::operator[](const KEY& name)
+		{
+			tasking::RWLockGuard<> lock(m_lock, tasking::READ);
+			return m_index[name];
+		}
 
         template <typename KEY, typename VALUE>
         inline const stx::btree_map<KEY, VALUE>& Index<KEY, VALUE>::get()

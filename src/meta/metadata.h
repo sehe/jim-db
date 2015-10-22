@@ -62,11 +62,11 @@ namespace jimdb
             @date 22.10.2015 13:29
             */
             explicit inline MetaData(const std::string& name);
-            ~MetaData() {};
+            virtual ~MetaData() {};
 
             size_t getHash() const;
         private:
-            std::string m_objectName;
+            const std::string m_objectName;
             size_t m_hash;
         };
     }

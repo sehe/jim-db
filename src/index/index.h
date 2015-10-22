@@ -46,9 +46,6 @@ namespace jimdb
             typedef T KEY;
             typedef U VALUE;
 
-            Index() {};
-            ~Index() {};
-
             /**
             \brief add an entry to the index
 
@@ -85,11 +82,6 @@ namespace jimdb
             @date 22.10.2015 13:22
             */
             inline const VALUE& operator[](const KEY& k);
-
-            /**
-            @see operator[]()
-            */
-            inline const VALUE& get(const KEY& k);
 
             /**
             @brief get the whole entry map
