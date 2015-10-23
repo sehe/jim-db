@@ -22,6 +22,7 @@
 #pragma once
 #include <memory>
 #include "../datatype/freetype.h"
+
 namespace jimdb
 {
     namespace memorymanagement

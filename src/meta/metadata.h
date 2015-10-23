@@ -26,17 +26,6 @@ namespace jimdb
 {
     namespace meta
     {
-        /**
-        \brief Typedef a index to a MetaManager
-
-        A Manager for the meta Data is simply just a index of the
-        hash and the shared_ptr to the MetaData which should be threadsafe again.
-
-        @author Benjamin Meyer
-        @date 22.10.2015 14:00
-        */
-        typedef index::Index<size_t, std::shared_ptr<MetaData>> MetaManager;
-
         enum AttributeTypes
         {
             OBJECT, ARRAY, INT, DOUBLE, STRING, BOOL

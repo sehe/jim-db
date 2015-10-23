@@ -22,6 +22,8 @@
 
 #include "requesttask.h"
 #include "../log/logger.h"
+#include "taskqueue.h"
+#include "inserttask.h"
 
 namespace jimdb
 {
@@ -38,12 +40,12 @@ namespace jimdb
             auto message = m_client->getData();
             //check the json
             auto& doc = (*message)();
-			if(doc.HasParseError())
-			{
-				LOG_WARN << "invalid JSON";
-				//TODO send info back
-				return;
-			}
+            if(doc.HasParseError())
+            {
+                LOG_WARN << "invalid JSON";
+                //TODO send info back
+                return;
+            }
 
             if (doc.FindMember("type") == doc.MemberEnd() || doc.FindMember("data") == doc.MemberEnd())
             {
@@ -61,6 +63,7 @@ namespace jimdb
             if (doc["type"].GetString() == std::string("insert"))
             {
                 LOG_DEBUG << "insert message";
+                TaskQueue::getInstance().push_pack(std::make_shared<InsertTask>(m_client, message));
                 return;
             }
 

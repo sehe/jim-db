@@ -22,11 +22,7 @@
 #include <stx/btree_map.h>
 #include "../thread/rwlock.h"
 #include "../thread/rwlockguard.h"
-
-namespace jimdb{namespace meta{
-	class MetaData;
-}}
-
+#include "../page/page.h"
 namespace jimdb
 {
     namespace index
@@ -77,7 +73,7 @@ namespace jimdb
 
             @return a const reference to the value to not manipulate like
             	index[somekey].add... so its const. If the map is empty, there
-				was no entry befor calling the operator!
+            	was no entry befor calling the operator!
             @author Benjamin Meyer
             @date 22.10.2015 13:22
             */
