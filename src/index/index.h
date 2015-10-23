@@ -88,6 +88,7 @@ namespace jimdb
             */
             inline const stx::btree_map<KEY, VALUE>& get();
 
+			inline bool empty();
         private:
             stx::btree_map<KEY, VALUE> m_index;
             tasking::RWLock m_lock;

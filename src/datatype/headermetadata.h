@@ -19,19 +19,40 @@
 // ############################################################################
 // **/
 #pragma once
-#include "task.h"
-
 namespace jimdb
 {
-    namespace tasking
+    namespace memorymanagement
     {
-        class InsertTask : public Task
+        /**
+        \brief The header information for one object
+
+        @author Benjamin Meyer
+        @date 23.10.2015 15:27
+        */
+        class HeaderMetaData
         {
         public:
-            explicit InsertTask(const std::shared_ptr<network::IClient>& client, const std::shared_ptr<network::Message> m);
-            void operator()() override;
+            inline HeaderMetaData(const size_t& id, const size_t& hash, const size_t& type, const size_t& pos);
+            /**
+			Dtor which set everything to 0 "kind of clean".
+            @author Benjamin Meyer
+            @date 23.10.2015 15:29
+            */
+            inline ~HeaderMetaData();
+            inline size_t getOID() const;
+            inline size_t getHash() const;
+            inline size_t getObjektType() const;
+            inline size_t getPos() const;
         private:
-            std::shared_ptr<network::Message> m_msg;
+            //objekt id
+            size_t m_oid;
+            //object hash
+            size_t m_hash;
+            //objekt type id better say the objekt name hash
+            size_t m_objektType;
+            //the position in body
+            size_t m_pos;
         };
     }
 }
+#include "headermetadata.hpp"

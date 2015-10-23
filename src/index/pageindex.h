@@ -31,7 +31,7 @@ namespace jimdb
         @author Benjamin Meyer
         @date 23.10.2015 12:08
         */
-        class PageIndex: public Index<size_t, memorymanagement::Page>
+        class PageIndex: public Index<size_t, std::shared_ptr<memorymanagement::Page>>
         {
         public:
             static PageIndex& getInstance();

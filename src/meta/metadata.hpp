@@ -27,7 +27,7 @@ namespace jimdb
         {
             m_hash = common::FNVHash()(name);
         }
-
+		
         inline size_t MetaData::getHash() const
         {
             return m_hash;
