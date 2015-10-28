@@ -39,6 +39,8 @@ namespace jimdb
             THREADS,
             PORT,
             MAX_TASKS,
+			PAGE_HEADER,
+			PAGE_BODY,
             SIZE_OF_ENUM,
         };
 

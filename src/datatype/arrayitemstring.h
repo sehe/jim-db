@@ -1,4 +1,4 @@
-﻿// /**
+// /**
 // ############################################################################
 // # GPL License                                                              #
 // #                                                                          #
@@ -19,42 +19,20 @@
 // ############################################################################
 // **/
 #pragma once
-#include "task.h"
-#include <vector>
-
+#include "basetype.h"
+#include "arrayitem.h"
+#include <string>
+#include <string>
+#include <memory>
 namespace jimdb
 {
-    namespace tasking
-    {
-        class InsertTask : public Task
-        {
-        public:
-            explicit InsertTask(const std::shared_ptr<network::IClient>& client, const std::shared_ptr<network::Message> m);
-            void operator()() override;
-        private:
-            std::shared_ptr<network::Message> m_msg;
-
-            /**
-            \brief insert a meta and returns the size WITH page overhead
-
-            only insert if the meta does not exsist
-            @author Benjamin Meyer
-            @date 28.10.2015 15:40
-            */
-            size_t checkSizeAndMeta(const std::string& name, const rapidjson::GenericValue<rapidjson::UTF8<>>& val);
-
-            /**
-            \brief calculates the size of the array with overhead
-
-            Also include inner object with a id
-            @author Benjamin Meyer
-            @date 28.10.2015 16:29
-            */
-            size_t checkSizeArray(const rapidjson::GenericValue<rapidjson::UTF8<>>& val);
-
-            //vector of inner object ids which get insterted
-            // while creation of the meta
-            std::vector<size_t> m_innerIDs;
-        };
-    }
+	namespace memorymanagement
+	{
+		class ArrayItemString : public ArrayItem<long long>
+		{
+			explicit inline ArrayItemString(const std::string& s);
+			inline std::shared_ptr<std::string> getString() const;
+		};
+#include "arrayitemstring.hpp"
+	}
 }

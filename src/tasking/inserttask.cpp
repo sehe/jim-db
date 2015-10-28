@@ -1,6 +1,8 @@
 ﻿#include "inserttask.h"
 #include "../meta/metaindex.h"
 #include "../index/pageindex.h"
+#include "../datatype/arrayitem.h"
+#include "../common/configuration.h"
 
 namespace jimdb
 {
@@ -12,20 +14,166 @@ namespace jimdb
 
         void InsertTask::operator()()
         {
-            //TODO fix this!
-            index::PageIndex::getInstance();
-            long long id = 0;
-            if (index::PageIndex::getInstance().empty())
-            {
-                auto p = std::make_shared<memorymanagement::Page>(512, 512);
-                id = p->getID();
-                index::PageIndex::getInstance().add(p->getID(), p);
-            }
-
             //insert into page
             //we already know that its a valid data and valid document here!
-            index::PageIndex::getInstance()[id]->insert((*m_msg)()["data"]);
+            auto& dat = (*m_msg)()["data"];
+            auto it = dat.MemberBegin();
+            if (it->value.IsObject())
+            {
+                LOG_DEBUG << "Object to insert name: " << it->name.GetString();
+            }
+            else
+            {
+                LOG_WARN << "Insert: data field is missing Object member";
+                return;
+            }
+            //insert it to meta and get the size
+            auto l_objSize = checkSizeAndMeta(it->name.GetString(), it->value);
+            LOG_DEBUG << "Object in Memory is: " << l_objSize << "byte";
+            //Now estimate the next page which has space for l_objSize
 
+            std::shared_ptr<memorymanagement::Page> l_page = nullptr;
+            {
+                auto& l_pIndex = index::PageIndex::getInstance().get();
+
+                //iterate backwards since the last meight have the most space
+                for (auto iterator = l_pIndex.end(); iterator != l_pIndex.begin(); ++iterator)
+                {
+                    if (iterator->second->free() > l_objSize)
+                    {
+                        l_page = iterator->second;
+                        return;
+                    }
+                }
+            }
+
+            if(l_page == nullptr)
+            {
+                //well does not fit in any page
+                auto& cfg = common::Configuration::getInstance();
+                l_page = std::make_shared<memorymanagement::Page>(cfg[common::PAGE_HEADER].GetInt64(),
+                         cfg[common::PAGE_BODY].GetInt64());
+                auto id = l_page->getID();
+
+				//this somehow throws?!
+                //index::PageIndex::getInstance().add(id, l_page);
+            }
+        }
+
+        size_t InsertTask::checkSizeAndMeta(const std::string& name, const rapidjson::GenericValue<rapidjson::UTF8<>>& value)
+        {
+            auto& meta = meta::MetaIndex::getInstance();
+            auto l_metaExsist = meta.contains(common::FNVHash()(name));
+            size_t l_objSize = 0;
+
+            //check if we need to insert a new meta
+            //scip this part if it already contains
+            auto newMeta = std::make_shared<meta::MetaData>(name);
+
+            //if not still iterate for size
+            for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it)
+            {
+                switch (it->value.GetType())
+                {
+                    case rapidjson::kNullType:
+                        LOG_WARN << "null type: " << it->name.GetString();
+                        break;
+
+                    case rapidjson::kFalseType:
+                    case rapidjson::kTrueType:
+                        if (!l_metaExsist)
+                            newMeta->add(it->name.GetString(), meta::BOOL);
+                        break;
+
+                    case rapidjson::kObjectType:
+                        //add to the current meta
+                        if (!l_metaExsist)
+                            newMeta->add(it->name.GetString(), meta::OBJECT);
+                        //now check if the obj already exsist
+                        //else create it or skip
+                        l_objSize += checkSizeAndMeta(it->name.GetString(), it->value);
+                        //also add the size of the new obj to it
+                        break;
+
+                    case rapidjson::kArrayType:
+                        if (!l_metaExsist)
+                            newMeta->add(it->name.GetString(), meta::ARRAY);
+
+                        l_objSize += checkSizeArray(it->value);
+                        break;
+
+                    case rapidjson::kStringType:
+                        if (!l_metaExsist)
+                            newMeta->add(it->name.GetString(), meta::STRING);
+                        //add the length of the string
+                        l_objSize += strlen(it->value.GetString());
+                        break;
+
+                    case rapidjson::kNumberType:
+                        if (!l_metaExsist)
+                        {
+                            if (it->value.IsInt())
+                                newMeta->add(it->name.GetString(), meta::INT); //number
+                            else
+                                newMeta->add(it->name.GetString(), meta::DOUBLE);//floatingpoint
+                        }
+                        break;
+                    default:
+                        LOG_WARN << "Unknown member Type: " << it->name.GetString() << ":" << it->value.GetType();
+                        break;
+                }
+                //add the general size of a regular object
+                //since it get added for every object
+                //for example every inner object has a filed with the obj id
+                //every array has a filed with the count of inner objects and so on.
+                //so all we do is adding the base and the rest get added in the loop above
+                l_objSize += sizeof(memorymanagement::BaseType<size_t>);
+            }
+
+            //add the new metadata to the meta;
+            if (!l_metaExsist)
+                meta.add(newMeta->getHash(), newMeta);
+
+            return l_objSize;
+        }
+
+
+        size_t InsertTask::checkSizeArray(const rapidjson::GenericValue<rapidjson::UTF8<>>& val)
+        {
+            //we got a array over here
+            size_t l_arrSize = 0;
+
+            //not member begin since we are in a array!
+            //only values here!
+            for (auto it = val.Begin(); it != val.End(); ++it)
+            {
+                switch (it->GetType())
+                {
+                    case rapidjson::kObjectType:
+                        //so now we got an object without a name!!!
+
+                        //now check if the obj already exsist
+                        //else create it or skip
+                        //TODO FIX THIS!!! NEED A ID HERE
+                        l_arrSize += checkSizeAndMeta("", *it);
+                        //also add the size of the new obj to it
+                        break;
+
+                    case rapidjson::kArrayType:
+                        l_arrSize += checkSizeArray(*it);
+                        break;
+
+                    case rapidjson::kStringType:
+                        //add the length of the string
+                        l_arrSize += strlen(it->GetString());
+                        break;
+                    default:
+                        LOG_WARN << "Unknown member Type in array ";
+                        break;
+                }
+                l_arrSize += sizeof(memorymanagement::ArrayItem<long long>);
+            }
+            return l_arrSize;
         }
     }
 }

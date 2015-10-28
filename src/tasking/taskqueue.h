@@ -73,7 +73,7 @@ namespace jimdb
             *@author Benjamin Meyer
             *@date Mittwoch, 22. Juli 2015
             */
-            size_t size() const;
+            size_t size();
 
         private:
             TaskQueue();

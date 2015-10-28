@@ -37,11 +37,13 @@ namespace jimdb
 
         const char* ConfigValuesMap::EnumString[] =
         {
-            "loglevel",
-            "logfile",
+            "log_level",
+            "log_file",
             "thread",
             "port",
             "max_tasks",
+			"page_header",
+			"page_body"
         };
 
         //check if valid numer must be the size of the enum!
@@ -89,6 +91,8 @@ namespace jimdb
             check(THREADS); //0 means take system default
             check(PORT);
             check(MAX_TASKS);
+			check(PAGE_HEADER);
+			check(PAGE_BODY);
 
             return true;
         }
@@ -121,6 +125,14 @@ namespace jimdb
 
             name.SetString(ConfigValuesMap::get(MAX_TASKS), alloc);
             doc.AddMember(name, 1024, doc.GetAllocator());
+
+			//1Kib
+			name.SetString(ConfigValuesMap::get(PAGE_HEADER), alloc);
+			doc.AddMember(name, 1024, doc.GetAllocator());
+
+			//16Kib
+			name.SetString(ConfigValuesMap::get(PAGE_BODY), alloc);
+			doc.AddMember(name, 16384, doc.GetAllocator());
 
             rapidjson::StringBuffer strbuf;
             rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);

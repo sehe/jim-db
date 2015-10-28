@@ -1,4 +1,4 @@
-﻿// /**
+// /**
 // ############################################################################
 // # GPL License                                                              #
 // #                                                                          #
@@ -18,43 +18,12 @@
 // # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 // ############################################################################
 // **/
-#pragma once
-#include "task.h"
-#include <vector>
 
-namespace jimdb
+inline ArrayType::ArrayType(const size_t& s): BaseType(s)
 {
-    namespace tasking
-    {
-        class InsertTask : public Task
-        {
-        public:
-            explicit InsertTask(const std::shared_ptr<network::IClient>& client, const std::shared_ptr<network::Message> m);
-            void operator()() override;
-        private:
-            std::shared_ptr<network::Message> m_msg;
+}
 
-            /**
-            \brief insert a meta and returns the size WITH page overhead
-
-            only insert if the meta does not exsist
-            @author Benjamin Meyer
-            @date 28.10.2015 15:40
-            */
-            size_t checkSizeAndMeta(const std::string& name, const rapidjson::GenericValue<rapidjson::UTF8<>>& val);
-
-            /**
-            \brief calculates the size of the array with overhead
-
-            Also include inner object with a id
-            @author Benjamin Meyer
-            @date 28.10.2015 16:29
-            */
-            size_t checkSizeArray(const rapidjson::GenericValue<rapidjson::UTF8<>>& val);
-
-            //vector of inner object ids which get insterted
-            // while creation of the meta
-            std::vector<size_t> m_innerIDs;
-        };
-    }
+inline size_t ArrayType::size()
+{
+    return m_data.data;
 }

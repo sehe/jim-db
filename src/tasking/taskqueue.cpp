@@ -39,13 +39,14 @@ namespace jimdb
 
         void TaskQueue::setMaxSize(const size_t& size)
         {
-			//make sure noone else uses the queue obj right now
-			std::unique_lock<std::mutex> lock(m_mutex);
+            //make sure noone else uses the queue obj right now
+            std::unique_lock<std::mutex> lock(m_mutex);
             m_maxSize = size;
         }
 
-        size_t TaskQueue::size() const
+        size_t TaskQueue::size()
         {
+            std::unique_lock<std::mutex> lock(m_mutex);
             return m_tasks.size();
         }
     }

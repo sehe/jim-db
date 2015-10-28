@@ -20,11 +20,11 @@
 **/
 inline bool TaskQueue::push_pack(std::shared_ptr<Task> t)
 {
+	std::unique_lock<std::mutex> lock(m_mutex);
     //if it's 0 the queue "is unlimited".
     if (m_maxSize != 0 && m_tasks.size() >= m_maxSize)
         return false;
 
-    std::lock_guard<std::mutex> lock(m_mutex);
     m_tasks.push_back(t);
     //notify that there is one more task, so one thread can work now
     m_cond.notify_one();

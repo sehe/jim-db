@@ -36,7 +36,11 @@ namespace jimdb
         public:
             static PageIndex& getInstance();
         private:
+			//store the last inserted page
+			//should be the "most empty"
+			std::shared_ptr<memorymanagement::Page> m_last;
             static PageIndex m_instance;
+			static std::mutex m_lock;
         };
     }
 }

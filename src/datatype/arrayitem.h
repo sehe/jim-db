@@ -19,42 +19,61 @@
 // ############################################################################
 // **/
 #pragma once
-#include "task.h"
-#include <vector>
-
+#include "basetype.h"
 namespace jimdb
 {
-    namespace tasking
+    namespace memorymanagement
     {
-        class InsertTask : public Task
+        enum ETypes
+        {
+            INT,
+            BOOL,
+            OBJECT,
+            ARRAY,
+            DOUBLE,
+            STRING,
+            INVALID
+        };
+
+        /**
+        \brief ArrayItem type
+
+        this is a "container" to optain the type of an array.
+        If we got the type we can stancil it with the BaseType
+        according to the type. OOP is a nice thing here ;)
+
+        Always take the according constructor while creation
+
+        later just cast it to any template and get the type to cast
+        it to the according arrayItem with the right type
+        @author Benjamin Meyer
+        @date 28.10.2015 16:37
+        */
+        template<typename T>
+        class ArrayItem : public BaseType<T>
         {
         public:
-            explicit InsertTask(const std::shared_ptr<network::IClient>& client, const std::shared_ptr<network::Message> m);
-            void operator()() override;
+
+            /**
+            \brief Constructor for example object
+
+            @author Benjamin Meyer
+            @date 28.10.2015 17:59
+            */
+            explicit ArrayItem(T& t, const ETypes& e);
+            inline ETypes getType() const;
+
+            /**
+            \brief Set the type used for strings and so on
+
+            Since strings cant be constructed with the basetype
+            @author Benjamin Meyer
+            @date 28.10.2015 17:52
+            */
+            inline void setType(const ETypes& type);
         private:
-            std::shared_ptr<network::Message> m_msg;
-
-            /**
-            \brief insert a meta and returns the size WITH page overhead
-
-            only insert if the meta does not exsist
-            @author Benjamin Meyer
-            @date 28.10.2015 15:40
-            */
-            size_t checkSizeAndMeta(const std::string& name, const rapidjson::GenericValue<rapidjson::UTF8<>>& val);
-
-            /**
-            \brief calculates the size of the array with overhead
-
-            Also include inner object with a id
-            @author Benjamin Meyer
-            @date 28.10.2015 16:29
-            */
-            size_t checkSizeArray(const rapidjson::GenericValue<rapidjson::UTF8<>>& val);
-
-            //vector of inner object ids which get insterted
-            // while creation of the meta
-            std::vector<size_t> m_innerIDs;
+            ETypes m_type;
         };
+#include "arrayitem.hpp"
     }
 }

@@ -36,7 +36,7 @@ inline StringType::StringType(const std::string& s) : BaseType<long long>()
 inline std::shared_ptr<std::string> StringType::getString() const
 {
     auto string = std::make_shared<std::string>();
-    //get the char array
+    //get the char array. Its a deep copy!
     string->append(reinterpret_cast<const char*>(this + 1), m_data.size);//appand it
     return string;//return the shared_ptr as copy
 }
