@@ -1,4 +1,4 @@
-﻿// /**
+// /**
 // ############################################################################
 // # GPL License                                                              #
 // #                                                                          #
@@ -18,35 +18,16 @@
 // # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 // ############################################################################
 // **/
-#pragma once
-#include "../page/page.h"
-#include "index.h"
-#include "../thread/spinlock.h"
 
-namespace jimdb
+void PageIndex::add(const KEY& k, const VALUE& type)
 {
-    namespace index
-    {
-        /**
-        \brief Singleton PageIndex
-        @author Benjamin Meyer
-        @date 23.10.2015 12:08
-        */
-        class PageIndex: public Index<size_t, std::shared_ptr<memorymanagement::Page>>
-        {
-        public:
-            static PageIndex& getInstance();
+    std::lock_guard<tasking::SpinLock> lock(m_lock);
+    m_last = type;
+    Index::add(k, type);
+}
 
-            inline void add(const KEY& k, const VALUE& type);
-            inline std::shared_ptr<memorymanagement::Page> last();      
-        private:
-            PageIndex() : m_last(nullptr) {};
-            //store the last inserted page
-            //should be the "most empty"
-            std::shared_ptr<memorymanagement::Page> m_last;
-            static PageIndex m_instance;
-            tasking::SpinLock m_lock;
-        };
-#include "pageindex.hpp"
-    }
+std::shared_ptr<memorymanagement::Page> PageIndex::last()
+{
+    std::lock_guard<tasking::SpinLock> lock(m_lock);
+    return m_last;
 }

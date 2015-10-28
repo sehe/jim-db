@@ -86,10 +86,10 @@ namespace jimdb
             @author Benjamin Meyer
             @date 22.10.2015 12:58
             */
-            inline const stx::btree_map<KEY, VALUE>& get();
+            //inline const stx::btree_map<KEY, VALUE>& get();
 
 			inline bool empty();
-        private:
+        protected:
             stx::btree_map<KEY, VALUE> m_index;
             tasking::RWLock m_lock;
         };

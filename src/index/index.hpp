@@ -58,12 +58,14 @@ namespace jimdb
             return m_index[name];
         }
 
+		/** // simply dont do this!
         template <typename KEY, typename VALUE>
         inline const stx::btree_map<KEY, VALUE>& Index<KEY, VALUE>::get()
         {
             tasking::RWLockGuard<> lock(m_lock, tasking::READ);
             return m_index;
         }
+		*/
 
         template <typename KEY, typename VALUE>
         inline bool Index<KEY, VALUE>::empty()

@@ -25,11 +25,9 @@ namespace jimdb
     namespace index
     {
         PageIndex PageIndex::m_instance;
-		std::mutex PageIndex::m_lock;
 
         PageIndex& PageIndex::getInstance()
         {
-			std::lock_guard<std::mutex> lock(m_lock);
             return m_instance;
         }
     }

@@ -32,20 +32,28 @@ namespace jimdb
             LOG_DEBUG << "Object in Memory is: " << l_objSize << "byte";
             //Now estimate the next page which has space for l_objSize
 
-            std::shared_ptr<memorymanagement::Page> l_page = nullptr;
-            {
-                auto& l_pIndex = index::PageIndex::getInstance().get();
+            //get the last created page
+            std::shared_ptr<memorymanagement::Page> l_page = index::PageIndex::getInstance().last();
 
-                //iterate backwards since the last meight have the most space
-                for (auto iterator = l_pIndex.end(); iterator != l_pIndex.begin(); ++iterator)
+            //You simply cant iterate and call the free?!
+            //duno why!
+
+            /** //EW DONT DO THAT!
+            auto& l_pIndex = index::PageIndex::getInstance().get();
+
+            //iterate backwards since the last meight have the most space
+            for (auto iterator = l_pIndex.end(); iterator != l_pIndex.begin(); ++iterator)
+            {
+
+                auto temp = iterator->second;
+                if (temp->free() > l_objSize)
                 {
-                    if (iterator->second->free() > l_objSize)
-                    {
-                        l_page = iterator->second;
-                        return;
-                    }
+                    l_page = iterator->second;
+                    return;
                 }
+
             }
+            **/
 
             if(l_page == nullptr)
             {
@@ -55,8 +63,8 @@ namespace jimdb
                          cfg[common::PAGE_BODY].GetInt64());
                 auto id = l_page->getID();
 
-				//this somehow throws?!
-                //index::PageIndex::getInstance().add(id, l_page);
+                //this somehow throws?!
+                index::PageIndex::getInstance().add(id, l_page);
             }
         }
 
