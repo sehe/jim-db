@@ -21,13 +21,27 @@
 
 void PageIndex::add(const KEY& k, const VALUE& type)
 {
-    std::lock_guard<tasking::SpinLock> lock(m_lock);
+    tasking::RWLockGuard<> lock(m_lock, tasking::WRITE);
     m_last = type;
-    Index::add(k, type);
+    //at it manual to the idx else
+    // we have lock in lock here!
+    m_index[k] = type;
 }
 
 std::shared_ptr<memorymanagement::Page> PageIndex::last()
 {
-    std::lock_guard<tasking::SpinLock> lock(m_lock);
+    tasking::RWLockGuard<>  lock(m_lock, tasking::READ);
     return m_last;
+}
+
+std::shared_ptr<memorymanagement::Page> PageIndex::find(const size_t& free)
+{
+    tasking::RWLockGuard<> lock(m_lock, tasking::READ);
+    //now find right but backwards
+    for (auto it = m_index.rbegin(); it != m_index.rend(); ++it)
+    {
+        if (it->second->free() > free)
+            return it->second;
+    }
+    return nullptr;
 }

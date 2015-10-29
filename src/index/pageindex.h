@@ -38,14 +38,14 @@ namespace jimdb
             static PageIndex& getInstance();
 
             inline void add(const KEY& k, const VALUE& type);
-            inline std::shared_ptr<memorymanagement::Page> last();      
+            inline std::shared_ptr<memorymanagement::Page> last(); 
+			inline std::shared_ptr<memorymanagement::Page> find(const size_t& free);
         private:
             PageIndex() : m_last(nullptr) {};
             //store the last inserted page
             //should be the "most empty"
             std::shared_ptr<memorymanagement::Page> m_last;
             static PageIndex m_instance;
-            tasking::SpinLock m_lock;
         };
 #include "pageindex.hpp"
     }

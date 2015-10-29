@@ -38,6 +38,7 @@ namespace jimdb
             //put free type info in header
             //so at pos 0 is a long long with the pos of the free type
             m_freepos = new(&static_cast<char*>(m_header)[0]) long long(0);
+
             //add the free ofset from the header
             m_headerFreePos = sizeof(long long);
             m_headerSpace = header - sizeof(long long);
@@ -76,8 +77,18 @@ namespace jimdb
             return m_freeSpace;
         }
 
-        void Page::insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value)
+        bool Page::insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value)
         {
+            //never forget to lock ...
+            tasking::RWLockGuard<> lock(m_rwLock, tasking::WRITE);
+            //get the object name
+            std::string name = value.MemberBegin()->name.GetString();
+            //TODO Insert header here!!
+            //TODO how to get first obj?! heck!
+
+            bool l_worked = insertObject(value.MemberBegin()->value, nullptr);
+
+            return l_worked;
         }
 
         void Page::inserHeader(const size_t& id, const size_t& hash, const size_t& type, const size_t& pos)
@@ -85,6 +96,98 @@ namespace jimdb
             //push into the header
             new(&static_cast<char*>(m_header)[m_headerFreePos]) HeaderMetaData(id, hash, type, pos);
             m_headerFreePos += sizeof(HeaderMetaData);
+        }
+
+        bool Page::insertObject(const rapidjson::GenericValue<rapidjson::UTF8<>>& value, BaseType<size_t>* l_last)
+        {
+            //get the members
+            for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it)
+            {
+                //do update this
+                //dont forget it pos = m_free to change m_free to the
+                //new pos!
+                FreeType* l_pos = nullptr;
+                switch (it->value.GetType())
+                {
+                    case rapidjson::kNullType:
+                        LOG_WARN << "null type: " << it->name.GetString();
+                        break;
+
+                    case rapidjson::kFalseType:
+                    case rapidjson::kTrueType:
+                        l_pos = find(sizeof(BaseType<bool>));
+
+                        break;
+
+                    case rapidjson::kObjectType:
+                        //pos for the obj id
+                        l_pos = find(sizeof(BaseType<size_t>));
+                        //TODO insert obj id HERE
+                        // pass the objid Object to the insertobj!
+                        // now recursive insert the obj
+                        insertObject(it->value, nullptr);
+                        break;
+
+                    case rapidjson::kArrayType:
+                        //pos for the array size
+                        l_pos = find(sizeof(BaseType<size_t>));
+                        //and insert array after this
+
+                        break;
+
+                    case rapidjson::kStringType:
+                        //find pos where the string fits
+                        l_pos = find(sizeof(BaseType<size_t>) + strlen(it->value.GetString()));
+                        break;
+
+                    case rapidjson::kNumberType:
+                        //doesnt matter since long long and double are equal on
+                        // x64
+                        l_pos = find(sizeof(BaseType<long long>));
+                        if (it->value.IsInt())
+                        {
+                            //insert INT
+                        }
+                        else
+                        {
+                            //INSERT DOUBLE
+                        }
+                        break;
+                    default:
+                        LOG_WARN << "Unknown member Type: " << it->name.GetString() << ":" << it->value.GetType();
+                        break;
+                }
+            }
+            //if we get here its in!
+            return true;
+        }
+
+        FreeType* Page::find(const size_t& size)
+        {
+            if (size >= m_freeSpace)
+                return nullptr;
+            //copy free ptr
+            auto l_free = m_free;
+            while(true)
+            {
+                if (l_free->getFree() > size)
+                    return l_free;
+
+                if (l_free->getNext() != 0)
+                {
+                    auto l_temp = reinterpret_cast<char*>(l_free);
+                    l_temp += l_free->getNext();
+                    l_free = reinterpret_cast<FreeType*>(l_temp);
+                    continue;
+                }
+                //if we get here we have no space for that!
+                return nullptr;
+            }
+        }
+
+        std::ptrdiff_t Page::dist(const void* p1, const void* p2) const
+        {
+            return static_cast<const char*>(p1) - static_cast<const char*>(p2);
         }
     }
 }

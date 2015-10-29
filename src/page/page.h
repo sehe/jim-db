@@ -43,7 +43,7 @@ namespace jimdb
             Page(long long header, long long body);
             ~Page();
 
-			long long getID();
+            long long getID();
             void setNext(const long long& id);
             long long getNext() const;
 
@@ -52,13 +52,17 @@ namespace jimdb
             \brief Insert a json obj to the page and checks for the meta data
 
             it also creates the metadata for the objects if needed
+            @return true if it worked, false if it doent fit because
+            	of to small free chunks. for example lage string but only
+            	small chunks are free. (fragmented)
             @author Benjamin Meyer
             @date 23.10.2015 17:26
             */
-            void insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value);
+            bool insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value);
 
         private:
             //voidptr to memory to static cast as we like
+            //never ever override this ptr!!
             void* m_header;
             void* m_body;
 
@@ -81,10 +85,31 @@ namespace jimdb
             //id generation with static counter
             static long long m_s_idCounter;
 
-			//lock for getFree and so on
-			tasking::RWLock m_rwLock;
+            //lock for getFree and so on
+            tasking::RWLock m_rwLock;
 
             void inserHeader(const size_t& id, const size_t& hash, const size_t& type, const size_t& pos);
+
+            /**
+            \brief Insert a Object
+
+            @param[in] last the previous type of "inner" objects,
+            	nullptr if there was no previous since its the frist object to be
+            	inserted.
+            @param[in] value the rapidjson vlaue to be inserted
+            @author Benjamin Meyer
+            @date 29.10.2015 12:12
+            */
+            bool insertObject(const rapidjson::GenericValue<rapidjson::UTF8<>>& value, BaseType<size_t>* l_last);
+
+            //returns a ptr to the spot where it can fit
+            //@return nullptr if no space found!
+            FreeType* find(const size_t& size);
+
+            //Caluclate the distance between two pointers
+            //used to calc the ->next() of objects
+            //doenst change the ptrs here
+            std::ptrdiff_t dist(const void* p1, const void* p2) const;
         };
     }
 }

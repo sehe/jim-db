@@ -32,40 +32,20 @@ namespace jimdb
             LOG_DEBUG << "Object in Memory is: " << l_objSize << "byte";
             //Now estimate the next page which has space for l_objSize
 
-            //get the last created page
-            std::shared_ptr<memorymanagement::Page> l_page = index::PageIndex::getInstance().last();
-
-            //You simply cant iterate and call the free?!
-            //duno why!
-
-            /** //EW DONT DO THAT!
-            auto& l_pIndex = index::PageIndex::getInstance().get();
-
-            //iterate backwards since the last meight have the most space
-            for (auto iterator = l_pIndex.end(); iterator != l_pIndex.begin(); ++iterator)
-            {
-
-                auto temp = iterator->second;
-                if (temp->free() > l_objSize)
-                {
-                    l_page = iterator->second;
-                    return;
-                }
-
-            }
-            **/
-
+            //get a page which could fit the obj
+            auto l_page = index::PageIndex::getInstance().find(l_objSize);
+            //if the ptr is still nullptr we need to create a new Page
             if(l_page == nullptr)
             {
                 //well does not fit in any page
                 auto& cfg = common::Configuration::getInstance();
                 l_page = std::make_shared<memorymanagement::Page>(cfg[common::PAGE_HEADER].GetInt64(),
                          cfg[common::PAGE_BODY].GetInt64());
-                auto id = l_page->getID();
-
-                //this somehow throws?!
-                index::PageIndex::getInstance().add(id, l_page);
+				//add the new page
+                index::PageIndex::getInstance().add(l_page->getID(), l_page);
             }
+
+			l_page->insert(dat);
         }
 
         size_t InsertTask::checkSizeAndMeta(const std::string& name, const rapidjson::GenericValue<rapidjson::UTF8<>>& value)
