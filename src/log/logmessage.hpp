@@ -30,6 +30,16 @@ namespace jimdb
         {
             m_stream << m;
             return *this;
+
+        }
+        template <>
+        inline LogMessage& LogMessage::operator<<(const bool& b)
+        {
+            if (b)
+                m_stream << "true";
+            else
+                m_stream << "false";
+            return *this;
         }
 
         inline LogMessage::LogMessage(const LoggerTypes& type, const std::string& file,

@@ -23,13 +23,15 @@
 #include "../assert.h"
 #include "../meta/metadata.h"
 #include "../datatype/headermetadata.h"
-#include "../meta/metaindex.h"
+#include "../index/objectindex.h"
+#include "../datatype/arrayitem.h"
 
 namespace jimdb
 {
     namespace memorymanagement
     {
         long long Page::m_s_idCounter = 0;
+        long long Page::m_objCount = 0;
 
         Page::Page(long long header, long long body) : m_freeSpace(body), m_next(0), m_id(++m_s_idCounter)
         {
@@ -37,15 +39,20 @@ namespace jimdb
             m_body = new char[body];
             //put free type info in header
             //so at pos 0 is a long long with the pos of the free type
-            m_freepos = new(&static_cast<char*>(m_header)[0]) long long(0);
+            m_freepos = new(static_cast<char*>(m_header)) long long(0);
 
             //add the free ofset from the header
-            m_headerFreePos = sizeof(long long);
-            m_headerSpace = header - sizeof(long long);
+            m_headerFreePos = new(static_cast<char*>(m_header) + sizeof(long long)) long long(0);
+            //because of m_freepos and m_headerFreePos
+            m_headerSpace = header - 2 * sizeof(long long);
 
             //throw in the free type into the body
             m_free = new(&static_cast<char*>(m_body)[0]) FreeType(body - sizeof(FreeType));
             ASSERT(m_free->getFree() == body);
+
+            //set the free of the header
+            m_headerFree = new(static_cast<char*>(m_header) + sizeof(long long)) FreeType(header - sizeof(FreeType));
+
         }
 
         Page::~Page()
@@ -77,117 +84,410 @@ namespace jimdb
             return m_freeSpace;
         }
 
-        bool Page::insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value)
+        bool Page::free(const size_t& size)
         {
+            tasking::RWLockGuard<> lock(m_rwLock, tasking::READ);
+            return find(size).first != nullptr;//nullptr = false in c++ 11 but be safe her
+        }
+
+        void Page::insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value)
+        {
+            //here we know this page has one chunk big enough to fitt the whole object
+            //including its overhead! so start inserting it.
+
             //never forget to lock ...
             tasking::RWLockGuard<> lock(m_rwLock, tasking::WRITE);
             //get the object name
             std::string name = value.MemberBegin()->name.GetString();
-            //TODO Insert header here!!
-            //TODO how to get first obj?! heck!
 
-            bool l_worked = insertObject(value.MemberBegin()->value, nullptr);
+            //returns the pos of the first element needed for the headerdata
 
-            return l_worked;
+            auto firstElementPos = insertObject(value.MemberBegin()->value, nullptr).first;
+
+
+            auto l_first = dist(firstElementPos, m_body);
+
+            /** // inline for a short check here
+            auto next = static_cast<StringType*>(m_body)->getNext();
+            auto innerobjHash =  reinterpret_cast<BaseType<size_t>*>(static_cast<char*>(m_body) + next)->getData();
+            LOG_DEBUG << innerobjHash << ": contains? " << meta::MetaIndex::getInstance().contains(innerobjHash);
+            **/
+
+            //insert the header
+            auto meta = insertHeader(m_objCount++, 0, common::FNVHash()(name), l_first);
+            //push the obj to obj index
+            index::ObjectIndex::getInstance().add(meta->getOID(), {m_id, dist(meta, m_header)});
+            //done!
+            LOG_DEBUG << "Space left: " << m_freeSpace;
         }
 
-        void Page::inserHeader(const size_t& id, const size_t& hash, const size_t& type, const size_t& pos)
+        void Page::setObjCounter(const long long& value) const
         {
-            //push into the header
-            new(&static_cast<char*>(m_header)[m_headerFreePos]) HeaderMetaData(id, hash, type, pos);
-            m_headerFreePos += sizeof(HeaderMetaData);
+            m_objCount = value;
         }
 
-        bool Page::insertObject(const rapidjson::GenericValue<rapidjson::UTF8<>>& value, BaseType<size_t>* l_last)
+
+		/** short explaination
+		- First we find a new FreeType where we can fit the Type.
+		- We get the next (if there is one != 0)
+		- we store the size of the free type
+		- create the Type and set the prev->next if there is a prev
+		- update the freeSpace
+		- reduce the size of the "new Free" we are going to create
+		- calc the position of the new Free
+		- get the next of the free (which is also a FreeType)
+		- call update Free
+		- create the new freetype at the new position
+		- set prev->next if there is a prev
+		- set newFree->next = next if there is a next
+		- also update the "freepos" for dumping
+		*/
+
+        std::pair<void*, void*> Page::insertObject(const rapidjson::GenericValue<rapidjson::UTF8<>>& value,
+                BaseType<size_t>* last)
         {
+            //return ptr to the first element
+            void* l_ret = nullptr;
+            //prev element ptr
+            BaseType<size_t>* l_prev = last;
+
+            //do update this
+            //dont forget it pos = m_free to change m_free to the
+            //new pos!
+            FreeType* l_pos = nullptr;
             //get the members
             for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it)
             {
-                //do update this
-                //dont forget it pos = m_free to change m_free to the
-                //new pos!
-                FreeType* l_pos = nullptr;
                 switch (it->value.GetType())
                 {
                     case rapidjson::kNullType:
                         LOG_WARN << "null type: " << it->name.GetString();
-                        break;
+                        continue;
 
                     case rapidjson::kFalseType:
                     case rapidjson::kTrueType:
-                        l_pos = find(sizeof(BaseType<bool>));
+                        {
+                            //doesnt matter since long long and double are equal on
+                            // x64
+                            //find pos where the string fits
+                            auto chain = find(sizeof(BaseType<bool>));
+                            l_pos = chain.first;
+                            auto l_next = l_pos->getNext();
+                            auto l_size = l_pos->getFree();
 
+                            void* l_new = new (l_pos) BaseType<bool>(it->value.GetBool());
+
+                            if (l_prev != nullptr)
+                                l_prev->setNext(dist(l_prev, l_new));
+
+                            m_freeSpace -= sizeof(BaseType<long long>);
+                            l_size -= sizeof(BaseType<long long>);
+							//move the pos backwards by..
+                            auto l_newFreePos = reinterpret_cast<char*> (l_pos) + sizeof(BaseType<long long>);
+
+                            FreeType* l_nextptr = nullptr;
+                            if (l_next != 0)
+                                l_nextptr = reinterpret_cast<FreeType*> (reinterpret_cast<char*> (l_pos) + l_next);
+
+                            updateFree(l_newFreePos, l_size, chain.second, l_nextptr);
+
+                        }
                         break;
-
                     case rapidjson::kObjectType:
-                        //pos for the obj id
-                        l_pos = find(sizeof(BaseType<size_t>));
-                        //TODO insert obj id HERE
-                        // pass the objid Object to the insertobj!
-                        // now recursive insert the obj
-                        insertObject(it->value, nullptr);
+                        {
+                            //pos for the obj id
+                            //and insert the ID of the obj
+                            auto chain = find(sizeof(BaseType<size_t>));
+                            l_pos = chain.first;
+                            auto l_next = l_pos->getNext();
+                            auto l_size = l_pos->getFree();
+
+                            void* l_new = new (l_pos) BaseType<size_t>(common::FNVHash()(it->name.GetString()));
+
+                            if (l_prev != nullptr)
+                                l_prev->setNext(dist(l_prev, l_new));
+
+                            m_freeSpace -= sizeof(BaseType<long long>);
+                            l_size -= sizeof(BaseType<long long>);
+							//move the pos backwards by..
+                            auto l_newFreePos = reinterpret_cast<char*> (l_pos) + sizeof(BaseType<size_t>);
+
+                            FreeType* l_nextptr = nullptr;
+                            if (l_next != 0)
+                                l_nextptr = reinterpret_cast<FreeType*> (reinterpret_cast<char*> (l_pos) + l_next);
+
+                            updateFree(l_newFreePos, l_size, chain.second, l_nextptr);
+
+                            // pass the objid Object to the insertobj!
+                            // now recursive insert the obj
+                            // the second contains the last element inserted
+                            // l_pos current contains the last inserted element and get set to the
+                            // last element of the obj we insert
+                            l_pos = static_cast<FreeType*>(insertObject(it->value, reinterpret_cast<BaseType<size_t>*>(l_pos)).second);
+                        }
                         break;
 
                     case rapidjson::kArrayType:
-                        //pos for the array size
-                        l_pos = find(sizeof(BaseType<size_t>));
-                        //and insert array after this
-
+                        {
+                            //nope not yet
+                            //insertArray(it->value, l_prev);
+                        }
                         break;
 
                     case rapidjson::kStringType:
-                        //find pos where the string fits
-                        l_pos = find(sizeof(BaseType<size_t>) + strlen(it->value.GetString()));
+                        {
+                            //find pos where the string fits
+                            auto chain = find(sizeof(BaseType<size_t>) + strlen(it->value.GetString()));
+                            l_pos = chain.first;
+                            auto l_next = l_pos->getNext();
+                            auto l_size = l_pos->getFree();
+                            //add the String Type at the pos of the FreeType
+                            auto* l_new = new (l_pos) StringType(it->value.GetString());
+                            if (l_prev != nullptr)
+                                l_prev->setNext(dist(l_prev, l_new));
+
+                            m_freeSpace -= (sizeof(BaseType<size_t>) + strlen(it->value.GetString()));
+                            l_size -= (sizeof(BaseType<size_t>) + strlen(it->value.GetString()));
+							//move the pos backwards by..
+                            auto l_newFreePos = reinterpret_cast<char*> (l_pos) + sizeof(BaseType<size_t>) + strlen(it->value.GetString());
+
+                            FreeType* l_nextptr = nullptr;
+                            if (l_next != 0)
+                                l_nextptr = reinterpret_cast<FreeType*> (reinterpret_cast<char*> (l_pos) + l_next);
+
+                            updateFree(l_newFreePos, l_size, chain.second, l_nextptr);
+                        }
                         break;
 
                     case rapidjson::kNumberType:
-                        //doesnt matter since long long and double are equal on
-                        // x64
-                        l_pos = find(sizeof(BaseType<long long>));
-                        if (it->value.IsInt())
                         {
-                            //insert INT
-                        }
-                        else
-                        {
-                            //INSERT DOUBLE
+                            //doesnt matter since long long and double are equal on
+                            // x64
+                            //find pos where the string fits
+                            auto chain = find(sizeof(BaseType<long long>));
+                            l_pos = chain.first;
+                            auto l_next = l_pos->getNext();
+                            auto l_size = l_pos->getFree();
+
+                            void* l_new;
+                            if (it->value.IsInt())
+                            {
+                                //insert INT
+                                l_new = new (l_pos) BaseType<long long>(it->value.GetInt64());
+                            }
+                            else
+                            {
+                                //INSERT DOUBLE
+                                l_new = new (l_pos) BaseType<double>(it->value.GetDouble());
+                            }
+                            if (l_prev != nullptr)
+                                l_prev->setNext(dist(l_prev, l_new));
+
+                            m_freeSpace -= sizeof(BaseType<long long>);
+                            l_size -= sizeof(BaseType<long long>);
+							//move the pos backwards by..
+                            auto l_newFreePos = reinterpret_cast<char*> (l_pos) + sizeof(BaseType<long long>);
+
+                            FreeType* l_nextptr = nullptr;
+                            if (l_next != 0)
+                                l_nextptr = reinterpret_cast<FreeType*> (reinterpret_cast<char*> (l_pos) + l_next);
+
+                            updateFree(l_newFreePos, l_size, chain.second, l_nextptr);
                         }
                         break;
                     default:
                         LOG_WARN << "Unknown member Type: " << it->name.GetString() << ":" << it->value.GetType();
-                        break;
+                        continue;
                 }
+                //so first element is set now, store it to return it.
+                if(l_ret == nullptr)
+                {
+                    l_ret = l_pos;
+                }
+                //prev is the l_pos now so cast it to this;
+                l_prev = reinterpret_cast<BaseType<size_t>*>(l_pos);
             }
             //if we get here its in!
-            return true;
+            return{ l_ret, l_pos };
         }
 
-        FreeType* Page::find(const size_t& size)
+        std::pair<FreeType*, FreeType*> Page::find(const size_t& size)
         {
             if (size >= m_freeSpace)
-                return nullptr;
+                return {nullptr , nullptr};
             //copy free ptr
+            FreeType* l_prev = nullptr;
             auto l_free = m_free;
             while(true)
             {
                 if (l_free->getFree() > size)
-                    return l_free;
+                    return{ l_free, l_prev };
 
                 if (l_free->getNext() != 0)
                 {
+                    l_prev = l_free;//set the previous
                     auto l_temp = reinterpret_cast<char*>(l_free);
                     l_temp += l_free->getNext();
                     l_free = reinterpret_cast<FreeType*>(l_temp);
                     continue;
                 }
                 //if we get here we have no space for that!
-                return nullptr;
+                return{ nullptr , nullptr };
             }
         }
 
         std::ptrdiff_t Page::dist(const void* p1, const void* p2) const
         {
-            return static_cast<const char*>(p1) - static_cast<const char*>(p2);
+            //dist from 1 to 2 is  2-1 ....
+            return static_cast<const char*>(p2) - static_cast<const char*>(p1);
+        }
+
+        void Page::updateFree(void* pos, const size_t& size,  FreeType* prev, FreeType* next)
+        {
+            FreeType* l_free = new(pos) FreeType(size);
+            //set the pref
+            if (prev != nullptr)
+            {
+                prev->setNext(prev - l_free);
+            }
+            else
+            {
+                //if there is no prev we got the first one to be updated!
+                m_free = l_free;
+                //also update the freepos
+                *m_freepos = dist(m_free, m_body);
+            }
+
+            //if next set it
+            if(next != nullptr)
+                l_free->setNext(l_free - next);
+        }
+
+        void* Page::insertArray(const rapidjson::GenericValue<rapidjson::UTF8<>>& arr, BaseType<size_t>* prev)
+        {
+            void* l_ret = nullptr;
+            for (auto arrayIt = arr.Begin(); arrayIt != arr.End(); ++arrayIt)
+            {
+                FreeType* l_pos = nullptr;
+
+                switch (arrayIt->GetType())
+                {
+                    case rapidjson::kNullType:
+                        break;
+                    case rapidjson::kFalseType:
+                    case rapidjson::kTrueType:
+                        {
+                            //doesnt matter since long long and double are equal on
+                            // x64
+                            //find pos where the string fits
+                            auto chain = find(sizeof(ArrayItem<bool>));
+                            l_pos = chain.first;
+                            auto l_next = l_pos->getNext();
+                            auto l_size = l_pos->getFree();
+
+                            void* l_new = new (l_pos) ArrayItem<bool>(arr.GetBool(), BOOL);
+
+                            if (prev != nullptr)
+                                prev->setNext(dist(prev, l_new));
+
+                            m_freeSpace -= sizeof(BaseType<long long>);
+                            l_size -= sizeof(BaseType<long long>);
+							//move the pos backwards by..
+                            auto l_newFreePos = reinterpret_cast<char*> (l_pos) + sizeof(ArrayItem<bool>);
+
+                            FreeType* l_nextptr = nullptr;
+                            if (l_next != 0)
+                                l_nextptr = reinterpret_cast<FreeType*> (reinterpret_cast<char*> (l_pos) + l_next);
+
+                            updateFree(l_newFreePos, l_size, chain.second, l_nextptr);
+                        }
+                        break;
+                    case rapidjson::kObjectType:
+                        break;
+                    case rapidjson::kArrayType:
+                        break;
+                    case rapidjson::kStringType:
+                        break;
+                    case rapidjson::kNumberType:
+                        break;
+                    default:
+                        break;
+                }
+                //at the last "FreeType" we inserted the Last element
+                l_ret = l_pos;
+            }
+            return l_ret;
+        }
+
+
+        HeaderMetaData* Page::insertHeader(const size_t& id, const size_t& hash, const size_t& type, const size_t& pos)
+        {
+            //get the spot and its next and size
+            auto l_pair = findHeaderSpot();
+            auto l_next = l_pair.first->getNext();
+            auto l_size = l_pair.first->getFree();
+
+            //create the new
+            auto l_meta = new(reinterpret_cast<char*>(l_pair.first)) HeaderMetaData(id, hash, type, pos);
+            
+			//move the "old" by the size of headermeta data ->
+            auto l_newFreePos = reinterpret_cast<char*> (l_pair.first) + sizeof(HeaderMetaData);
+
+            l_size -= sizeof(HeaderMetaData);
+            m_headerSpace -= sizeof(HeaderMetaData);
+
+            FreeType* l_nextptr = nullptr;
+            if (l_next != 0)
+                l_nextptr = reinterpret_cast<FreeType*> (reinterpret_cast<char*> (l_pair.first) + l_next);
+
+            updateFree(l_newFreePos, l_size, l_pair.second, l_nextptr);
+            return l_meta;
+        }
+
+        std::pair<FreeType*, FreeType*> Page::findHeaderSpot()
+        {
+            if (sizeof(HeaderMetaData) >= m_headerSpace)
+                return{ nullptr , nullptr };
+            //copy free ptr
+            FreeType* l_prev = nullptr;
+            auto l_free = m_headerFree;
+            while (true)
+            {
+                if (l_free->getFree() > sizeof(HeaderMetaData))
+                    return{ l_free, l_prev };
+
+                if (l_free->getNext() != 0)
+                {
+                    l_prev = l_free;//set the previous
+                    auto l_temp = reinterpret_cast<char*>(l_free);
+                    l_temp += l_free->getNext();
+                    l_free = reinterpret_cast<FreeType*>(l_temp);
+                    continue;
+                }
+                //if we get here we have no space for that!
+                return{ nullptr , nullptr };
+            }
+        }
+
+        void Page::updateFreeHeader(void* pos, const size_t& size, FreeType* prev, FreeType* next)
+        {
+            FreeType* l_free = new(pos) FreeType(size);
+            //set the pref
+            if (prev != nullptr)
+            {
+                prev->setNext(prev - l_free);
+            }
+            else
+            {
+                //if there is no prev we got the first one to be updated!
+                m_headerFree = l_free;
+                //also update the freepos
+                *m_headerFreePos = dist(m_free, m_body);
+            }
+
+            //if next set it
+            if (next != nullptr)
+                l_free->setNext(l_free - next);
         }
     }
 }

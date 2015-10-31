@@ -80,15 +80,12 @@ namespace jimdb
             inline const VALUE& operator[](const KEY& k);
 
             /**
-            @brief get the whole entry map
-            @return the btree containing everything but it's const (to travers etc).
-            	Can be used like a regular std::map.
+            @return true if the idx is empty
             @author Benjamin Meyer
-            @date 22.10.2015 12:58
+            @date 31.10.2015 15:43
             */
-            //inline const stx::btree_map<KEY, VALUE>& get();
+            inline bool empty();
 
-			inline bool empty();
         protected:
             stx::btree_map<KEY, VALUE> m_index;
             tasking::RWLock m_lock;

@@ -40,7 +40,10 @@ std::shared_ptr<memorymanagement::Page> PageIndex::find(const size_t& free)
     //now find right but backwards
     for (auto it = m_index.rbegin(); it != m_index.rend(); ++it)
     {
-        if (it->second->free() > free)
+        //if the page has a chunk where i can compleatly fit
+        // faster then try insert and revert if not fit
+        // else free() > free for a try insert lateron
+        if (it->second->free(free))
             return it->second;
     }
     return nullptr;

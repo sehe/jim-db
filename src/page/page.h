@@ -29,6 +29,8 @@ namespace jimdb
 {
     namespace memorymanagement
     {
+        class HeaderMetaData;
+
         /**
         \brief The page Class
 
@@ -48,36 +50,60 @@ namespace jimdb
             long long getNext() const;
 
             long long free();
+
+            /**
+            \brief check if there is a chunk min size
+
+            @return true if there is one chunk big enough
+            @author Benjamin Meyer
+            @date 31.10.2015 13:29
+            */
+            bool free(const size_t& size);
             /**
             \brief Insert a json obj to the page and checks for the meta data
 
             it also creates the metadata for the objects if needed
-            @return true if it worked, false if it doent fit because
-            	of to small free chunks. for example lage string but only
-            	small chunks are free. (fragmented)
             @author Benjamin Meyer
             @date 23.10.2015 17:26
             */
-            bool insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value);
+            void insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value);
 
+            /**
+            \brief set it after sys crashed
+
+            @author Benjamin Meyer
+            @date 31.10.2015 14:54
+            */
+            void setObjCounter(const long long& value) const;
         private:
+            static long long m_objCount;
             //voidptr to memory to static cast as we like
             //never ever override this ptr!!
             void* m_header;
             void* m_body;
 
+            /**############################################
+            * private methods for body
+            * ############################################*/
+
             //pointer to the free typ chain start
             FreeType* m_free;
-
+            //holds the information of free space
+            long long m_freeSpace;
             //position of the free typ object start info
             long long* m_freepos;
 
-            //offset to the next free header position
-            long long m_headerFreePos;
-            long long m_headerSpace;
+            /**############################################
+            * private methods for header
+            * ############################################*/
 
-            //holds the information of free space
-            long long m_freeSpace;
+            //offset to the next free header position
+            long long* m_headerFreePos;
+            long long m_headerSpace;
+            //Freetype of the header
+            FreeType* m_headerFree;
+
+
             //holds the ID of the next page
             long long m_next;
             long long m_id;
@@ -88,7 +114,9 @@ namespace jimdb
             //lock for getFree and so on
             tasking::RWLock m_rwLock;
 
-            void inserHeader(const size_t& id, const size_t& hash, const size_t& type, const size_t& pos);
+            /**############################################
+             * private methods for object
+             * ############################################*/
 
             /**
             \brief Insert a Object
@@ -97,19 +125,60 @@ namespace jimdb
             	nullptr if there was no previous since its the frist object to be
             	inserted.
             @param[in] value the rapidjson vlaue to be inserted
+            @return the ptr to the first element and the last element
             @author Benjamin Meyer
             @date 29.10.2015 12:12
             */
-            bool insertObject(const rapidjson::GenericValue<rapidjson::UTF8<>>& value, BaseType<size_t>* l_last);
+            std::pair<void*, void*> insertObject(const rapidjson::GenericValue<rapidjson::UTF8<>>& value, BaseType<size_t>* l_last);
 
             //returns a ptr to the spot where it can fit
-            //@return nullptr if no space found!
-            FreeType* find(const size_t& size);
+            //@return pair of freetype position, freetype previous
+            //prev is needed to update the chain properly
+            std::pair<FreeType*, FreeType*> find(const size_t& size);
 
             //Caluclate the distance between two pointers
             //used to calc the ->next() of objects
             //doenst change the ptrs here
             std::ptrdiff_t dist(const void* p1, const void* p2) const;
+
+            /**
+            \brief add a new free type
+
+            @param[in] pos new startposition of that freetype
+            @author Benjamin Meyer
+            @date 31.10.2015 13:45
+            */
+            void updateFree(void* pos, const size_t& size,  FreeType* prev, FreeType* next);
+
+            /**
+            \brief insert a whole array
+
+            @param[in] prev the prev element to set the next
+            @return the ptr to the last element
+            @author Benjamin Meyer
+            @date 31.10.2015 15:22
+            */
+            void* insertArray(const rapidjson::GenericValue<rapidjson::UTF8<>>& arr, BaseType<size_t>* prev);
+
+
+            /**############################################
+            * private methods for header insert
+            * ############################################*/
+
+            HeaderMetaData* insertHeader(const size_t& id, const size_t& hash, const size_t& type, const size_t& pos);
+
+            //returns a ptr to the spot where it can fit
+            //@return pair of freetype position, freetype previous
+            std::pair<FreeType*, FreeType*> findHeaderSpot();
+
+            /**
+            \brief update header free types
+            creates a new freetype at pos with the size and set the previous->next = "new"
+            and "new"-> next.
+            @author Benjamin Meyer
+            @date 31.10.2015 16:32
+            */
+            void updateFreeHeader(void* pos, const size_t& size, FreeType* prev, FreeType* next);
         };
     }
 }

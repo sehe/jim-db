@@ -35,8 +35,11 @@ namespace jimdb
         class ObjectIndexValue
         {
         public:
-            size_t m_page;
-            size_t m_pos;
+            long long m_page;
+            //the position of the header object!
+            //not of the object itself this meight change
+            //by fragmenting
+            long long m_pos;
         };
 
         /**

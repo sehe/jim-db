@@ -61,6 +61,7 @@ namespace jimdb
             @date 28.10.2015 17:59
             */
             explicit ArrayItem(T& t, const ETypes& e);
+			explicit ArrayItem(const T& t, const ETypes& e);
             inline ETypes getType() const;
 
             /**

@@ -42,7 +42,7 @@
 to prevent from copy elision
 \see http://stackoverflow.com/questions/30372466/logger-logs-2-times-instead-of-one-time-because-of-copy/30372847#30372847
 */
-#define LOG_SCOPE_TIME jimdb::common::LogTimer t___ = jimdb::common::Logger::Timer(__FILE__,__LINE__); t___
+#define LOG_SCOPE_TIME jimdb::common::LogTimer t___ = jimdb::common::Logger::Timer(__FILENAME__,__LINE__); t___
 
 namespace jimdb
 {
