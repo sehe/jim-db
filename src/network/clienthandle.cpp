@@ -100,8 +100,8 @@ namespace jimdb
         std::shared_ptr<Message> ClientHandle::getData()
         {
             int n;
-            char size[MESSAGE_SIZE];
-            n = recv(m_sock, size, sizeof(size), 0);
+            char size[MESSAGE_SIZE+1];
+            n = recv(m_sock, size, sizeof(size)-1, 0);
             //check if retval passed
             if (!checkRetValRecv(n))
                 return nullptr;
