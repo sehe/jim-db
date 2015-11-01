@@ -51,7 +51,7 @@ namespace jimdb
             inline rapidjson::Document& operator()();
 
         private:
-            char* m_message;
+            char* const m_message;
             rapidjson::Document m_doc;
         };
 
