@@ -25,6 +25,7 @@
 #include "../datatype/headermetadata.h"
 #include "../index/objectindex.h"
 #include "../datatype/arrayitem.h"
+#include "../network/MessageFactory.h"
 
 namespace jimdb
 {
@@ -32,27 +33,23 @@ namespace jimdb
     {
         long long Page::m_s_idCounter = 0;
         long long Page::m_objCount = 0;
-
-        Page::Page(long long header, long long body) : m_freeSpace(body), m_next(0), m_id(++m_s_idCounter)
+        //take care order does matter here since header and body need to be init first to set the freepos values!
+        Page::Page(long long header, long long body) : m_header(new char[header]), m_body(new char[body]), m_freeSpace(body),
+            //set the freepos value ptr to the first header slot
+            m_freepos(new(static_cast<char*>(m_header)) long long(0)),
+            //set the header free pos ptr to the second  "long long" slot
+            m_headerFreePos(new(static_cast<char*>(m_header) + sizeof(long long)) long long(0)), m_next(0),
+            m_id(++m_s_idCounter)
         {
-            m_header = new char[header];
-            m_body = new char[body];
-            //put free type info in header
-            //so at pos 0 is a long long with the pos of the free type
-            m_freepos = new(static_cast<char*>(m_header)) long long(0);
-
-            //add the free ofset from the header
-            m_headerFreePos = new(static_cast<char*>(m_header) + sizeof(long long)) long long(0);
             //because of m_freepos and m_headerFreePos
             m_headerSpace = header - 2 * sizeof(long long);
 
-            //throw in the free type into the body
-            m_free = new(&static_cast<char*>(m_body)[0]) FreeType(body - sizeof(FreeType));
+            //add the free type into the body
+            m_free = new(&static_cast<char*>(m_body)[0]) FreeType(body);
             ASSERT(m_free->getFree() == body);
 
             //set the free of the header
-            m_headerFree = new(static_cast<char*>(m_header) + sizeof(long long)) FreeType(header - sizeof(FreeType));
-
+            m_headerFree = new(static_cast<char*>(m_header) + 2 * sizeof(long long)) FreeType(header - 2 * sizeof(long long));
         }
 
         Page::~Page()
@@ -84,41 +81,43 @@ namespace jimdb
             return m_freeSpace;
         }
 
-        bool Page::free(const size_t& size)
+        bool Page::isLocked() const
         {
-            tasking::RWLockGuard<> lock(m_rwLock, tasking::READ);
-            return find(size).first != nullptr;//nullptr = false in c++ 11 but be safe her
+            return m_rwLock;
         }
 
-        void Page::insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value)
+        bool Page::free(const size_t& size)
         {
+            //tasking::RWLockGuard<> lock(m_rwLock, tasking::WRITE);
+            return find(size).first != nullptr
+                   && m_headerSpace >= sizeof(HeaderMetaData);//nullptr = false in c++ 11 but be safe her
+        }
+
+        size_t Page::insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value)
+        {
+            //never forget to lock ...
+            tasking::RWLockGuard<> lock(m_rwLock, tasking::WRITE);
+
             //here we know this page has one chunk big enough to fitt the whole object
             //including its overhead! so start inserting it.
 
-            //never forget to lock ...
-            tasking::RWLockGuard<> lock(m_rwLock, tasking::WRITE);
             //get the object name
             std::string name = value.MemberBegin()->name.GetString();
 
             //returns the pos of the first element needed for the headerdata
 
             auto firstElementPos = insertObject(value.MemberBegin()->value, nullptr).first;
+            auto l_first = dist(m_body, firstElementPos);
 
-
-            auto l_first = dist(firstElementPos, m_body);
-
-            /** // inline for a short check here
-            auto next = static_cast<StringType*>(m_body)->getNext();
-            auto innerobjHash =  reinterpret_cast<BaseType<size_t>*>(static_cast<char*>(m_body) + next)->getData();
-            LOG_DEBUG << innerobjHash << ": contains? " << meta::MetaIndex::getInstance().contains(innerobjHash);
-            **/
 
             //insert the header
             auto meta = insertHeader(m_objCount++, 0, common::FNVHash()(name), l_first);
             //push the obj to obj index
-            index::ObjectIndex::getInstance().add(meta->getOID(), {m_id, dist(meta, m_header)});
+            index::ObjectIndex::getInstance().add(meta->getOID(), {m_id, dist(m_header, meta)});
             //done!
+
             LOG_DEBUG << "Space left: " << m_freeSpace;
+            return meta->getOID();
         }
 
         void Page::setObjCounter(const long long& value) const
@@ -127,21 +126,21 @@ namespace jimdb
         }
 
 
-		/** short explaination
-		- First we find a new FreeType where we can fit the Type.
-		- We get the next (if there is one != 0)
-		- we store the size of the free type
-		- create the Type and set the prev->next if there is a prev
-		- update the freeSpace
-		- reduce the size of the "new Free" we are going to create
-		- calc the position of the new Free
-		- get the next of the free (which is also a FreeType)
-		- call update Free
-		- create the new freetype at the new position
-		- set prev->next if there is a prev
-		- set newFree->next = next if there is a next
-		- also update the "freepos" for dumping
-		*/
+        /** short explaination
+        - First we find a new FreeType where we can fit the Type.
+        - We get the next (if there is one != 0)
+        - we store the size of the free type
+        - create the Type and set the prev->next if there is a prev
+        - update the freeSpace
+        - reduce the size of the "new Free" we are going to create
+        - calc the position of the new Free
+        - get the next of the free (which is also a FreeType)
+        - call update Free
+        - create the new freetype at the new position
+        - set prev->next if there is a prev
+        - set newFree->next = next if there is a next
+        - also update the "freepos" for dumping
+        */
 
         std::pair<void*, void*> Page::insertObject(const rapidjson::GenericValue<rapidjson::UTF8<>>& value,
                 BaseType<size_t>* last)
@@ -182,7 +181,7 @@ namespace jimdb
 
                             m_freeSpace -= sizeof(BaseType<long long>);
                             l_size -= sizeof(BaseType<long long>);
-							//move the pos backwards by..
+                            //move the pos backwards by..
                             auto l_newFreePos = reinterpret_cast<char*> (l_pos) + sizeof(BaseType<long long>);
 
                             FreeType* l_nextptr = nullptr;
@@ -209,7 +208,7 @@ namespace jimdb
 
                             m_freeSpace -= sizeof(BaseType<long long>);
                             l_size -= sizeof(BaseType<long long>);
-							//move the pos backwards by..
+                            //move the pos backwards by..
                             auto l_newFreePos = reinterpret_cast<char*> (l_pos) + sizeof(BaseType<size_t>);
 
                             FreeType* l_nextptr = nullptr;
@@ -236,8 +235,11 @@ namespace jimdb
 
                     case rapidjson::kStringType:
                         {
-                            //find pos where the string fits
-                            auto chain = find(sizeof(BaseType<size_t>) + strlen(it->value.GetString()));
+                            // find pos where the string fits
+                            // somehow we get here sometimes and it does not fit!
+                            // which cant be since we lock the whole page
+                            auto chain = find(sizeof(StringType) + strlen(it->value.GetString()));
+
                             l_pos = chain.first;
                             auto l_next = l_pos->getNext();
                             auto l_size = l_pos->getFree();
@@ -246,9 +248,9 @@ namespace jimdb
                             if (l_prev != nullptr)
                                 l_prev->setNext(dist(l_prev, l_new));
 
-                            m_freeSpace -= (sizeof(BaseType<size_t>) + strlen(it->value.GetString()));
-                            l_size -= (sizeof(BaseType<size_t>) + strlen(it->value.GetString()));
-							//move the pos backwards by..
+                            m_freeSpace -= (sizeof(StringType) + strlen(it->value.GetString()));
+                            l_size -= (sizeof(StringType) + strlen(it->value.GetString()));
+                            //move the pos backwards by..
                             auto l_newFreePos = reinterpret_cast<char*> (l_pos) + sizeof(BaseType<size_t>) + strlen(it->value.GetString());
 
                             FreeType* l_nextptr = nullptr;
@@ -285,7 +287,7 @@ namespace jimdb
 
                             m_freeSpace -= sizeof(BaseType<long long>);
                             l_size -= sizeof(BaseType<long long>);
-							//move the pos backwards by..
+                            //move the pos backwards by..
                             auto l_newFreePos = reinterpret_cast<char*> (l_pos) + sizeof(BaseType<long long>);
 
                             FreeType* l_nextptr = nullptr;
@@ -318,9 +320,12 @@ namespace jimdb
             //copy free ptr
             FreeType* l_prev = nullptr;
             auto l_free = m_free;
+            //ASSERT(*m_freepos == dist(m_body, m_free));
             while(true)
             {
-                if (l_free->getFree() > size)
+				//we need at least one more spot for FreeType
+				//else we lose chunks
+                if (l_free->getFree() > size + sizeof(FreeType))
                     return{ l_free, l_prev };
 
                 if (l_free->getNext() != 0)
@@ -355,7 +360,7 @@ namespace jimdb
                 //if there is no prev we got the first one to be updated!
                 m_free = l_free;
                 //also update the freepos
-                *m_freepos = dist(m_free, m_body);
+                *m_freepos = dist(m_body, m_free);
             }
 
             //if next set it
@@ -392,7 +397,7 @@ namespace jimdb
 
                             m_freeSpace -= sizeof(BaseType<long long>);
                             l_size -= sizeof(BaseType<long long>);
-							//move the pos backwards by..
+                            //move the pos backwards by..
                             auto l_newFreePos = reinterpret_cast<char*> (l_pos) + sizeof(ArrayItem<bool>);
 
                             FreeType* l_nextptr = nullptr;
@@ -427,10 +432,10 @@ namespace jimdb
             auto l_next = l_pair.first->getNext();
             auto l_size = l_pair.first->getFree();
 
-            //create the new
+            //create the new header at the position of the first element returned
             auto l_meta = new(reinterpret_cast<char*>(l_pair.first)) HeaderMetaData(id, hash, type, pos);
-            
-			//move the "old" by the size of headermeta data ->
+
+            //move the "old" by the size of headermeta data ->
             auto l_newFreePos = reinterpret_cast<char*> (l_pair.first) + sizeof(HeaderMetaData);
 
             l_size -= sizeof(HeaderMetaData);
@@ -440,7 +445,7 @@ namespace jimdb
             if (l_next != 0)
                 l_nextptr = reinterpret_cast<FreeType*> (reinterpret_cast<char*> (l_pair.first) + l_next);
 
-            updateFree(l_newFreePos, l_size, l_pair.second, l_nextptr);
+            updateFreeHeader(l_newFreePos, l_size, l_pair.second, l_nextptr);
             return l_meta;
         }
 

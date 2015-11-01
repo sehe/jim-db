@@ -22,7 +22,7 @@
 #pragma once
 #include <memory>
 #include <string>
-
+#include <rapidjson/document.h>
 namespace jimdb
 {
     namespace network
@@ -41,9 +41,25 @@ namespace jimdb
         **/
         class MessageFactory
         {
-            public:
-                MessageFactory();
-                std::shared_ptr<std::string> generate(const MessageTypes& t) const;
+        public:
+            MessageFactory();
+            std::shared_ptr<std::string> generate(const MessageTypes& t) const;
+            /**
+            \brief generate a result message
+
+            the message contains/wrapps the object added to it as result
+            @author Benjamin Meyer
+            @date 01.11.2015 09:41
+            */
+            std::shared_ptr<std::string> generate(const rapidjson::GenericValue<rapidjson::UTF8<>>& result);
+            /**
+            \brief generates a result message of an insert
+
+            @param[in] oid the object ID which was inserted
+            @author Benjamin Meyer
+            @date 01.11.2015 09:42
+            */
+            std::shared_ptr<std::string> generateResultInsert(const size_t& oid);
         };
     }
 }

@@ -24,6 +24,9 @@
 #include <ostream>
 #include<memory>
 #include "iclient.h"
+
+//size of the number in front of a message
+#define MESSAGE_SIZE 8 
 namespace jimdb
 {
     namespace network

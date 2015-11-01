@@ -51,3 +51,8 @@ inline void RWLock::writeUnlock()
     m_writing = false;
     m_cond.notify_all();
 }
+
+inline RWLock::operator bool() const
+{
+    return m_writing;
+}

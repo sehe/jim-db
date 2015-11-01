@@ -43,6 +43,9 @@ namespace jimdb
             inline void readUnlock();
             inline void writeLock();
             inline void writeUnlock();
+			//true if there is a write lock!
+			inline operator bool() const;
+
         private:
             int m_reader;
             bool m_writing;

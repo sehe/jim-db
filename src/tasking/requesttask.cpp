@@ -24,6 +24,7 @@
 #include "../log/logger.h"
 #include "taskqueue.h"
 #include "inserttask.h"
+#include "findtask.h"
 
 namespace jimdb
 {
@@ -78,6 +79,14 @@ namespace jimdb
                 LOG_DEBUG << "query message";
                 return;
             }
+
+			if (doc["type"].GetString() == std::string("find"))
+			{
+				LOG_DEBUG << "find message";
+				TaskQueue::getInstance().push_pack(std::make_shared<FindTask>(m_client, message));
+				return;
+			}
+
             //todo do something with the request
         }
     }

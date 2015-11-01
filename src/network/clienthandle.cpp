@@ -23,6 +23,7 @@
 #include "../log/logger.h"
 #include "message.h"
 
+#define MESSAGE_SIZE 8
 namespace jimdb
 {
     namespace network
@@ -50,8 +51,8 @@ namespace jimdb
         {
             if (!m_connected)
                 return false;
-            char length[sizeof(int) + 1];
-            sprintf(length, "%4d", static_cast<int>(s->size()));
+            char length[MESSAGE_SIZE+1];
+            sprintf(length, "%8d", static_cast<int>(s->size()));
             auto toSend = std::string(length);
             toSend += *s; //add the message
             int iSendResult;
@@ -63,7 +64,7 @@ namespace jimdb
                 closesocket(m_sock);
                 return false;
             }
-            LOG_INFO << "Sent: " << *s;
+            LOG_DEBUG << "Sent: " << *s;
             return true;
         }
 
@@ -99,7 +100,7 @@ namespace jimdb
         std::shared_ptr<Message> ClientHandle::getData()
         {
             int n;
-            char size[4];
+            char size[MESSAGE_SIZE];
             n = recv(m_sock, size, sizeof(size), 0);
             //check if retval passed
             if (!checkRetValRecv(n))
@@ -143,7 +144,7 @@ namespace jimdb
             }
             if (n == 0)
             {
-                LOG_INFO << "Client disconnected.";
+                LOG_DEBUG << "Client disconnected.";
                 m_connected = false;
                 return false;
             }

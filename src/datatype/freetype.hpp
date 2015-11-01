@@ -21,7 +21,7 @@
 
 inline FreeType::FreeType(const size_t& size) :StringType()
 {
-	m_data.size = size;
+	m_data.size = size - sizeof(FreeType);
 }
 
 inline size_t FreeType::getFree() const

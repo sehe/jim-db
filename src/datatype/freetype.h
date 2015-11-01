@@ -25,11 +25,23 @@ namespace jimdb
 {
     namespace memorymanagement
     {
+        /**
+        \brief Type to reserve Free space
+
+        Take care the data field always
+        contains -sizeof(FreeType) "free" value,
+        since this get added to the end.
+        @author Benjamin Meyer
+        @date 01.11.2015 10:34
+        */
         class FreeType : public StringType
         {
         public:
+
             explicit inline FreeType(const size_t& size);
-			inline size_t getFree() const;
+            // returns the "free space" it does include
+            // the size of this
+            inline size_t getFree() const;
         };
 #include "freetype.hpp"
     }

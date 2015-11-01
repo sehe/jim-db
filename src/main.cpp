@@ -37,6 +37,7 @@ of memory and allow to querry them.
 #include "common/cmdargs.h"
 #include "thread/worker.h"
 #pragma comment(lib,"user32.lib")
+#include <vector>
 
 //forward declare
 BOOL WINAPI ConsoleHandler(DWORD CEvent);
@@ -129,7 +130,7 @@ int main(int argc, char* argv[])
     }
 
     LOG_INFO << "Starting: " << threads + 1 << " Workers";
-    std::list<std::unique_ptr<jimdb::tasking::Worker>> m_workers;
+    std::vector<std::unique_ptr<jimdb::tasking::Worker>> m_workers;
     for (unsigned int i = 0; i < std::thread::hardware_concurrency(); ++i)
     {
         m_workers.push_back(std::make_unique<jimdb::tasking::Worker>(tasks));

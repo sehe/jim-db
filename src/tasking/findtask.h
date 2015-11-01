@@ -1,4 +1,4 @@
-// /**
+﻿// /**
 // ############################################################################
 // # GPL License                                                              #
 // #                                                                          #
@@ -18,35 +18,21 @@
 // # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 // ############################################################################
 // **/
-
-void PageIndex::add(const KEY& k, const VALUE& type)
+#pragma once
+#include "task.h"
+namespace jimdb
 {
-    tasking::RWLockGuard<> lock(m_lock, tasking::WRITE);
-    m_last = type;
-    //at it manual to the idx else
-    // we have lock in lock here!
-    m_index[k] = type;
-}
-
-std::shared_ptr<memorymanagement::Page> PageIndex::last()
-{
-    tasking::RWLockGuard<>  lock(m_lock, tasking::READ);
-    return m_last;
-}
-
-std::shared_ptr<memorymanagement::Page> PageIndex::find(const size_t& free)
-{
-    tasking::RWLockGuard<> lock(m_lock, tasking::WRITE);
-    //now find right but backwards
-    for (auto it = m_index.rbegin(); it != m_index.rend(); ++it)
+    namespace tasking
     {
-        //if the page has a chunk where i can compleatly fit
-        // faster then try insert and revert if not fit
-        // else free() > free for a try insert lateron
-        if (it->second->free(free) && !it->second->isLocked())
+        class FindTask : public Task
         {
-            return it->second; //dont unlock when returned
-        }
+        public:
+            explicit FindTask(const std::shared_ptr<network::IClient>& client, const std::shared_ptr<network::Message> m);
+            void operator()() override;
+
+
+        private:
+			std::shared_ptr<network::Message> m_msg;
+        };
     }
-    return nullptr;
 }

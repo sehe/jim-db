@@ -51,10 +51,13 @@ namespace jimdb
 
             long long free();
 
+            bool isLocked() const;
+
             /**
             \brief check if there is a chunk min size
 
             @return true if there is one chunk big enough
+            	AND if there is one more header slot!
             @author Benjamin Meyer
             @date 31.10.2015 13:29
             */
@@ -63,10 +66,11 @@ namespace jimdb
             \brief Insert a json obj to the page and checks for the meta data
 
             it also creates the metadata for the objects if needed
+            @return returns the object ID
             @author Benjamin Meyer
             @date 23.10.2015 17:26
             */
-            void insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value);
+            size_t insert(const rapidjson::GenericValue<rapidjson::UTF8<>>& value);
 
             /**
             \brief set it after sys crashed
@@ -77,10 +81,9 @@ namespace jimdb
             void setObjCounter(const long long& value) const;
         private:
             static long long m_objCount;
-            //voidptr to memory to static cast as we like
-            //never ever override this ptr!!
-            void* m_header;
-            void* m_body;
+            //const voidptr to memory to static cast as we like
+            void* const m_header;
+            void* const m_body;
 
             /**############################################
             * private methods for body
@@ -91,14 +94,16 @@ namespace jimdb
             //holds the information of free space
             long long m_freeSpace;
             //position of the free typ object start info
-            long long* m_freepos;
+            //it doesnt change so its const
+            long long* const m_freepos;
 
             /**############################################
             * private methods for header
             * ############################################*/
 
             //offset to the next free header position
-            long long* m_headerFreePos;
+            //it doesnt change so its const too
+            long long* const m_headerFreePos;
             long long m_headerSpace;
             //Freetype of the header
             FreeType* m_headerFree;

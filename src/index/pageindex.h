@@ -38,8 +38,16 @@ namespace jimdb
             static PageIndex& getInstance();
 
             inline void add(const KEY& k, const VALUE& type);
-            inline std::shared_ptr<memorymanagement::Page> last(); 
-			inline std::shared_ptr<memorymanagement::Page> find(const size_t& free);
+            inline std::shared_ptr<memorymanagement::Page> last();
+            /**
+            \brief find a unlocked page which can fit free
+
+            @param[in] free the size needed
+            @return nullptr or a page which is unlocked and can fitt it
+            @author Benjamin Meyer
+            @date 01.11.2015 11:33
+            */
+            inline std::shared_ptr<memorymanagement::Page> find(const size_t& free);
         private:
             PageIndex() : m_last(nullptr) {};
             //store the last inserted page

@@ -3,6 +3,8 @@
 #include "../index/pageindex.h"
 #include "../datatype/arrayitem.h"
 #include "../common/configuration.h"
+#include "../network/MessageFactory.h"
+#include "../assert.h"
 
 namespace jimdb
 {
@@ -27,25 +29,35 @@ namespace jimdb
                 LOG_WARN << "Insert: data field is missing Object member";
                 return;
             }
-            //insert it to meta and get the size
+
+            //insert it to meta and get the size of the data in memory
             auto l_objSize = checkSizeAndMeta(it->name.GetString(), it->value);
+
             LOG_DEBUG << "Object in Memory is: " << l_objSize << "byte";
             //Now estimate the next page which has space for l_objSize
 
-            //get a page which could fit the obj
+            // get a page which could fit the obj and which is not locked
+            // if its locked we create a new page
+            // so there are depending on the machine up to cpu max
+            // locked pages
             auto l_page = index::PageIndex::getInstance().find(l_objSize);
-            //if the ptr is still nullptr we need to create a new Page
+
             if(l_page == nullptr)
             {
+                //if the ptr is still nullptr we need to create a new Page
                 //well does not fit in any page
                 auto& cfg = common::Configuration::getInstance();
                 l_page = std::make_shared<memorymanagement::Page>(cfg[common::PAGE_HEADER].GetInt64(),
                          cfg[common::PAGE_BODY].GetInt64());
-				//add the new page
+                //add the new page
                 index::PageIndex::getInstance().add(l_page->getID(), l_page);
             }
+			//insert the obj to the page
+            auto oid = l_page->insert(dat);
 
-			l_page->insert(dat);
+            //generate answer and return it.
+            network::MessageFactory factory;
+            m_client->send(factory.generateResultInsert(oid));
         }
 
         size_t InsertTask::checkSizeAndMeta(const std::string& name, const rapidjson::GenericValue<rapidjson::UTF8<>>& value)
