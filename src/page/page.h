@@ -194,6 +194,27 @@ namespace jimdb
             @date 31.10.2015 16:32
             */
             void updateFreeHeader(void* pos, const size_t& size, FreeType* prev, FreeType* next);
+
+            /**############################################
+            * private methods for building the Object out of memory
+            * ############################################*/
+
+
+            /**
+            \brief Add Member to a rapidjson::Value
+            	It iterates the MetaInformation of the Hash value
+            	to generate the members.
+
+            @param[in] hash the name hash of the object to be inserted to get the Meta for it
+            @param[in] start the first element ob the object
+            @param[in] toAdd the Value where we add the members to
+            @param[in] aloc the allocator for new values
+            @return the last element ptr
+            @author Benjamin Meyer
+            @date 02.11.2015 14:59
+            */
+            void* buildObject(const size_t& hash, void* start, rapidjson::Value& toAdd, rapidjson::MemoryPoolAllocator<>& aloc);
+
         };
     }
 }

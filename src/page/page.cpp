@@ -496,43 +496,46 @@ namespace jimdb
                 l_free->setNext(l_free - next);
         }
 
-        std::shared_ptr<std::string> Page::getJSONObject(const long long& headerpos)
+        void* Page::buildObject(const size_t& hash, void* start, rapidjson::Value& l_obj,
+                                rapidjson::MemoryPoolAllocator<>& aloc)
         {
-            tasking::RWLockGuard<> lock(m_rwLock, tasking::READ);
-
-            //get the header first
-            auto l_header = reinterpret_cast<HeaderMetaData*>(static_cast<char*>(m_header) + headerpos);
-            //get the type
-            auto l_objectType = l_header->getObjektType();
             //get the meta information of the object type
+            //to build it
             auto& l_metaIdx = meta::MetaIndex::getInstance();
             //get the meta dataset
-            auto& l_meta = l_metaIdx[l_objectType];
+            auto& l_meta = l_metaIdx[hash];
 
-            rapidjson::Document l_obj;
-            l_obj.SetObject();
-
-            rapidjson::GenericValue<rapidjson::UTF8<>> l_innerobj;
-            l_innerobj.SetObject();
-
-            BaseType<size_t>* l_ptr = reinterpret_cast<BaseType<size_t>*>(static_cast<char*>(m_body) + l_header->getPos());
+            //now we are already in an object here with l_obj!
+            auto l_ptr = start;
             for (auto it = l_meta->begin(); it != l_meta->end(); ++it)
             {
                 //create the name value
-                rapidjson::Value l_name(it->name.c_str(), it->name.length(), l_obj.GetAllocator());
+                rapidjson::Value l_name(it->name.c_str(), it->name.length(), aloc);
                 //create the value we are going to add
                 rapidjson::Value l_value;
                 //now start building it up again
                 switch (it->type)
                 {
                     case meta::OBJECT:
+                        {
+                            auto l_data = static_cast<BaseType<size_t>*>(l_ptr);
+                            //get the hash to optain the metadata
+                            auto l_hash = l_data->getData();
+                            //set to object and create the inner object
+                            l_value.SetObject();
+
+                            //get the start pointer which is the "next" element
+                            //and call recursive
+                            l_ptr = static_cast<BaseType<size_t>*>(buildObject(l_hash,
+                                                                   reinterpret_cast<char*>(l_data) + l_data->getNext(), l_value, aloc));
+                        }
                         break;
                     case meta::ARRAY:
                         break;
                     case meta::INT:
                         {
                             //create the data
-                            auto l_data = reinterpret_cast<BaseType<long long>*>(l_ptr);
+                            auto l_data = static_cast<BaseType<long long>*>(l_ptr);
                             //with length attribute it's faster ;)
                             l_value = l_data->getData();
                         }
@@ -540,7 +543,7 @@ namespace jimdb
                     case meta::DOUBLE:
                         {
                             //create the data
-                            auto l_data = reinterpret_cast<BaseType<double>*>(l_ptr);
+                            auto l_data = static_cast<BaseType<double>*>(l_ptr);
                             //with length attribute it's faster ;)
                             l_value = l_data->getData();
                         }
@@ -548,33 +551,61 @@ namespace jimdb
                     case meta::STRING:
                         {
                             //create the data
-                            auto l_data = reinterpret_cast<StringType*>(l_ptr);
+                            auto l_data = static_cast<StringType*>(l_ptr);
                             //with length attribute it's faster
-                            l_value.SetString(l_data->getString()->c_str(), l_data->getString()->length(), l_obj.GetAllocator());
+                            l_value.SetString(l_data->getString()->c_str(), l_data->getString()->length(), aloc);
                         }
                         break;
                     case meta::BOOL:
                         {
                             //create the data
-                            auto l_data = reinterpret_cast<BaseType<bool>*>(l_ptr);
+                            auto l_data = static_cast<BaseType<bool>*>(l_ptr);
                             l_value = l_data->getData();
                         }
                         break;
                     default:
                         break;
                 }
-                //add the new value
-                l_innerobj.AddMember(l_name, l_value, l_obj.GetAllocator());
+                l_obj.AddMember(l_name, l_value, aloc);
                 //update the lptr
-                l_ptr = reinterpret_cast<BaseType<size_t>*>(reinterpret_cast<char*>(l_ptr) + l_ptr->getNext());
+                l_ptr = static_cast<char*>(l_ptr) + static_cast<BaseType<size_t>*>(l_ptr)->getNext();
             }
+            //return the l_ptr which current shows to the next lement. //see line above
+            return l_ptr;
+        }
+
+        std::shared_ptr<std::string> Page::getJSONObject(const long long& headerpos)
+        {
+			//reading the Page
+            tasking::RWLockGuard<> lock(m_rwLock, tasking::READ);
+            //get the header first
+            auto l_header = reinterpret_cast<HeaderMetaData*>(static_cast<char*>(m_header) + headerpos);
+            //get the type
+            auto l_objectType = l_header->getObjektType();
+
+            //get the idx
+            auto& l_metaIdx = meta::MetaIndex::getInstance();
+            //get the meta dataset
+            auto& l_meta = l_metaIdx[l_objectType];
+
+            //create the document
+            rapidjson::Document l_obj;
+            l_obj.SetObject();
+
+            //now generate the inner part of the object
+            rapidjson::Value l_value;
+            l_value.SetObject();
+            //calc the start id
+            void* start = static_cast<char*>(m_body) + l_header->getPos();
+            buildObject(l_objectType, start, l_value, l_obj.GetAllocator());
 
             //generate name
             auto l_objName = l_meta->getName();
             rapidjson::Value l_name(l_objName.c_str(), l_objName.length(), l_obj.GetAllocator());
-            //add the innerobject with the name
-            l_obj.AddMember(l_name, l_innerobj, l_obj.GetAllocator());
+            //now add the inner object
+            l_obj.AddMember(l_name, l_value, l_obj.GetAllocator());
 
+            //convert to string
             rapidjson::StringBuffer strbuf;
             rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
             l_obj.Accept(writer);
