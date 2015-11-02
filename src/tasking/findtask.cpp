@@ -1,5 +1,6 @@
 ﻿#include "findtask.h"
 #include "../index/objectindex.h"
+#include "../index/pageindex.h"
 
 namespace jimdb
 {
@@ -10,6 +11,7 @@ namespace jimdb
 
         void FindTask::operator()()
         {
+            LOG_SCOPE_TIME << "Find and create";
             //optain the oid
             auto& l_data = (*m_msg)()["data"];
             if(l_data.FindMember("oid__") == l_data.MemberEnd())
@@ -18,24 +20,27 @@ namespace jimdb
                 return;
             }
 
+            //check if oid id is int
             if(!l_data["oid__"].IsInt64())
             {
                 LOG_WARN << "invalid find task. oid__ is no int";
                 return;
             }
 
+            //get the ID we are looking for and check if its valid
             auto l_oid = l_data["oid__"].GetInt64();
-
-            LOG_DEBUG << "looking for oid__: " << l_oid;
-
             if(!index::ObjectIndex::getInstance().contains(l_oid))
             {
                 LOG_WARN << "invalid find task. oid not found";
                 return;
             }
 
+            //get the meta information of the object
             auto& l_meta = index::ObjectIndex::getInstance()[l_oid];
-            LOG_DEBUG << l_oid << " found on page: " << l_meta.m_page << " header pos: " << l_meta.m_pos;
+            //get the page where the object is
+            auto l_page = index::PageIndex::getInstance()[l_meta.m_page];
+            //get/create the object
+            auto l_obj = l_page->getJSONObject(l_meta.m_pos);
         }
     }
 }

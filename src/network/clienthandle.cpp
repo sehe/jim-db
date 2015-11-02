@@ -51,7 +51,7 @@ namespace jimdb
         {
             if (!m_connected)
                 return false;
-            char length[MESSAGE_SIZE+1];
+            char length[MESSAGE_SIZE + 1];
             sprintf(length, "%8d", static_cast<int>(s->size()));
             auto toSend = std::string(length);
             toSend += *s; //add the message
@@ -64,7 +64,7 @@ namespace jimdb
                 closesocket(m_sock);
                 return false;
             }
-            LOG_DEBUG << "Sent: " << *s;
+            //LOG_DEBUG << "Sent: " << *s;
             return true;
         }
 
@@ -100,23 +100,24 @@ namespace jimdb
         std::shared_ptr<Message> ClientHandle::getData()
         {
             int n;
-            char size[MESSAGE_SIZE+1];
-            n = recv(m_sock, size, sizeof(size)-1, 0);
+            char size[MESSAGE_SIZE + 1];
+            n = recv(m_sock, size, sizeof(size) - 1, 0);
             //check if retval passed
             if (!checkRetValRecv(n))
                 return nullptr;
             //calc how much data
             auto msgLen = atoi(size);
-            LOG_DEBUG << "recv a message with size: " << msgLen;
+            //LOG_DEBUG << "recv a message with size: " << msgLen;
             //create buffer for the data
             auto buffer = new char[msgLen + 1]; //one more for nullterm
+            buffer[msgLen] = '\0';//add null term
             //read buffer
             n = recv(m_sock, buffer, msgLen, 0);
-            buffer[msgLen] = '\0';//add null term
+
             //check retval if it passes
             if (!checkRetValRecv(n))
                 return nullptr;
-            LOG_DEBUG << "Buffer Message: " << buffer;
+            //LOG_DEBUG << "Buffer Message: " << buffer;
             //return ne Message
             return std::make_shared<Message>(buffer);
         }

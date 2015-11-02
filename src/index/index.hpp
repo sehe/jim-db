@@ -76,5 +76,12 @@ namespace jimdb
             tasking::RWLockGuard<> lock(m_lock, tasking::READ);
             return m_index.empty();
         }
+
+	    template <typename T, typename U>
+	    stx::btree_map<typename Index<T, U>::KEY, typename Index<T, U>::VALUE>& Index<T, U>::get()
+        {
+			tasking::RWLockGuard<> lock(m_lock, tasking::READ);
+			return m_index;
+        }
     }
 }

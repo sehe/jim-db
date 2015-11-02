@@ -63,26 +63,22 @@ namespace jimdb
 
             if (doc["type"].GetString() == std::string("insert"))
             {
-                LOG_DEBUG << "insert message";
                 TaskQueue::getInstance().push_pack(std::make_shared<InsertTask>(m_client, message));
                 return;
             }
 
             if (doc["type"].GetString() == std::string("delete"))
             {
-                LOG_DEBUG << "delete message";
                 return;
             }
 
             if (doc["type"].GetString() == std::string("query"))
             {
-                LOG_DEBUG << "query message";
                 return;
             }
 
 			if (doc["type"].GetString() == std::string("find"))
 			{
-				LOG_DEBUG << "find message";
 				TaskQueue::getInstance().push_pack(std::make_shared<FindTask>(m_client, message));
 				return;
 			}

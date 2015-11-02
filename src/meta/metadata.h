@@ -21,6 +21,7 @@
 #pragma once
 #include "../common/fnvhash.h"
 #include "../index/index.h"
+#include <vector>
 
 namespace jimdb
 {
@@ -30,6 +31,12 @@ namespace jimdb
         {
             OBJECT, ARRAY, INT, DOUBLE, STRING, BOOL
         };
+
+		struct MetaValue
+		{
+			std::string name;
+			AttributeTypes type;
+		};
 
         /**
         @brief metdata for one object
@@ -41,7 +48,7 @@ namespace jimdb
         @author Benjamin Meyer
         @date 22.10.2015 11:58
         */
-        class MetaData: public index::Index<std::string, AttributeTypes>
+        class MetaData: public std::vector<MetaValue>
         {
         public:
             /**
@@ -51,9 +58,9 @@ namespace jimdb
             @date 22.10.2015 13:29
             */
             explicit inline MetaData(const std::string& name);
-            virtual ~MetaData() {};
 
             size_t getHash() const;
+			std::string getName() const;
         private:
             const std::string m_objectName;
             size_t m_hash;

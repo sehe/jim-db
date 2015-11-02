@@ -37,7 +37,6 @@
 #define LOG_EXCAPT jimdb::common::Logger::Log(jimdb::common::LoggerTypes::EXCAPTION,__FILENAME__,__LINE__)
 #define LOG_DEBUG jimdb::common::Logger::Log(jimdb::common::LoggerTypes::DEBUG,__FILENAME__,__LINE__)
 
-
 /**
 to prevent from copy elision
 \see http://stackoverflow.com/questions/30372466/logger-logs-2-times-instead-of-one-time-because-of-copy/30372847#30372847

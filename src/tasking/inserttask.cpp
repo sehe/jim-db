@@ -20,11 +20,7 @@ namespace jimdb
             //we already know that its a valid data and valid document here!
             auto& dat = (*m_msg)()["data"];
             auto it = dat.MemberBegin();
-            if (it->value.IsObject())
-            {
-                LOG_DEBUG << "Object to insert name: " << it->name.GetString();
-            }
-            else
+            if (!it->value.IsObject())
             {
                 LOG_WARN << "Insert: data field is missing Object member";
                 return;
@@ -33,7 +29,6 @@ namespace jimdb
             //insert it to meta and get the size of the data in memory
             auto l_objSize = checkSizeAndMeta(it->name.GetString(), it->value);
 
-            LOG_DEBUG << "Object in Memory is: " << l_objSize << "byte";
             //Now estimate the next page which has space for l_objSize
 
             // get a page which could fit the obj and which is not locked
@@ -52,7 +47,7 @@ namespace jimdb
                 //add the new page
                 index::PageIndex::getInstance().add(l_page->getID(), l_page);
             }
-			//insert the obj to the page
+            //insert the obj to the page
             auto oid = l_page->insert(dat);
 
             //generate answer and return it.
@@ -82,13 +77,13 @@ namespace jimdb
                     case rapidjson::kFalseType:
                     case rapidjson::kTrueType:
                         if (!l_metaExsist)
-                            newMeta->add(it->name.GetString(), meta::BOOL);
+                            newMeta->push_back({ it->name.GetString(), meta::BOOL });
                         break;
 
                     case rapidjson::kObjectType:
                         //add to the current meta
                         if (!l_metaExsist)
-                            newMeta->add(it->name.GetString(), meta::OBJECT);
+                            newMeta->push_back({ it->name.GetString(), meta::OBJECT });
                         //now check if the obj already exsist
                         //else create it or skip
                         l_objSize += checkSizeAndMeta(it->name.GetString(), it->value);
@@ -97,14 +92,14 @@ namespace jimdb
 
                     case rapidjson::kArrayType:
                         if (!l_metaExsist)
-                            newMeta->add(it->name.GetString(), meta::ARRAY);
+                            newMeta->push_back({ it->name.GetString(), meta::ARRAY });
 
                         l_objSize += checkSizeArray(it->value);
                         break;
 
                     case rapidjson::kStringType:
                         if (!l_metaExsist)
-                            newMeta->add(it->name.GetString(), meta::STRING);
+                            newMeta->push_back({ it->name.GetString(), meta::STRING });
                         //add the length of the string
                         l_objSize += strlen(it->value.GetString());
                         break;
@@ -113,21 +108,21 @@ namespace jimdb
                         if (!l_metaExsist)
                         {
                             if (it->value.IsInt())
-                                newMeta->add(it->name.GetString(), meta::INT); //number
+                                newMeta->push_back({ it->name.GetString(), meta::INT }); //number
                             else
-                                newMeta->add(it->name.GetString(), meta::DOUBLE);//floatingpoint
+                                newMeta->push_back({ it->name.GetString(), meta::DOUBLE });//floatingpoint
+                            break;
+                        default:
+                            LOG_WARN << "Unknown member Type: " << it->name.GetString() << ":" << it->value.GetType();
+                            break;
                         }
-                        break;
-                    default:
-                        LOG_WARN << "Unknown member Type: " << it->name.GetString() << ":" << it->value.GetType();
-                        break;
+                        //add the general size of a regular object
+                        //since it get added for every object
+                        //for example every inner object has a filed with the obj id
+                        //every array has a filed with the count of inner objects and so on.
+                        //so all we do is adding the base and the rest get added in the loop above
+                        l_objSize += sizeof(memorymanagement::BaseType<size_t>);
                 }
-                //add the general size of a regular object
-                //since it get added for every object
-                //for example every inner object has a filed with the obj id
-                //every array has a filed with the count of inner objects and so on.
-                //so all we do is adding the base and the rest get added in the loop above
-                l_objSize += sizeof(memorymanagement::BaseType<size_t>);
             }
 
             //add the new metadata to the meta;

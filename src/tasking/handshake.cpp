@@ -24,7 +24,7 @@ namespace jimdb
             auto mes = m_client->getData();
             //check if handshaje is valid
             if (std::string("hi") == mes->operator()()["data"].GetString())
-                LOG_DEBUG << "Handshake successful";
+                ;
             else
             {
                 LOG_WARN << "handshake Failed";

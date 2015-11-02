@@ -79,6 +79,16 @@ namespace jimdb
             @date 31.10.2015 14:54
             */
             void setObjCounter(const long long& value) const;
+
+
+            /**
+            \brief Generate the object from headerpos
+
+            @author Benjamin Meyer
+            @date 02.11.2015 11:44
+            */
+            std::shared_ptr<std::string> getJSONObject(const long long& headerpos);
+
         private:
             static long long m_objCount;
             //const voidptr to memory to static cast as we like

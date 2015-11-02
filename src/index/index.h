@@ -86,6 +86,14 @@ namespace jimdb
             */
             inline bool empty();
 
+            /**
+            \brief use this with caution!
+
+			Since it meight get manipulated!
+            @author Benjamin Meyer
+            @date 02.11.2015 11:55
+            */
+            inline stx::btree_map<KEY, VALUE>& get();
         protected:
             stx::btree_map<KEY, VALUE> m_index;
             tasking::RWLock m_lock;

@@ -32,5 +32,10 @@ namespace jimdb
         {
             return m_hash;
         }
+
+	    inline std::string MetaData::getName() const
+	    {
+			return m_objectName;
+        }
     }
 }
