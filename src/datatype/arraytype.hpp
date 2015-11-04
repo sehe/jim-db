@@ -18,12 +18,21 @@
 // # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 // ############################################################################
 // **/
-
-inline ArrayType::ArrayType(const size_t& s): BaseType(s)
+namespace jimdb
 {
-}
+    namespace memorymanagement
+    {
+        inline ArrayType::ArrayType(const size_t& s) : BaseType(s)
+        {
+        }
 
-inline size_t ArrayType::size()
-{
-    return m_data.data;
+        inline ArrayType::ArrayType(size_t& s) : BaseType(s)
+        {
+        }
+
+        inline size_t ArrayType::size()
+        {
+            return m_data.data;
+        }
+    }
 }

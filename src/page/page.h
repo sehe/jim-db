@@ -146,24 +146,26 @@ namespace jimdb
             */
             std::pair<void*, void*> insertObject(const rapidjson::GenericValue<rapidjson::UTF8<>>& value, BaseType<size_t>* l_last);
 
-            //returns a ptr to the spot where it can fit
-            //@return pair of freetype position, freetype previous
-            //prev is needed to update the chain properly
-            std::pair<FreeType*, FreeType*> find(const size_t& size);
+            /**
+            \brief returns a ptr to the slot where it can fit
+            	also can be used to find a valid spot!
 
-            //Caluclate the distance between two pointers
-            //used to calc the ->next() of objects
-            //doenst change the ptrs here
-            std::ptrdiff_t dist(const void* p1, const void* p2) const;
+            @param[in] size size of the object to fit
+            @param[in] aloc bool to indicate we should aloc the space. Default is TRUE!
+            	Set false for checking if there is a slot for the size without alocing.
+            @return void* is also a FreeType* or nullptr if there is no slot!
+            @author Benjamin Meyer
+            @date 04.11.2015 08:28
+            */
+            void* find(const size_t& size, bool aloc = true);
 
             /**
-            \brief add a new free type
+            \brief Caluclate the distance between two pointers
 
-            @param[in] pos new startposition of that freetype
             @author Benjamin Meyer
-            @date 31.10.2015 13:45
+            @date 04.11.2015 08:35
             */
-            void updateFree(void* pos, const size_t& size,  FreeType* prev, FreeType* next);
+            std::ptrdiff_t dist(const void* const p1, const void* const p2) const;
 
             /**
             \brief insert a whole array
@@ -181,19 +183,15 @@ namespace jimdb
             * ############################################*/
 
             HeaderMetaData* insertHeader(const size_t& id, const size_t& hash, const size_t& type, const size_t& pos);
-
-            //returns a ptr to the spot where it can fit
-            //@return pair of freetype position, freetype previous
-            std::pair<FreeType*, FreeType*> findHeaderSpot();
-
             /**
-            \brief update header free types
-            creates a new freetype at pos with the size and set the previous->next = "new"
-            and "new"-> next.
+            \brief returns a header position, also used to check if we have a valid slot
+            	just set aloc to false which is default true!
+
+            @param[in] aloc do also aloc the space. If false we can check for a header position
             @author Benjamin Meyer
-            @date 31.10.2015 16:32
+            @date 04.11.2015 08:51
             */
-            void updateFreeHeader(void* pos, const size_t& size, FreeType* prev, FreeType* next);
+            void* findHeaderPosition(bool aloc = true);
 
             /**############################################
             * private methods for building the Object out of memory
@@ -215,6 +213,7 @@ namespace jimdb
             */
             void* buildObject(const size_t& hash, void* start, rapidjson::Value& toAdd, rapidjson::MemoryPoolAllocator<>& aloc);
 
+            void* buildArray(const long long& elemCount,void* start,rapidjson::Value& toAdd, rapidjson::MemoryPoolAllocator<>& aloc);
         };
     }
 }

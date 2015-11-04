@@ -26,13 +26,14 @@
 #include <memory>
 namespace jimdb
 {
-	namespace memorymanagement
-	{
-		class ArrayItemString : public ArrayItem<long long>
-		{
-			explicit inline ArrayItemString(const std::string& s);
-			inline std::shared_ptr<std::string> getString() const;
-		};
+    namespace memorymanagement
+    {
+        class ArrayItemString : public ArrayItem<long long>
+        {
+        public:
+            explicit inline ArrayItemString(const std::string& s);
+            inline std::shared_ptr<std::string> getString() const;
+        };
 #include "arrayitemstring.hpp"
-	}
+    }
 }
