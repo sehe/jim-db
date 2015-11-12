@@ -218,7 +218,12 @@ namespace jimdb
                             //and insert the ID of the obj
                             l_pos = find(sizeof(BaseType<size_t>));
                             std::string name = it->name.GetString();
-                            void* l_new = new (l_pos) BaseType<size_t>(common::FNVHash()(name));
+                            auto hash = common::FNVHash()(name);
+                            void* l_new = nullptr;
+                            {
+                                BaseType<size_t>* tmp = new (l_pos) BaseType<size_t>(hash);
+                                l_new = tmp;
+                            }
 
                             if (l_prev != nullptr)
                                 l_prev->setNext(dist(l_prev, l_new));

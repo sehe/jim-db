@@ -22,7 +22,7 @@
 #pragma once
 
 //link against winsock2 32 lib
-#pragma comment(lib, "Ws2_32.lib") 
+//#pragma comment(lib, "Ws2_32.lib") 
 
 #include "../tasking/taskqueue.h"
 #include "iserver.h"

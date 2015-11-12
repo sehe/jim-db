@@ -41,9 +41,11 @@ static std::ostream& LOG_DEBUG = std::clog;
 #include "tasking/inserttask.h"
 #include "index/objectindex.h"
 #include "index/pageindex.h"
+#include "meta/metaindex.h"
+#include "common/fnvhash.h"
 #include "common/cmdargs.h"
 #include "thread/worker.h"
-#pragma comment(lib,"user32.lib")
+//#pragma comment(lib,"user32.lib")
 #include <vector>
 #else
 
@@ -62,39 +64,18 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
 int main(int argc, char* argv[])
 {
-#if 0
-        char TEST_JSON_BODY[] = R"(
-        {
-            "Person": {
-                "age": 25,
-                    "double": 23.23,
-                    "boolean": true,
-                    "double2": 23.23,
-                    "firstInnerObj": {
-                        "innerDoub": 12.12
-                    }
-            }
+    char TEST_JSON_BODY[] = R"(
+{
+    "Person": {
+        "firstInnerObj": {
+            "innerDoub": 12.12
+        },
+        "secondInnerObj": {
+            "secInnerDoub": 12.12
         }
-        )";
-#else
-        char TEST_JSON_BODY[] = R"(
-        {
-            "Person":
-            {
-                "age":25,
-                    "double": 23.23,
-                    "boolean": true,
-                    "double2": 23.23,
-                    "firstInnerObj":{
-                        "innerDoub": 12.12
-                    },
-                    "secondInnerObj":{
-                        "secInnerDoub": 12.12
-                    }
-            }
-        }
-        )";
-#endif
+    }
+}
+    )";
     {
         using namespace jimdb::memorymanagement;
         {
@@ -109,9 +90,21 @@ int main(int argc, char* argv[])
 
             auto l_oid     = page.insert(d);
 
+            {
+                auto& mi = jimdb::meta::MetaIndex::getInstance().get();
+                for (auto& kvp : mi) {
+                    std::cout << kvp.first << ", " << std::addressof(*kvp.second) << "\n";
+                }
+
+                for (auto name : { "Person", "firstInnerObj", "secondInnerObj" })
+                {
+                    std::cout << "Hash(" << name << ") -> " << jimdb::common::FNVHash{}(name) << "\n";
+                }
+            }
+
+            return 0;
             auto l_meta    = jimdb::index::ObjectIndex::getInstance()[l_oid];
             auto l_obj     = page.getJSONObject(l_meta.m_pos);
-
 
             std::cout << *l_obj;
         }
