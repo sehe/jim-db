@@ -36,9 +36,9 @@ static constexpr SOCKET INVALID_SOCKET = -1;
 
 struct WSADATA {};
 using WORD=uint16_t;
-void WSACleanup();
-int WSAStartup(WORD, WSADATA*);
-void ZeroMemory(void*, size_t);
+void WSACleanup() {}
+int WSAStartup(WORD, WSADATA*) {return -1;}
+void ZeroMemory(void*, size_t) {}
 
 WORD MAKEWORD(int,int) { return 42; }
 
