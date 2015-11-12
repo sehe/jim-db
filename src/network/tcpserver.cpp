@@ -154,6 +154,7 @@ namespace jimdb
             if (ClientSocket == INVALID_SOCKET)
             {
                 LOG_ERROR << "accept failed: " << WSAGetLastError();
+                std::this_thread::sleep_for(std::chrono::seconds(1));
                 closesocket(m_listensocket);
                 //do not clean!
                 return 1;

@@ -31,21 +31,24 @@ of memory and allow to querry them.
 #include <iostream>
 static std::ostream& LOG_DEBUG = std::clog;
 
-#if 0
+#if 1
 #include "network/tcpserver.h"
 #include "log/logger.h"
 #include <thread>
 #include <list>
 #include "common/configuration.h"
 #include "tasking/taskqueue.h"
+#include "tasking/inserttask.h"
+#include "index/objectindex.h"
+#include "index/pageindex.h"
 #include "common/cmdargs.h"
 #include "thread/worker.h"
 #pragma comment(lib,"user32.lib")
 #include <vector>
 #else
-#include "page/page.h"
 
 #endif
+#include "page/page.h"
 
 using BOOL = bool;
 using DWORD = uint32_t;
@@ -60,52 +63,59 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent);
 int main(int argc, char* argv[])
 {
 #if 0
-    const char* json = R"(
-    {
-        "Person": {
-            "age": 25,
-                "double": 23.23,
-                "boolean": true,
-                "double2": 23.23,
-                "firstInnerObj": {
-                    "innerDoub": 12.12
-                }
-        }
-    }
-    )";
-#else
-    const char* json = R"(
-    {
-        "Person":
+        char TEST_JSON_BODY[] = R"(
         {
-            "age":25,
-                "double": 23.23,
-                "boolean": true,
-                "double2": 23.23,
-                "firstInnerObj":{
-                    "innerDoub": 12.12
-                },
-                "secondInnerObj":{
-                    "secInnerDoub": 12.12
-                }
+            "Person": {
+                "age": 25,
+                    "double": 23.23,
+                    "boolean": true,
+                    "double2": 23.23,
+                    "firstInnerObj": {
+                        "innerDoub": 12.12
+                    }
+            }
+        }
+        )";
+#else
+        char TEST_JSON_BODY[] = R"(
+        {
+            "Person":
+            {
+                "age":25,
+                    "double": 23.23,
+                    "boolean": true,
+                    "double2": 23.23,
+                    "firstInnerObj":{
+                        "innerDoub": 12.12
+                    },
+                    "secondInnerObj":{
+                        "secInnerDoub": 12.12
+                    }
+            }
+        }
+        )";
+#endif
+    {
+        using namespace jimdb::memorymanagement;
+        {
+            rapidjson::Document d;
+            d.Parse(TEST_JSON_BODY);
+            assert(d.IsObject());
+
+            auto it        = d.MemberBegin();
+            auto l_objSize = jimdb::tasking::InsertTask::checkSizeAndMeta("Person", it->value);
+            //auto l_page    = jimdb::index::PageIndex::getInstance().find(l_objSize);
+            Page page(32u<<10, 32u<<10);
+
+            auto l_oid     = page.insert(d);
+
+            auto l_meta    = jimdb::index::ObjectIndex::getInstance()[l_oid];
+            auto l_obj     = page.getJSONObject(l_meta.m_pos);
+
+
+            std::cout << *l_obj;
         }
     }
-    )";
-#endif
-    rapidjson::Document d;
-    d.Parse(json);
-
-    std::cout << "Sample JSON parsed\n";
-    assert(d.IsObject());
-    using namespace jimdb::memorymanagement;
-    Page page(32u<<10, 32u<<10);
-    page.insert(d);
-    page.insert(d);
-    page.insert(d);
-    page.insert(d);
-    page.insert(d);
-    page.insert(d);
-    page.insert(d);
 
 
 #if 0
@@ -185,6 +195,13 @@ int main(int argc, char* argv[])
     auto& tasks = jimdb::tasking::TaskQueue::getInstance();
     //set up the max number of tasks
     tasks.setMaxSize(cfg[jimdb::common::MAX_TASKS].GetInt());
+
+    {
+        tasks.push_pack(
+                std::make_shared<jimdb::tasking::InsertTask>
+                (nullptr, std::make_shared<jimdb::network::Message>(TEST_JSON_BODY))
+            );
+    }
 
     std::shared_ptr<jimdb::network::IServer> tcpServer = std::make_shared<jimdb::network::TCPServer>(tasks);
     tcpServer->start();

@@ -41,8 +41,8 @@ if conf.env["buildtype"] == "release" :
     conf.env.AppendUnique(CPPDEFINES     = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "JIMDB_NDEBUG"])
     conf.env.AppendUnique(CPPFLAGS       = ["-O2", "-finline-functions"])
 elif conf.env["buildtype"] == "debug" :
-    conf.env.AppendUnique(LINKFLAGS   = ["-g"])
-    conf.env.AppendUnique(CPPFLAGS    = ["-g", "-Wall"])
+    conf.env.AppendUnique(LINKFLAGS   = ["-g", "-O0" ])
+    conf.env.AppendUnique(CPPFLAGS    = ["-g", "-O0", "-Wall"])
 
 
 

@@ -31,7 +31,7 @@ namespace jimdb
         public:
             explicit InsertTask(const std::shared_ptr<network::IClient>& client, const std::shared_ptr<network::Message> m);
             void operator()() override;
-        private:
+        //private:
             std::shared_ptr<network::Message> m_msg;
 
             /**
@@ -41,7 +41,7 @@ namespace jimdb
             @author Benjamin Meyer
             @date 28.10.2015 15:40
             */
-            size_t checkSizeAndMeta(const std::string& name, const rapidjson::GenericValue<rapidjson::UTF8<>>& val);
+            static size_t checkSizeAndMeta(const std::string& name, const rapidjson::GenericValue<rapidjson::UTF8<>>& val);
 
             /**
             \brief calculates the size of the array with overhead
@@ -50,7 +50,7 @@ namespace jimdb
             @author Benjamin Meyer
             @date 28.10.2015 16:29
             */
-            size_t checkSizeArray(const rapidjson::GenericValue<rapidjson::UTF8<>>& val);
+            static size_t checkSizeArray(const rapidjson::GenericValue<rapidjson::UTF8<>>& val);
 
             //vector of inner object ids which get insterted
             // while creation of the meta
