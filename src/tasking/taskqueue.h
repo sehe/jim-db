@@ -23,6 +23,7 @@
 #include "task.h"
 #include <memory>
 #include <deque>
+#include <condition_variable>
 namespace jimdb
 {
     namespace tasking

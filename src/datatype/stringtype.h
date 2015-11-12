@@ -22,6 +22,7 @@
 #pragma once
 #include "basetype.h"
 #include <string>
+#include <cstring>
 #include <memory>
 
 namespace jimdb
@@ -51,6 +52,6 @@ namespace jimdb
             //just chain it at the end of the free space type
             ~StringType() {};
         };
-#include "StringType.hpp"
+#include "stringtype.hpp"
     }
 }

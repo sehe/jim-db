@@ -19,7 +19,7 @@
 ############################################################################
 **/
 
-#include "CmdArgs.h"
+#include "cmdargs.h"
 #include <iostream>
 #include "../log/logger.h"
 

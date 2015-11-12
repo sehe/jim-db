@@ -18,6 +18,7 @@
 // # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 // ############################################################################
 // **/
+#include <memory>
 
 inline ArrayItemString::ArrayItemString(const std::string& s) : ArrayItem<long long>(0, STRING)
 {

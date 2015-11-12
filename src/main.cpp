@@ -28,6 +28,9 @@ of memory and allow to querry them.
 \author Benjamin Meyer
 \date DATE
 */
+#include <iostream>
+static std::ostream& LOG_DEBUG = std::clog;
+
 #include "network/tcpserver.h"
 #include "log/logger.h"
 #include <thread>
@@ -39,7 +42,14 @@ of memory and allow to querry them.
 #pragma comment(lib,"user32.lib")
 #include <vector>
 
+using BOOL = bool;
+using DWORD = uint32_t;
+static constexpr BOOL TRUE = true;
+static constexpr BOOL FALSE = false;
+#define WINAPI 
+
 //forward declare
+typedef BOOL WINAPI (*PHANDLER_ROUTINE)(DWORD);
 BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
 int main(int argc, char* argv[])
@@ -109,11 +119,13 @@ int main(int argc, char* argv[])
     //after this the logger can be used as regular!
 
     //setup the console handle:
+#ifdef _WIN32
     if (SetConsoleCtrlHandler(
                 static_cast<PHANDLER_ROUTINE>(ConsoleHandler), TRUE) == FALSE)
     {
         LOG_WARN << "Unable to install console handler!";
     }
+#endif
 
     auto& tasks = jimdb::tasking::TaskQueue::getInstance();
     //set up the max number of tasks
@@ -143,14 +155,15 @@ int main(int argc, char* argv[])
     }
 }
 
-
 BOOL WINAPI ConsoleHandler(DWORD CEvent)
 {
+#ifdef _WIN32
     switch (CEvent)
     {
         case CTRL_CLOSE_EVENT:
             MessageBox(nullptr,
-                       "Closing JIMDB!", "CEvent", MB_OK);
+                    "Closing JIMDB!", "CEvent", MB_OK);
     }
+#endif
     return true;
 }

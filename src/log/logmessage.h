@@ -82,10 +82,10 @@ namespace jimdb
 
 
             LogMessage(const LogMessage& other);
-            LogMessage(LogMessage&& other);
+            //LogMessage(LogMessage&& other);
 
             LogMessage& operator=(const LogMessage& other);
-            LogMessage& operator=(LogMessage&& other);
+            //LogMessage& operator=(LogMessage&& other);
 
         private:
             std::ostringstream m_stream;

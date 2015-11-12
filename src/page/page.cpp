@@ -25,10 +25,10 @@
 #include "../datatype/headermetadata.h"
 #include "../index/objectindex.h"
 #include "../datatype/arrayitem.h"
-#include "../network/MessageFactory.h"
+#include "../network/messagefactory.h"
 #include "../meta/metaindex.h"
 #include <rapidjson/stringbuffer.h>
-#include <rapidjson/PrettyWriter.h>
+#include <rapidjson/prettywriter.h>
 #include "../datatype/arrayitemstring.h"
 #include "../datatype/arraytype.h"
 
@@ -36,25 +36,25 @@ namespace jimdb
 {
     namespace memorymanagement
     {
-        long long Page::m_s_idCounter = 0;
-        long long Page::m_objCount = 0;
+        int64_t Page::m_s_idCounter = 0;
+        int64_t Page::m_objCount = 0;
         //take care order does matter here since header and body need to be init first to set the freepos values!
-        Page::Page(long long header, long long body) : m_header(new char[header]), m_body(new char[body]), m_freeSpace(body),
+        Page::Page(int64_t header, int64_t body) : m_header(new char[header]), m_body(new char[body]), m_freeSpace(body),
             //set the freepos value ptr to the first header slot
-            m_freepos(new(static_cast<char*>(m_header)) long long(0)),
-            //set the header free pos ptr to the second  "long long" slot
-            m_headerFreePos(new(static_cast<char*>(m_header) + sizeof(long long)) long long(0)), m_next(0),
+            m_freepos(new(static_cast<char*>(m_header)) int64_t(0)),
+            //set the header free pos ptr to the second  "int64_t" slot
+            m_headerFreePos(new(static_cast<char*>(m_header) + sizeof(int64_t)) int64_t(0)), m_next(0),
             m_id(++m_s_idCounter)
         {
             //because of m_freepos and m_headerFreePos
-            m_headerSpace = header - 2 * sizeof(long long);
+            m_headerSpace = header - 2 * sizeof(int64_t);
 
             //add the free type into the body
             m_free = new(&static_cast<char*>(m_body)[0]) FreeType(body);
             ASSERT(m_free->getFree() == body);
 
             //set the free of the header
-            m_headerFree = new(static_cast<char*>(m_header) + 2 * sizeof(long long)) FreeType(header - 2 * sizeof(long long));
+            m_headerFree = new(static_cast<char*>(m_header) + 2 * sizeof(int64_t)) FreeType(header - 2 * sizeof(int64_t));
         }
 
         Page::~Page()
@@ -64,23 +64,23 @@ namespace jimdb
             delete[] m_body;
         }
 
-        long long Page::getID()
+        int64_t Page::getID()
         {
             tasking::RWLockGuard<> lock(m_rwLock, tasking::READ);
             return m_s_idCounter;
         }
 
-        void Page::setNext(const long long& id)
+        void Page::setNext(const int64_t& id)
         {
             m_next = id;
         }
 
-        long long Page::getNext() const
+        int64_t Page::getNext() const
         {
             return m_next;
         }
 
-        long long Page::free()
+        int64_t Page::free()
         {
             tasking::RWLockGuard<> lock(m_rwLock, tasking::READ);
             return m_freeSpace;
@@ -125,13 +125,13 @@ namespace jimdb
             return meta->getOID();
         }
 
-        void Page::setObjCounter(const long long& value) const
+        void Page::setObjCounter(const int64_t& value) const
         {
             m_objCount = value;
         }
 
 
-        std::shared_ptr<std::string> Page::getJSONObject(const long long& headerpos)
+        std::shared_ptr<std::string> Page::getJSONObject(const int64_t& headerpos)
         {
             //reading the Page
             tasking::RWLockGuard<> lock(m_rwLock, tasking::READ);
@@ -201,7 +201,7 @@ namespace jimdb
                     case rapidjson::kFalseType:
                     case rapidjson::kTrueType:
                         {
-                            //doesnt matter since long long and double are equal on
+                            //doesnt matter since int64_t and double are equal on
                             // x64
                             //find pos where the string fits
                             l_pos = find(sizeof(BaseType<bool>));
@@ -267,16 +267,16 @@ namespace jimdb
 
                     case rapidjson::kNumberType:
                         {
-                            //doesnt matter since long long and double are equal on
+                            //doesnt matter since int64_t and double are equal on
                             // x64
                             //find pos where the string fits
-                            l_pos = find(sizeof(BaseType<long long>));
+                            l_pos = find(sizeof(BaseType<int64_t>));
 
                             void* l_new;
                             if (it->value.IsInt())
                             {
                                 //insert INT
-                                l_new = new (l_pos) BaseType<long long>(it->value.GetInt64());
+                                l_new = new (l_pos) BaseType<int64_t>(it->value.GetInt64());
                             }
                             else
                             {
@@ -414,7 +414,7 @@ namespace jimdb
                     case rapidjson::kFalseType:
                     case rapidjson::kTrueType:
                         {
-                            //doesnt matter since long long and double are equal on
+                            //doesnt matter since int64_t and double are equal on
                             // x64
                             //find pos where the string fits
                             l_pos = find(sizeof(ArrayItem<bool>));
@@ -449,16 +449,16 @@ namespace jimdb
                         break;
                     case rapidjson::kNumberType:
                         {
-                            //doesnt matter since long long and double are equal on
+                            //doesnt matter since int64_t and double are equal on
                             // x64
                             //find pos where the string fits
-                            l_pos = find(sizeof(ArrayItem<long long>));
+                            l_pos = find(sizeof(ArrayItem<int64_t>));
 
                             void* l_new;
                             if (arrayIt->IsInt())
                             {
                                 //insert INT
-                                l_new = new (l_pos) ArrayItem<long long>(arrayIt->GetInt64(), INT);
+                                l_new = new (l_pos) ArrayItem<int64_t>(arrayIt->GetInt64(), INT);
                             }
                             else
                             {
@@ -625,7 +625,7 @@ namespace jimdb
                     case meta::INT:
                         {
                             //create the data
-                            auto l_data = static_cast<BaseType<long long>*>(l_ptr);
+                            auto l_data = static_cast<BaseType<int64_t>*>(l_ptr);
                             //with length attribute it's faster ;)
                             l_value = l_data->getData();
                         }
@@ -664,7 +664,7 @@ namespace jimdb
             return l_ptr;
         }
 
-        void* Page::buildArray(const long long& elemCount, void* start, rapidjson::Value& toAdd,
+        void* Page::buildArray(const int64_t& elemCount, void* start, rapidjson::Value& toAdd,
                                rapidjson::MemoryPoolAllocator<>& aloc)
         {
             auto l_ptr = start;
@@ -678,7 +678,7 @@ namespace jimdb
                 {
                     case INT:
                         {
-                            l_value = static_cast<ArrayItem<long long>*>(l_ptr)->getData();
+                            l_value = static_cast<ArrayItem<int64_t>*>(l_ptr)->getData();
                             toAdd.PushBack(l_value, aloc);
                         }
                         break;

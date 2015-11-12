@@ -21,13 +21,15 @@
 
 #pragma once
 
-#include <Winsock2.h>
-#include <ws2tcpip.h>
 //link against winsock2 32 lib
 #pragma comment(lib, "Ws2_32.lib") 
 
 #include "../tasking/taskqueue.h"
 #include "iserver.h"
+
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+
 namespace jimdb
 {
     namespace network

@@ -42,14 +42,14 @@ namespace jimdb
         class Page
         {
         public:
-            Page(long long header, long long body);
+            Page(int64_t header, int64_t body);
             ~Page();
 
-            long long getID();
-            void setNext(const long long& id);
-            long long getNext() const;
+            int64_t getID();
+            void setNext(const int64_t& id);
+            int64_t getNext() const;
 
-            long long free();
+            int64_t free();
 
             bool isLocked() const;
 
@@ -78,7 +78,7 @@ namespace jimdb
             @author Benjamin Meyer
             @date 31.10.2015 14:54
             */
-            void setObjCounter(const long long& value) const;
+            void setObjCounter(const int64_t& value) const;
 
 
             /**
@@ -87,10 +87,10 @@ namespace jimdb
             @author Benjamin Meyer
             @date 02.11.2015 11:44
             */
-            std::shared_ptr<std::string> getJSONObject(const long long& headerpos);
+            std::shared_ptr<std::string> getJSONObject(const int64_t& headerpos);
 
         private:
-            static long long m_objCount;
+            static int64_t m_objCount;
             //const voidptr to memory to static cast as we like
             void* const m_header;
             void* const m_body;
@@ -102,10 +102,10 @@ namespace jimdb
             //pointer to the free typ chain start
             FreeType* m_free;
             //holds the information of free space
-            long long m_freeSpace;
+            int64_t m_freeSpace;
             //position of the free typ object start info
             //it doesnt change so its const
-            long long* const m_freepos;
+            int64_t* const m_freepos;
 
             /**############################################
             * private methods for header
@@ -113,18 +113,18 @@ namespace jimdb
 
             //offset to the next free header position
             //it doesnt change so its const too
-            long long* const m_headerFreePos;
-            long long m_headerSpace;
+            int64_t* const m_headerFreePos;
+            int64_t m_headerSpace;
             //Freetype of the header
             FreeType* m_headerFree;
 
 
             //holds the ID of the next page
-            long long m_next;
-            long long m_id;
+            int64_t m_next;
+            int64_t m_id;
 
             //id generation with static counter
-            static long long m_s_idCounter;
+            static int64_t m_s_idCounter;
 
             //lock for getFree and so on
             tasking::RWLock m_rwLock;
@@ -213,7 +213,7 @@ namespace jimdb
             */
             void* buildObject(const size_t& hash, void* start, rapidjson::Value& toAdd, rapidjson::MemoryPoolAllocator<>& aloc);
 
-            void* buildArray(const long long& elemCount,void* start,rapidjson::Value& toAdd, rapidjson::MemoryPoolAllocator<>& aloc);
+            void* buildArray(const int64_t& elemCount,void* start,rapidjson::Value& toAdd, rapidjson::MemoryPoolAllocator<>& aloc);
         };
     }
 }

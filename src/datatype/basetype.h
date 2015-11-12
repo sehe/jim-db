@@ -21,6 +21,8 @@
 
 #pragma once
 #include <memory>
+#include <cstddef>
+#include <cstring>
 
 namespace jimdb
 {
@@ -69,6 +71,6 @@ namespace jimdb
 
             long long m_next;
         };
-#include "BaseType.hpp"
+#include "basetype.hpp"
     }
 }

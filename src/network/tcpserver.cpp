@@ -24,6 +24,24 @@
 #include "../log/logger.h"
 #include "../common/configuration.h"
 
+static constexpr SOCKET INVALID_SOCKET = -1;
+
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+struct WSADATA {};
+using WORD=uint16_t;
+void WSACleanup();
+int WSAStartup(WORD, WSADATA*);
+void ZeroMemory(void*, size_t);
+
+WORD MAKEWORD(int,int) { return 42; }
+
 namespace jimdb
 {
     namespace network
@@ -50,7 +68,7 @@ namespace jimdb
                 return false;
             }
 
-            struct addrinfo* result = nullptr, *ptr = nullptr, hints;
+            addrinfo* result = nullptr, *ptr = nullptr, hints;
             ZeroMemory(&hints, sizeof(hints));
             hints.ai_family = AF_INET ;
             hints.ai_socktype = SOCK_STREAM ;
@@ -129,7 +147,7 @@ namespace jimdb
             ClientSocket = INVALID_SOCKET;
             // Accept a client socket
             struct sockaddr their_addr; //stored address
-            int sin_size = sizeof their_addr;
+            socklen_t sin_size = sizeof their_addr;
             ClientSocket = ::accept(m_listensocket,
                                     &their_addr,
                                     &sin_size);
@@ -168,7 +186,7 @@ namespace jimdb
             struct timeval tv;
             tv.tv_sec = 0;
             tv.tv_usec = 100;
-            if (select(temp_set.fd_count, &temp_set, nullptr, nullptr, &tv) == -1)
+            //if (select(temp_set.fd_count, &temp_set, nullptr, nullptr, &tv) == -1)
             {
                 //failed to select
                 LOG_ERROR << "fail in select method at accept";

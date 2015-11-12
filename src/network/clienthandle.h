@@ -20,10 +20,21 @@
 **/
 
 #pragma once
-#include <WinSock2.h>
 #include <ostream>
 #include<memory>
 #include "iclient.h"
+
+using SOCKET = long;
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+static constexpr int SOCKET_ERROR = -1;
+static constexpr int WSAECONNRESET = -2;
+
+void setsockopt(SOCKET, int, int, char const*, size_t);
+void closesocket(SOCKET);
+int send(SOCKET, char const*, int, int);
+int WSAGetLastError();
+size_t recv(SOCKET, char*, size_t, int);
 
 //size of the number in front of a message
 #define MESSAGE_SIZE 8 
@@ -42,7 +53,7 @@ namespace jimdb
         class ClientHandle :public IClient
         {
         public:
-            explicit ClientHandle(const SOCKET& s, const sockaddr& add);
+            explicit ClientHandle(const SOCKET& s, const struct sockaddr& add);
             ~ClientHandle();
 
             /**

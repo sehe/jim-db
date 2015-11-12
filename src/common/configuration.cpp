@@ -27,7 +27,7 @@
 #include "assert.h"
 #include <iostream>
 #include <rapidjson/stringbuffer.h>
-#include <rapidjson/PrettyWriter.h>
+#include <rapidjson/prettywriter.h>
 
 namespace jimdb
 {

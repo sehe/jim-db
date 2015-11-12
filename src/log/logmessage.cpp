@@ -66,7 +66,7 @@ namespace jimdb
             m_stream << other.m_stream.str();
         }
 
-        LogMessage::LogMessage(LogMessage&& other) : m_stream(std::move(other.m_stream)), m_type(other.m_type) {}
+        //LogMessage::LogMessage(LogMessage&& other) : m_stream(std::move(other.m_stream)), m_type(other.m_type) {}
 
         LogMessage& LogMessage::operator=(const LogMessage& other)
         {
@@ -77,13 +77,13 @@ namespace jimdb
             return *this;
         }
 
-        LogMessage& LogMessage::operator=(LogMessage&& other)
-        {
-            if (this == &other)
-                return *this;
-            m_stream = std::move(other.m_stream);
-            m_type = other.m_type;
-            return *this;
-        }
+        //LogMessage& LogMessage::operator=(LogMessage&& other)
+        //{
+            //if (this == &other)
+                //return *this;
+            //m_stream = std::move(other.m_stream);
+            //m_type = other.m_type;
+            //return *this;
+        //}
     }
 }

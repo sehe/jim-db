@@ -20,6 +20,7 @@
 **/
 
 #pragma once
+#include <string.h>
 #include "rapidjson/document.h"
 
 namespace jimdb
@@ -57,4 +58,4 @@ namespace jimdb
 
     }
 }
-#include "Message.hpp"
+#include "message.hpp"

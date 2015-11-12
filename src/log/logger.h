@@ -27,9 +27,11 @@
 #include <mutex>
 #include <iostream>
 //custom macro for filename shorten but only for windows
+#ifdef _WIN32
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
-//LINUX
-//#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#else
+#define __FILENAME__ __FILE__
+#endif
 
 #define LOG_ERROR jimdb::common::Logger::Log(jimdb::common::LoggerTypes::ERROR_L,__FILENAME__,__LINE__)
 #define LOG_INFO jimdb::common::Logger::Log(jimdb::common::LoggerTypes::INFO,__FILENAME__,__LINE__)
