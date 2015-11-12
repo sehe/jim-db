@@ -100,6 +100,14 @@ int main(int argc, char* argv[])
     using namespace jimdb::memorymanagement;
     Page page(32u<<10, 32u<<10);
     page.insert(d);
+    page.insert(d);
+    page.insert(d);
+    page.insert(d);
+    page.insert(d);
+    page.insert(d);
+    page.insert(d);
+
+
 #if 0
     //logger can be at init using the startup log
     auto& args = jimdb::common::CmdArgs::getInstance();
