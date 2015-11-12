@@ -33,9 +33,9 @@ import Utilities
 
 conf.env.Replace(CPPDEFINES  = ["JIMDB_WINDOWS"])
 #conf.env.Replace(CPPFLAGS    = ["-std=c++14", "-stdlib=libc++"])
-conf.env.Replace(CPPFLAGS    = ["-std=c++14", "-pthread"])
+conf.env.Replace(CPPFLAGS    = ["-std=c++14", "-pthread", "-fsanitize=undefined"])
 #conf.env.Replace(LINKFLAGS   = ["-stdlib=libc++", "-pthread"])
-conf.env.Replace(LINKFLAGS   = ["-pthread"])
+conf.env.Replace(LINKFLAGS   = ["-pthread", "-fsanitize=undefined"])
 
 if conf.env["buildtype"] == "release" :
     conf.env.AppendUnique(CPPDEFINES     = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "JIMDB_NDEBUG"])

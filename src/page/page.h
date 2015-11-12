@@ -92,8 +92,8 @@ namespace jimdb
         private:
             static int64_t m_objCount;
             //const voidptr to memory to static cast as we like
-            void* const m_header;
-            void* const m_body;
+            char* const m_header;
+            char* const m_body;
 
             /**############################################
             * private methods for body

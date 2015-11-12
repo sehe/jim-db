@@ -33,7 +33,7 @@ static constexpr int WSAECONNRESET = -2;
 void setsockopt(SOCKET, int, int, char const*, size_t);
 void closesocket(SOCKET);
 int send(SOCKET, char const*, int, int) ;
-int WSAGetLastError();
+size_t WSAGetLastError();
 size_t recv(SOCKET, char*, size_t, int);
 
 //size of the number in front of a message

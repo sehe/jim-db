@@ -59,40 +59,44 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
 int main(int argc, char* argv[])
 {
-#if 1
+#if 0
     const char* json = R"(
+    {
         "Person": {
             "age": 25,
-            "double": 23.23,
-            "boolean": true,
-            "double2": 23.23,
-            "firstInnerObj": {
-                "innerDoub": 12.12
-            }
+                "double": 23.23,
+                "boolean": true,
+                "double2": 23.23,
+                "firstInnerObj": {
+                    "innerDoub": 12.12
+                }
         }
+    }
     )";
 #else
     const char* json = R"(
+    {
         "Person":
         {
             "age":25,
-            "double": 23.23,
-            "boolean": true,
-            "double2": 23.23,
-            "firstInnerObj":{
-                "innerDoub": 12.12
-            },
-            "secondInnerObj":{
-                "secInnerDoub": 12.12
-            }
+                "double": 23.23,
+                "boolean": true,
+                "double2": 23.23,
+                "firstInnerObj":{
+                    "innerDoub": 12.12
+                },
+                "secondInnerObj":{
+                    "secInnerDoub": 12.12
+                }
         }
+    }
     )";
 #endif
     rapidjson::Document d;
     d.Parse(json);
 
     std::cout << "Sample JSON parsed\n";
-
+    assert(d.IsObject());
     using namespace jimdb::memorymanagement;
     Page page(32u<<10, 32u<<10);
     page.insert(d);

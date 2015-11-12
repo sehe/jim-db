@@ -26,7 +26,7 @@
 void setsockopt(SOCKET, int, int, char const*, size_t) {}
 void closesocket(SOCKET) {}
 int send(SOCKET, char const*, int, int) {return -1;}
-int WSAGetLastError(){return -1;}
+size_t WSAGetLastError(){return -1;}
 size_t recv(SOCKET, char*, size_t, int){return -1;}
 #define MESSAGE_SIZE 8
 namespace jimdb
