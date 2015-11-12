@@ -31,6 +31,7 @@ of memory and allow to querry them.
 #include <iostream>
 static std::ostream& LOG_DEBUG = std::clog;
 
+#if 0
 #include "network/tcpserver.h"
 #include "log/logger.h"
 #include <thread>
@@ -41,6 +42,10 @@ static std::ostream& LOG_DEBUG = std::clog;
 #include "thread/worker.h"
 #pragma comment(lib,"user32.lib")
 #include <vector>
+#else
+#include "page/page.h"
+
+#endif
 
 using BOOL = bool;
 using DWORD = uint32_t;
@@ -54,6 +59,44 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent);
 
 int main(int argc, char* argv[])
 {
+#if 1
+    const char* json = R"(
+        "Person": {
+            "age": 25,
+            "double": 23.23,
+            "boolean": true,
+            "double2": 23.23,
+            "firstInnerObj": {
+                "innerDoub": 12.12
+            }
+        }
+    )";
+#else
+    const char* json = R"(
+        "Person":
+        {
+            "age":25,
+            "double": 23.23,
+            "boolean": true,
+            "double2": 23.23,
+            "firstInnerObj":{
+                "innerDoub": 12.12
+            },
+            "secondInnerObj":{
+                "secInnerDoub": 12.12
+            }
+        }
+    )";
+#endif
+    rapidjson::Document d;
+    d.Parse(json);
+
+    std::cout << "Sample JSON parsed\n";
+
+    using namespace jimdb::memorymanagement;
+    Page page(32u<<10, 32u<<10);
+    page.insert(d);
+#if 0
     //logger can be at init using the startup log
     auto& args = jimdb::common::CmdArgs::getInstance();
     args.init(argc, argv);
@@ -153,6 +196,8 @@ int main(int argc, char* argv[])
     {
         tcpServer->accept(true); //call accept blocking
     }
+#else
+#endif
 }
 
 BOOL WINAPI ConsoleHandler(DWORD CEvent)
